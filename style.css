@@ -541,5 +541,582 @@ body {
     .section-title {
         font-size: 20px;
     }
+
+    .main-content {
+        margin-top: 80px;
+    }
+
+    .content-section {
+        padding: 0;
+    }
+}
+
+/* Guide Section - Modern Dark Theme */
+.guide-section {
+    padding: 4rem 0;
+    color: #fff;
+}
+
+.guide-container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 3rem 20px;
+    background-color: #000;
+    border-radius: 12px;
+}
+
+.guide-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2rem;
+    position: relative;
+    padding-left: 1rem;
+    border-left: 4px solid #00d4ff;
+}
+
+.notice-main-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #fff;
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #333;
+}
+
+/* Error Guide */
+.error-guide {
+    margin-bottom: 4rem;
+}
+
+.error-list-modern {
+    list-style: none;
+    padding-left: 0;
+    margin: 1.5rem 0;
+}
+
+.error-list-modern li {
+    font-size: 18px;
+    color: #fff;
+    padding: 1rem 1.5rem;
+    margin-bottom: 0.75rem;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    border-left: 4px solid #ff6b6b;
+    border-radius: 6px;
+    position: relative;
+    padding-left: 3rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.error-list-modern li:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.error-list-modern li:before {
+    content: "⚠";
+    position: absolute;
+    left: 1rem;
+    font-size: 20px;
+}
+
+.solution-modern {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 2px solid #00d4ff;
+    margin-top: 2rem;
+    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+}
+
+.solution-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #00d4ff;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.solution-title:before {
+    content: "→";
+    font-size: 24px;
+}
+
+.solution-steps {
+    list-style: none;
+    padding-left: 0;
+    margin: 1.5rem 0;
+}
+
+.solution-steps li {
+    font-size: 18px;
+    color: #fff;
+    padding: 1rem 1.5rem;
+    margin-bottom: 0.75rem;
+    background-color: rgba(0, 212, 255, 0.1);
+    border-left: 4px solid #00d4ff;
+    border-radius: 6px;
+    position: relative;
+    padding-left: 3rem;
+}
+
+.solution-steps li:before {
+    content: counter(step-counter);
+    counter-increment: step-counter;
+    position: absolute;
+    left: 1rem;
+    width: 28px;
+    height: 28px;
+    background-color: #00d4ff;
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.solution-steps {
+    counter-reset: step-counter;
+}
+
+.solution-note {
+    font-size: 16px;
+    color: #aaa;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border-left: 3px solid #ffa500;
+}
+
+/* Notice Guide */
+.notice-guide {
+    margin-bottom: 4rem;
+}
+
+.notice-card {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    border-radius: 12px;
+    border-left: 4px solid #ffa500;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.notice-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 165, 0, 0.2);
+}
+
+.notice-number {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+}
+
+.notice-content h4 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.notice-content p {
+    font-size: 16px;
+    color: #ddd;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+}
+
+.quote-modern {
+    font-style: italic;
+    color: #00d4ff;
+    background-color: rgba(0, 212, 255, 0.1);
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    border-left: 3px solid #00d4ff;
+}
+
+.notice-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 1rem 0;
+}
+
+.notice-list li {
+    font-size: 16px;
+    color: #ddd;
+    line-height: 1.8;
+    margin-bottom: 0.75rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.notice-list li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #00d4ff;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.warning-modern {
+    color: #ff6b6b;
+    font-weight: 600;
+    padding: 1rem;
+    background-color: rgba(255, 107, 107, 0.1);
+    border-radius: 6px;
+    border-left: 3px solid #ff6b6b;
+    margin: 1rem 0;
+}
+
+/* Recommendation Guide */
+.recommendation-guide {
+    margin-bottom: 4rem;
+}
+
+.recommendation-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #333;
+}
+
+.recommendation-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 2px solid #00ff88;
+    box-shadow: 0 8px 24px rgba(0, 255, 136, 0.2);
+}
+
+.recommendation-subtitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #00ff88;
+    margin-bottom: 1.5rem;
+}
+
+.recommendation-card p {
+    font-size: 16px;
+    color: #ddd;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+}
+
+.note-box {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border-left: 4px solid #00d4ff;
+}
+
+.note-box p {
+    font-size: 15px;
+    color: #bbb;
+    line-height: 1.8;
+    margin-bottom: 0.75rem;
+}
+
+.note-box p:last-child {
+    margin-bottom: 0;
+}
+
+/* Settings Guide */
+.settings-guide {
+    margin-bottom: 2rem;
+}
+
+.settings-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #333;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.setting-item {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 2px solid #6366f1;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.setting-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+}
+
+.setting-item h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #6366f1;
+    margin-bottom: 0.75rem;
+}
+
+.setting-item p {
+    font-size: 15px;
+    color: #ddd;
+    line-height: 1.6;
+}
+
+.final-warning {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 2rem;
+}
+
+/* Responsive for Guide Section */
+@media (max-width: 768px) {
+    .guide-section {
+        padding: 2rem 0;
+    }
+
+    .guide-container {
+        padding: 2rem 15px;
+        border-radius: 0;
+        margin: 0 15px;
+    }
+
+    .guide-title {
+        font-size: 20px;
+        margin-bottom: 1.5rem;
+        padding-left: 0.75rem;
+        border-left-width: 3px;
+    }
+
+    .notice-main-title {
+        font-size: 20px;
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .error-guide {
+        margin-bottom: 3rem;
+    }
+
+    .error-list-modern li {
+        font-size: 16px;
+        padding: 0.875rem 1rem;
+        padding-left: 2.5rem;
+    }
+
+    .error-list-modern li:before {
+        left: 0.75rem;
+        font-size: 18px;
+    }
+
+    .solution-modern {
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .solution-title {
+        font-size: 18px;
+        margin-bottom: 1rem;
+    }
+
+    .solution-steps li {
+        font-size: 16px;
+        padding: 0.875rem 1rem;
+        padding-left: 2.5rem;
+    }
+
+    .solution-steps li:before {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        left: 0.75rem;
+    }
+
+    .solution-note {
+        font-size: 14px;
+        padding: 0.875rem;
+        margin-top: 1rem;
+    }
+
+    .notice-guide {
+        margin-bottom: 3rem;
+    }
+
+    .notice-card {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .notice-number {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .notice-content h4 {
+        font-size: 18px;
+    }
+
+    .notice-content p {
+        font-size: 15px;
+    }
+
+    .quote-modern {
+        font-size: 14px;
+        padding: 0.875rem;
+    }
+
+    .notice-list li {
+        font-size: 15px;
+        padding-left: 1.25rem;
+    }
+
+    .warning-modern {
+        font-size: 14px;
+        padding: 0.875rem;
+    }
+
+    .recommendation-guide {
+        margin-bottom: 3rem;
+    }
+
+    .recommendation-title {
+        font-size: 20px;
+        margin-bottom: 1.5rem;
+    }
+
+    .recommendation-card {
+        padding: 1.5rem;
+    }
+
+    .recommendation-subtitle {
+        font-size: 18px;
+        margin-bottom: 1rem;
+    }
+
+    .recommendation-card p {
+        font-size: 15px;
+    }
+
+    .note-box {
+        padding: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .note-box p {
+        font-size: 14px;
+    }
+
+    .settings-guide {
+        margin-bottom: 1.5rem;
+    }
+
+    .settings-title {
+        font-size: 20px;
+        margin-bottom: 1.5rem;
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .setting-item {
+        padding: 1.25rem;
+    }
+
+    .setting-item h4 {
+        font-size: 16px;
+    }
+
+    .setting-item p {
+        font-size: 14px;
+    }
+
+    .final-warning {
+        font-size: 16px;
+        margin-top: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .guide-section {
+        padding: 1.5rem 0;
+    }
+
+    .guide-container {
+        padding: 1.5rem 12px;
+        margin: 0 10px;
+    }
+
+    .guide-title {
+        font-size: 18px;
+        margin-bottom: 1.25rem;
+    }
+
+    .notice-main-title {
+        font-size: 18px;
+    }
+
+    .error-list-modern li {
+        font-size: 15px;
+        padding: 0.75rem 0.875rem;
+        padding-left: 2.25rem;
+    }
+
+    .solution-modern {
+        padding: 1.25rem;
+    }
+
+    .solution-title {
+        font-size: 16px;
+    }
+
+    .solution-steps li {
+        font-size: 15px;
+        padding: 0.75rem 0.875rem;
+        padding-left: 2.25rem;
+    }
+
+    .notice-card {
+        padding: 1.25rem;
+    }
+
+    .recommendation-card {
+        padding: 1.25rem;
+    }
+
+    .setting-item {
+        padding: 1rem;
+    }
 }
 
