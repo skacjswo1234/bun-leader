@@ -58,6 +58,7 @@ export async function onRequest(context) {
       .run();
 
       // 텔레그램 알림 전송 (band-program 사이트인 경우만)
+      let telegramStatus = null;
       if (site_id === 'band-program') {
         const telegramBotToken = env.TELEGRAM_BOT_TOKEN;
         const telegramChatId = env.TELEGRAM_CHAT_ID;
@@ -78,30 +79,44 @@ export async function onRequest(context) {
           console.log('[Telegram] 알림 메시지 생성 완료');
           console.log('[Telegram] 메시지 내용:', notificationMessage.substring(0, 100) + '...');
           
-          // 비동기로 전송 (응답을 기다리지 않음)
-          sendTelegramMessage(telegramBotToken, telegramChatId, notificationMessage)
-            .then(success => {
-              if (success) {
-                console.log('[Telegram] ✅ 알림 전송 성공');
-              } else {
-                console.error('[Telegram] ❌ 알림 전송 실패 - API 응답 오류');
-              }
-            })
-            .catch(error => {
-              console.error('[Telegram] ❌ 알림 전송 실패:', error);
-              console.error('[Telegram] 에러 상세:', error.message || error);
-            });
+          // 텔레그램 전송 시도 (응답을 기다림)
+          try {
+            const telegramSuccess = await sendTelegramMessage(telegramBotToken, telegramChatId, notificationMessage);
+            if (telegramSuccess) {
+              console.log('[Telegram] ✅ 알림 전송 성공');
+              telegramStatus = 'success';
+            } else {
+              console.error('[Telegram] ❌ 알림 전송 실패 - API 응답 오류');
+              telegramStatus = 'failed';
+            }
+          } catch (error) {
+            console.error('[Telegram] ❌ 알림 전송 실패:', error);
+            console.error('[Telegram] 에러 상세:', error.message || error);
+            telegramStatus = 'error';
+          }
         } else {
           console.warn('[Telegram] ⚠️ 환경 변수가 설정되지 않음 - BOT_TOKEN 또는 CHAT_ID가 없습니다');
           console.warn('[Telegram] 사용 가능한 환경 변수:', Object.keys(env).filter(key => key.includes('TELEGRAM') || key.includes('telegram')));
+          telegramStatus = 'not_configured';
         }
       } else {
         console.log('[Telegram] 알림 전송 건너뜀 - site_id:', site_id, '(band-program이 아님)');
+        telegramStatus = 'skipped';
       }
 
       return new Response(JSON.stringify({ 
         success: true,
-        id: result.meta.last_row_id 
+        id: result.meta.last_row_id,
+        telegram: {
+          sent: telegramStatus === 'success',
+          status: telegramStatus,
+          message: telegramStatus === 'success' ? '텔레그램 알림이 전송되었습니다.' :
+                   telegramStatus === 'failed' ? '텔레그램 알림 전송에 실패했습니다.' :
+                   telegramStatus === 'error' ? '텔레그램 알림 전송 중 오류가 발생했습니다.' :
+                   telegramStatus === 'not_configured' ? '텔레그램 알림이 설정되지 않았습니다.' :
+                   telegramStatus === 'skipped' ? '텔레그램 알림 대상이 아닙니다.' :
+                   '알 수 없음'
+        }
       }), {
         status: 201,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

@@ -322,7 +322,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (result.success) {
                     console.log('[문의 폼] ✅ 문의 접수 성공 - ID:', result.id);
-                    console.log('[문의 폼] 💡 텔레그램 알림 전송 여부는 Cloudflare Dashboard Logs에서 확인하세요');
+                    
+                    // 텔레그램 전송 상태 확인
+                    if (result.telegram) {
+                        if (result.telegram.sent) {
+                            console.log('[문의 폼] 📱 텔레그램 알림: ✅ 전송 성공');
+                            console.log('[문의 폼] 📱 텔레그램 상태:', result.telegram.message);
+                        } else {
+                            console.warn('[문의 폼] 📱 텔레그램 알림: ❌ 전송 실패');
+                            console.warn('[문의 폼] 📱 텔레그램 상태:', result.telegram.status, '-', result.telegram.message);
+                        }
+                    } else {
+                        console.log('[문의 폼] 📱 텔레그램 알림 정보 없음');
+                    }
+                    
                     showModal('문의 접수 완료', '문의가 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
                     inquiryForm.reset();
                 } else {
