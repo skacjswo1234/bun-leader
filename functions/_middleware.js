@@ -33,9 +33,12 @@ export async function onRequest(context) {
 
   // 루트 경로 처리
   if (url.pathname === '/' || url.pathname === '') {
-    // 도메인 매핑이 있으면 해당 사이트로, 없으면 기본 사이트(band-program)로
-    const targetSite = siteId || 'band-program';
-    return Response.redirect(`${url.origin}/sites/${targetSite}/`, 301);
+    // 도메인 매핑이 있으면 해당 사이트로 리다이렉트
+    // 없으면 루트 index.html (사이트 허브) 표시
+    if (siteId) {
+      return Response.redirect(`${url.origin}/sites/${siteId}/`, 301);
+    }
+    // 도메인 매핑이 없으면 기본 index.html 표시 (next()로 계속 진행)
   }
 
   // 매핑된 도메인이 있고, /sites/ 경로가 아닌 경우
