@@ -8,7 +8,8 @@ export async function onRequest(context) {
   const { request, env, params } = context;
   const url = new URL(request.url);
   const method = request.method;
-  const path = params.path || '';
+  // path가 배열일 수 있으므로 문자열로 변환
+  const path = Array.isArray(params.path) ? params.path.join('/') : (params.path || '');
 
   // CORS preflight 처리
   if (method === 'OPTIONS') {
