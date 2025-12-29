@@ -11,7 +11,7 @@
         <header class="admin-header">
             <div class="header-top">
                 <div class="logo-container">
-                    <img src="/sites/band-program/logo.png" alt="분양리더 로고" class="header-logo">
+                    <img src="/logo-white.png" alt="분양리더 로고" class="header-logo">
                 </div>
                 <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기">
                     <span class="menu-icon">☰</span>
@@ -59,6 +59,7 @@
                             <option value="completed">처리 완료</option>
                         </select>
                         <button class="refresh-btn" id="refreshBtn">새로고침</button>
+                        <button class="refresh-btn" id="logoutBtn" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.3); color: #FCA5A5;">로그아웃</button>
                     </div>
                 </div>
 
@@ -90,6 +91,26 @@
     </div>
 
     <script src="scripts/admin.js"></script>
+    <script>
+        // 로그인 체크
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/admin/stats');
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/admin/login.html';
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = '/admin/login.html';
+            }
+        }
+
+        // 페이지 로드 시 로그인 체크
+        checkLogin();
+    </script>
 </body>
 </html>
 

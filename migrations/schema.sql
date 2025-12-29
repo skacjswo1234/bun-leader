@@ -35,6 +35,14 @@ CREATE TABLE IF NOT EXISTS site_fields (
     UNIQUE(site_id, field_name)
 );
 
+CREATE TABLE IF NOT EXISTS admins (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_inquiries_site_id ON inquiries(site_id);
 CREATE INDEX IF NOT EXISTS idx_inquiries_status ON inquiries(status);
 CREATE INDEX IF NOT EXISTS idx_inquiries_created_at ON inquiries(created_at);
@@ -45,3 +53,6 @@ INSERT OR IGNORE INTO sites (id, name, domain) VALUES
 
 INSERT OR IGNORE INTO site_fields (site_id, field_name, field_label, field_type, field_options, is_required, display_order) VALUES
     ('band-program', 'product_type', '상품유형', 'select', '["베이직(100만원)", "프리미엄(200만원)", "VIP(300만원)"]', 1, 1);
+
+INSERT OR IGNORE INTO admins (username, password) VALUES
+    ('admin', 'admin123');

@@ -79,6 +79,27 @@ document.addEventListener('DOMContentLoaded', () => {
         loadStats();
         loadInquiries();
     });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        if (!confirm('로그아웃 하시겠습니까?')) return;
+
+        try {
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                window.location.href = '/admin/login.html';
+            } else {
+                alert('로그아웃에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('오류가 발생했습니다.');
+        }
+    });
 });
 
 // 통계 로드

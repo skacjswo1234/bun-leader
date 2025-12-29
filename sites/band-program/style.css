@@ -493,6 +493,107 @@ body {
     font-size: 14px;
 }
 
+/* 우측 하단 고정 버튼 */
+.fixed-buttons {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fixed-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: #fff;
+}
+
+.phone-btn {
+    background: linear-gradient(135deg, #03C75A 0%, #02b350 100%);
+}
+
+.phone-btn:hover {
+    background: linear-gradient(135deg, #02b350 0%, #03C75A 100%);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(3, 199, 90, 0.4);
+}
+
+.top-btn {
+    background: linear-gradient(135deg, #666 0%, #555 100%);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+}
+
+.top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.top-btn:hover {
+    background: linear-gradient(135deg, #555 0%, #444 100%);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.top-btn.show:hover {
+    transform: translateY(-3px) scale(1.05);
+}
+
+.fixed-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .fixed-buttons {
+        bottom: 20px;
+        right: 20px;
+        gap: 10px;
+    }
+
+    .fixed-btn {
+        width: 50px;
+        height: 50px;
+    }
+
+    .fixed-btn svg {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .fixed-buttons {
+        bottom: 15px;
+        right: 15px;
+        gap: 8px;
+    }
+
+    .fixed-btn {
+        width: 48px;
+        height: 48px;
+    }
+
+    .fixed-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .header-container {

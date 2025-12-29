@@ -51,3 +51,25 @@ menuLinks.forEach(link => {
     });
 });
 
+// Top 버튼 기능
+const topBtn = document.getElementById('topBtn');
+
+if (topBtn) {
+    // 스크롤 시 Top 버튼 표시/숨김
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            topBtn.classList.add('show');
+        } else {
+            topBtn.classList.remove('show');
+        }
+    });
+
+    // Top 버튼 클릭 시 맨 위로 스크롤
+    topBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+

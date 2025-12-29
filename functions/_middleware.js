@@ -12,8 +12,13 @@ export async function onRequest(context) {
     return next();
   }
 
-  // 관리자 화면은 그대로 통과
+  // 관리자 화면 처리
   if (url.pathname.startsWith('/admin/')) {
+    // 로그인 페이지는 인증 체크 없이 통과
+    if (url.pathname === '/admin/login.html' || url.pathname === '/admin/') {
+      return next();
+    }
+    // 다른 관리자 페이지는 인증 체크 (클라이언트 사이드에서 처리)
     return next();
   }
 
@@ -23,10 +28,11 @@ export async function onRequest(context) {
   }
 
   // 도메인별 사이트 매핑
+  // 별도 도메인으로 접속 시 해당 사이트로 자동 리다이렉트
   const domainMapping = {
     'band-program.com': 'band-program',
     'www.band-program.com': 'band-program',
-    'xn--9m1b22at9hd2c62blxw.com': 'band-program',
+    'xn--9m1b22at9hd2c62blxw.com': 'band-program',  // band-program 전용 도메인
     'www.xn--9m1b22at9hd2c62blxw.com': 'band-program',
   };
 
@@ -35,12 +41,12 @@ export async function onRequest(context) {
 
   // 루트 경로 처리
   if (url.pathname === '/' || url.pathname === '') {
-    // 도메인 매핑이 있으면 해당 사이트로 리다이렉트
-    // 없으면 루트 index.html (사이트 허브) 표시
+    // 별도 도메인으로 접속한 경우 해당 사이트로 리다이렉트
     if (siteId) {
       return Response.redirect(`${url.origin}/sites/${siteId}/`, 301);
     }
-    // 도메인 매핑이 없으면 기본 index.html 표시 (next()로 계속 진행)
+    // 루트 도메인은 허브(index.html) 표시
+    // next()로 계속 진행하여 루트 index.html 표시
   }
 
   // 매핑된 도메인이 있고, /sites/ 경로가 아닌 경우
@@ -51,6 +57,16 @@ export async function onRequest(context) {
       ? `/sites/${siteId}${url.pathname}`
       : `/sites/${siteId}/${url.pathname}`;
     return Response.redirect(`${url.origin}${newPath}`, 301);
+  }
+
+  // 디렉토리 경로를 index.html로 명시적 리다이렉트
+  // 예: /sites/band-program/ → /sites/band-program/index.html
+  if (url.pathname.endsWith('/') && url.pathname !== '/') {
+    const pathWithoutTrailingSlash = url.pathname.slice(0, -1);
+    // 이미 index.html로 끝나지 않는 경우에만 리다이렉트
+    if (!url.pathname.endsWith('/index.html')) {
+      return Response.redirect(`${url.origin}${pathWithoutTrailingSlash}/index.html`, 301);
+    }
   }
 
   // 기본 동작 (기존 파일 서빙)
