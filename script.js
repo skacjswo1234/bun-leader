@@ -30,15 +30,23 @@ document.addEventListener('keydown', (e) => {
 const menuLinks = document.querySelectorAll('.menu-list a');
 menuLinks.forEach(link => {
     link.addEventListener('click', (e) => {
-        e.preventDefault();
         const targetId = link.getAttribute('href');
-        const targetSection = document.querySelector(targetId);
         
-        if (targetSection) {
+        // 같은 페이지 내 섹션 이동인 경우 (#으로 시작)
+        if (targetId && targetId.startsWith('#')) {
+            e.preventDefault();
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                closeMenu();
+                setTimeout(() => {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
+        } else {
+            // 다른 페이지로 이동하는 경우 - 메뉴만 닫고 정상 이동 허용
             closeMenu();
-            setTimeout(() => {
-                targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 300);
+            // preventDefault()를 호출하지 않아서 정상적으로 페이지 이동됨
         }
     });
 });
