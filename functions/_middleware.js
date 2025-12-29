@@ -26,6 +26,8 @@ export async function onRequest(context) {
   const domainMapping = {
     'band-program.com': 'band-program',
     'www.band-program.com': 'band-program',
+    'xn--9m1b22at9hd2c62blxw.com': 'band-program',
+    'www.xn--9m1b22at9hd2c62blxw.com': 'band-program',
   };
 
   // 도메인에 매핑된 사이트 찾기

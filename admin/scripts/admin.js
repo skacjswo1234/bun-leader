@@ -136,13 +136,31 @@ function displayInquiries(inquiries) {
         return;
     }
 
-    tbody.innerHTML = inquiries.map(inquiry => `
+    tbody.innerHTML = inquiries.map(inquiry => {
+        // custom_fields 파싱
+        let customFields = {};
+        if (inquiry.custom_fields) {
+            try {
+                customFields = typeof inquiry.custom_fields === 'string' 
+                    ? JSON.parse(inquiry.custom_fields) 
+                    : inquiry.custom_fields;
+            } catch (e) {
+                console.error('Failed to parse custom_fields:', e);
+            }
+        }
+
+        // 문의 타입 추출 (페이지 경로나 다른 방법으로 판단)
+        // 현재는 custom_fields에서 추출하거나 기본값 사용
+        const inquiryType = getInquiryType(inquiry, customFields);
+        const productType = customFields.product_type || customFields.productType || '-';
+
+        return `
         <tr>
             <td>${inquiry.id}</td>
-            <td><span class="inquiry-type-badge">${escapeHtml(inquiry.inquiry_type || '-')}</span></td>
+            <td><span class="inquiry-type-badge">${escapeHtml(inquiryType)}</span></td>
             <td>${escapeHtml(inquiry.name)}</td>
             <td>${escapeHtml(inquiry.contact)}</td>
-            <td>${escapeHtml(inquiry.product_type || '-')}</td>
+            <td>${escapeHtml(productType)}</td>
             <td><span class="status-badge ${inquiry.status}">${getStatusText(inquiry.status)}</span></td>
             <td>${formatDate(inquiry.created_at)}</td>
             <td>
@@ -157,7 +175,30 @@ function displayInquiries(inquiries) {
                 </div>
             </td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
+}
+
+// 문의 타입 추출 함수
+function getInquiryType(inquiry, customFields) {
+    // custom_fields에서 inquiry_type 찾기
+    if (customFields.inquiry_type) {
+        return customFields.inquiry_type;
+    }
+    
+    // product_type으로 판단 (fallback)
+    const productType = customFields.product_type || customFields.productType;
+    if (productType) {
+        if (productType.includes('밴드홍보대행') || productType.includes('베이직') || productType.includes('프리미엄') || productType.includes('VIP')) {
+            return '밴드홍보대행';
+        }
+        if (productType.includes('프로그램') || productType.includes('일반버전') || productType.includes('프로버전')) {
+            return '밴드프로그램판매';
+        }
+    }
+    
+    // 기본값
+    return '-';
 }
 
 // 페이지네이션 표시

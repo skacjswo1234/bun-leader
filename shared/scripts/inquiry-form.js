@@ -263,6 +263,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 커스텀 필드 수집 (productType 등)
             const customFields = {};
+            
+            // 문의 타입 추가
+            if (INQUIRY_TYPE) {
+                customFields.inquiry_type = INQUIRY_TYPE;
+            }
+            
             const productType = document.getElementById('productType')?.value;
             if (productType) {
                 customFields.product_type = productType;
