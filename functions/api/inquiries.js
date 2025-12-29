@@ -62,6 +62,9 @@ export async function onRequest(context) {
         const telegramBotToken = env.TELEGRAM_BOT_TOKEN;
         const telegramChatId = env.TELEGRAM_CHAT_ID;
         
+        console.log('[Telegram] 알림 전송 시도 - site_id:', site_id);
+        console.log('[Telegram] 환경 변수 확인 - BOT_TOKEN:', telegramBotToken ? '설정됨' : '없음', 'CHAT_ID:', telegramChatId ? '설정됨' : '없음');
+        
         if (telegramBotToken && telegramChatId) {
           const inquiryData = {
             site_id,
@@ -72,13 +75,28 @@ export async function onRequest(context) {
           };
           
           const notificationMessage = formatInquiryNotification(inquiryData);
+          console.log('[Telegram] 알림 메시지 생성 완료');
+          console.log('[Telegram] 메시지 내용:', notificationMessage.substring(0, 100) + '...');
           
           // 비동기로 전송 (응답을 기다리지 않음)
           sendTelegramMessage(telegramBotToken, telegramChatId, notificationMessage)
+            .then(success => {
+              if (success) {
+                console.log('[Telegram] ✅ 알림 전송 성공');
+              } else {
+                console.error('[Telegram] ❌ 알림 전송 실패 - API 응답 오류');
+              }
+            })
             .catch(error => {
-              console.error('Telegram notification failed:', error);
+              console.error('[Telegram] ❌ 알림 전송 실패:', error);
+              console.error('[Telegram] 에러 상세:', error.message || error);
             });
+        } else {
+          console.warn('[Telegram] ⚠️ 환경 변수가 설정되지 않음 - BOT_TOKEN 또는 CHAT_ID가 없습니다');
+          console.warn('[Telegram] 사용 가능한 환경 변수:', Object.keys(env).filter(key => key.includes('TELEGRAM') || key.includes('telegram')));
         }
+      } else {
+        console.log('[Telegram] 알림 전송 건너뜀 - site_id:', site_id, '(band-program이 아님)');
       }
 
       return new Response(JSON.stringify({ 

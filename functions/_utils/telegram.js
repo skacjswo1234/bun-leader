@@ -12,34 +12,46 @@
  */
 export async function sendTelegramMessage(botToken, chatId, message) {
   if (!botToken || !chatId) {
-    console.error('Telegram: Missing botToken or chatId');
+    console.error('[Telegram] Missing botToken or chatId');
+    console.error('[Telegram] botToken:', botToken ? '있음' : '없음', 'chatId:', chatId ? '있음' : '없음');
     return false;
   }
 
   try {
     const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    console.log('[Telegram] API 요청 시작 - URL:', url.replace(botToken, 'BOT_TOKEN_HIDDEN'));
+    console.log('[Telegram] 요청 데이터 - chatId:', chatId, 'message 길이:', message.length);
+    
+    const requestBody = {
+      chat_id: chatId,
+      text: message,
+      parse_mode: 'HTML', // HTML 형식 지원
+    };
     
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        parse_mode: 'HTML', // HTML 형식 지원
-      }),
+      body: JSON.stringify(requestBody),
     });
+
+    console.log('[Telegram] API 응답 상태:', response.status, response.statusText);
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('Telegram API Error:', errorData);
+      console.error('[Telegram] API 오류 응답:', JSON.stringify(errorData, null, 2));
       return false;
     }
 
+    const responseData = await response.json();
+    console.log('[Telegram] API 성공 응답:', JSON.stringify(responseData, null, 2));
     return true;
   } catch (error) {
-    console.error('Telegram send error:', error);
+    console.error('[Telegram] 요청 중 예외 발생:', error);
+    console.error('[Telegram] 에러 타입:', error.constructor.name);
+    console.error('[Telegram] 에러 메시지:', error.message);
+    console.error('[Telegram] 에러 스택:', error.stack);
     return false;
   }
 }
