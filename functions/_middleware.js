@@ -2,6 +2,8 @@
  * Pages Functions Middleware
  * 도메인별로 다른 사이트를 라우팅
  */
+import { checkAuth } from './_utils/auth.js';
+
 export async function onRequest(context) {
   const { request, next, env } = context;
   const url = new URL(request.url);
@@ -15,10 +17,16 @@ export async function onRequest(context) {
   // 관리자 화면 처리
   if (url.pathname.startsWith('/admin/')) {
     // 로그인 페이지는 인증 체크 없이 통과
-    if (url.pathname === '/admin/login.html' || url.pathname === '/admin/') {
+    if (url.pathname === '/admin/login.html' || url.pathname === '/admin/login') {
       return next();
     }
-    // 다른 관리자 페이지는 인증 체크 (클라이언트 사이드에서 처리)
+    
+    // 다른 관리자 페이지는 인증 체크
+    if (!checkAuth(request)) {
+      // 미인증 시 로그인 페이지로 리다이렉트
+      return Response.redirect(`${url.origin}/admin/login.html`, 302);
+    }
+    
     return next();
   }
 
