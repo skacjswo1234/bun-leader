@@ -192,16 +192,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json();
 
-            if (result.success) {
+            if (response.ok && result.success) {
                 alert('비밀번호가 성공적으로 변경되었습니다.');
                 document.getElementById('passwordChangeForm').reset();
                 cancelPasswordChange.click(); // 취소 버튼 클릭하여 섹션 닫기
             } else {
-                alert(result.error || '비밀번호 변경에 실패했습니다.');
+                // 401 에러 또는 기타 에러 처리
+                const errorMessage = result.error || result.message || '비밀번호 변경에 실패했습니다.';
+                alert(errorMessage);
             }
         } catch (error) {
             console.error('Password change error:', error);
-            alert('오류가 발생했습니다.');
+            alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;

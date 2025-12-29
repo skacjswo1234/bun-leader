@@ -16,6 +16,13 @@ export async function onRequest(context) {
 
   // 관리자 화면 처리
   if (url.pathname.startsWith('/admin/')) {
+    // 정적 리소스(styles, scripts)는 인증 체크 없이 통과
+    if (url.pathname.startsWith('/admin/styles/') || 
+        url.pathname.startsWith('/admin/scripts/') ||
+        url.pathname.startsWith('/admin/images/')) {
+      return next();
+    }
+    
     // 로그인 페이지는 인증 체크 없이 통과
     if (url.pathname === '/admin/login.html' || url.pathname === '/admin/login') {
       return next();
