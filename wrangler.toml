@@ -1,0 +1,17 @@
+# Cloudflare Pages Functions 설정
+# Pages Functions는 자동으로 functions/ 폴더를 인식합니다
+
+name = "bun-leader"
+compatibility_date = "2024-01-01"
+
+# D1 데이터베이스 바인딩
+# Pages 대시보드에서 환경 변수로 설정하거나
+# wrangler pages deploy 시 --d1=BINDING_NAME=database_id 형식으로 설정
+
+[[d1_databases]]
+binding = "DB"
+database_name = "bun-leader-db"
+database_id = "YOUR_DATABASE_ID"  # Cloudflare D1에서 생성 후 ID 입력
+
+# Pages는 functions/ 폴더를 자동으로 인식하므로
+# 별도의 라우트 설정이 필요 없습니다

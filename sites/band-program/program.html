@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>분양리더</title>
+    <title>분양리더 - 프로그램</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -37,25 +37,43 @@
     <main class="main-content">
         <section id="section1" class="content-section">
             <div class="image-container">
-                <img src="images/band/b-1.gif" alt="b-1">
+                <img src="images/program/h-1.gif" alt="h-1">
             </div>
         </section>
 
         <section id="section2" class="content-section">
             <div class="image-container">
-                <img src="images/band/b-2.gif" alt="b-2">
+                <img src="images/program/h-2.png" alt="h-2">
             </div>
         </section>
 
         <section id="section3" class="content-section">
             <div class="image-container">
-                <img src="images/band/b-3.gif" alt="b-3">
+                <img src="images/program/h-3.gif" alt="h-3">
             </div>
         </section>
 
         <section id="section4" class="content-section">
             <div class="image-container">
-                <img src="images/band/b-4.png" alt="b-4">
+                <img src="images/program/h-4.png" alt="h-4">
+            </div>
+        </section>
+
+        <section id="section5" class="content-section">
+            <div class="image-container">
+                <img src="images/program/h-5.png" alt="h-5">
+            </div>
+        </section>
+
+        <section id="section6" class="content-section">
+            <div class="image-container">
+                <img src="images/program/h-6.png" alt="h-6">
+            </div>
+        </section>
+
+        <section id="section7" class="content-section">
+            <div class="image-container">
+                <img src="images/program/h-7.png" alt="h-7">
             </div>
         </section>
 
@@ -76,9 +94,8 @@
                         <label for="productType">상품유형</label>
                         <select id="productType" name="productType" required>
                             <option value="">선택해주세요</option>
-                            <option value="basic">밴드홍보대행 - 베이직(100만원)</option>
-                            <option value="premium">밴드홍보대행 - 프리미엄(200만원)</option>
-                            <option value="vip">밴드홍보대행 - VIP(300만원)</option>
+                            <option value="일반버전(100만원)">밴드프로그램 - 일반버전(100만원)</option>
+                            <option value="프로버전(200만원)">밴드프로그램 - 프로버전(200만원)</option>
                         </select>
                     </div>
                     <button type="submit" class="submit-btn">문의하기</button>
@@ -94,7 +111,14 @@
         </div>
     </footer>
 
+    <script>
+        // 사이트 ID 설정
+        window.SITE_ID = 'band-program';
+        // 문의 타입 설정
+        window.INQUIRY_TYPE = '밴드프로그램판매';
+    </script>
     <script src="script.js"></script>
+    <script src="/shared/scripts/inquiry-form.js"></script>
 </body>
 </html>
 

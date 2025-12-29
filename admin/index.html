@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - 문의 관리</title>
+    <link rel="stylesheet" href="styles/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <div class="header-top">
+                <h1>문의 관리 시스템</h1>
+                <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기">
+                    <span class="menu-icon">☰</span>
+                </button>
+            </div>
+            <div class="stats-summary" id="statsSummary">
+                <div class="stat-item">
+                    <span class="stat-label">전체 문의</span>
+                    <span class="stat-value" id="totalInquiries">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">대기 중</span>
+                    <span class="stat-value pending" id="pendingInquiries">-</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 모바일 오버레이 -->
+        <div class="mobile-overlay" id="mobileOverlay"></div>
+
+        <div class="admin-layout">
+            <!-- 왼쪽 사이드바 (PC) / 오른쪽 슬라이드 메뉴 (모바일) -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <h3>사이트 선택</h3>
+                    <button class="sidebar-close" id="sidebarClose" aria-label="메뉴 닫기">✕</button>
+                </div>
+                <nav class="site-sidebar">
+                    <button class="sidebar-item active" data-site="band-program">
+                        <span class="sidebar-icon">🎵</span>
+                        <span class="sidebar-text">밴드홍보대행</span>
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- 오른쪽 메인 콘텐츠 -->
+            <main class="main-content">
+                <div class="content-header">
+                    <h2 class="content-title" id="contentTitle">밴드홍보대행 문의</h2>
+                    <div class="filters">
+                        <select id="statusFilter" class="filter-select">
+                            <option value="">전체 상태</option>
+                            <option value="pending">대기 중</option>
+                            <option value="contacted">연락 완료</option>
+                            <option value="completed">처리 완료</option>
+                        </select>
+                        <button class="refresh-btn" id="refreshBtn">새로고침</button>
+                    </div>
+                </div>
+
+                <div class="inquiries-table-container">
+                    <table class="inquiries-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>문의타입</th>
+                                <th>이름</th>
+                                <th>연락처</th>
+                                <th>상품유형</th>
+                                <th>상태</th>
+                                <th>등록일시</th>
+                                <th>작업</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inquiriesTableBody">
+                            <tr>
+                                <td colspan="8" class="loading">로딩 중...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="pagination"></div>
+            </main>
+        </div>
+    </div>
+
+    <script src="scripts/admin.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,489 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+    color: #fff;
+    min-height: 100vh;
+}
+
+.admin-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.admin-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid #03C75A;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.menu-toggle {
+    display: none; /* PC에서는 숨김 */
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.3s;
+}
+
+.menu-toggle:hover {
+    color: #03C75A;
+}
+
+.admin-header h1 {
+    font-size: 32px;
+    margin-bottom: 1rem;
+    color: #03C75A;
+}
+
+.stats-summary {
+    display: flex;
+    gap: 2rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #aaa;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.stat-value.pending {
+    color: #ffa500;
+}
+
+/* 레이아웃: 사이드바 + 메인 콘텐츠 */
+.admin-layout {
+    display: flex;
+    min-height: calc(100vh - 120px);
+}
+
+/* 왼쪽 사이드바 */
+.sidebar {
+    width: 280px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border-right: 1px solid #333;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.sidebar-header {
+    display: none; /* PC에서는 숨김 */
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #333;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    font-size: 18px;
+    color: #03C75A;
+    margin: 0;
+}
+
+.sidebar-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.sidebar-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #03C75A;
+}
+
+.site-sidebar {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    border-left: 3px solid transparent;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 15px;
+    text-align: left;
+    width: 100%;
+}
+
+.sidebar-item:hover {
+    background: rgba(3, 199, 90, 0.1);
+    border-left-color: #03C75A;
+}
+
+.sidebar-item.active {
+    background: rgba(3, 199, 90, 0.2);
+    border-left-color: #03C75A;
+    color: #03C75A;
+    font-weight: 600;
+}
+
+.sidebar-icon {
+    font-size: 20px;
+    width: 24px;
+    text-align: center;
+}
+
+.sidebar-text {
+    flex: 1;
+}
+
+/* 오른쪽 메인 콘텐츠 */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    overflow-x: auto;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.content-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #03C75A;
+    margin: 0;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.filter-select {
+    padding: 0.75rem 1rem;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #03C75A;
+}
+
+.refresh-btn {
+    padding: 0.75rem 1.5rem;
+    background: #03C75A;
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.refresh-btn:hover {
+    background: #02b350;
+    transform: translateY(-2px);
+}
+
+.inquiries-table-container {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    overflow-x: auto;
+}
+
+.inquiries-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.inquiries-table th {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid #03C75A;
+    color: #03C75A;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.inquiries-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #333;
+    font-size: 14px;
+}
+
+.inquiries-table tbody tr:hover {
+    background: rgba(3, 199, 90, 0.1);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge.pending {
+    background: rgba(255, 165, 0, 0.2);
+    color: #ffa500;
+}
+
+.status-badge.contacted {
+    background: rgba(3, 199, 90, 0.2);
+    color: #03C75A;
+}
+
+.status-badge.completed {
+    background: rgba(100, 100, 100, 0.2);
+    color: #aaa;
+}
+
+.inquiry-type-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(3, 199, 90, 0.15);
+    color: #03C75A;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.action-btn.contact {
+    background: #03C75A;
+    color: #000;
+}
+
+.action-btn.complete {
+    background: #666;
+    color: #fff;
+}
+
+.action-btn.delete {
+    background: #ff4444;
+    color: #fff;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #aaa;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.pagination-btn {
+    padding: 0.5rem 1rem;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.pagination-btn:hover {
+    background: #2a2a2a;
+    border-color: #03C75A;
+}
+
+.pagination-btn.active {
+    background: #03C75A;
+    border-color: #03C75A;
+    color: #000;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 모바일 오버레이 */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.mobile-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block; /* 모바일에서만 표시 */
+    }
+
+    .admin-header {
+        padding: 1rem 1.5rem;
+    }
+
+    .admin-header h1 {
+        font-size: 20px;
+    }
+
+    .stats-summary {
+        gap: 1rem;
+    }
+
+    .stat-value {
+        font-size: 20px;
+    }
+
+    .admin-layout {
+        position: relative;
+    }
+
+    .mobile-overlay {
+        display: block;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: -100%; /* 기본적으로 오른쪽 밖에 숨김 */
+        width: 280px;
+        height: 100vh;
+        z-index: 999;
+        border-right: none;
+        border-left: 1px solid #333;
+        transition: right 0.3s ease-in-out;
+        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar.active {
+        right: 0; /* 활성화 시 오른쪽에서 슬라이드 */
+    }
+
+    .sidebar-header {
+        display: flex; /* 모바일에서만 표시 */
+    }
+
+    .site-sidebar {
+        padding: 0.5rem 0;
+        overflow-y: auto;
+        max-height: calc(100vh - 60px);
+    }
+
+    .sidebar-item {
+        padding: 1rem 1.5rem;
+        border-left: 3px solid transparent;
+        border-bottom: none;
+    }
+
+    .sidebar-item:hover,
+    .sidebar-item.active {
+        border-left-color: #03C75A;
+        border-bottom: none;
+    }
+
+    .main-content {
+        padding: 1rem;
+        width: 100%;
+    }
+
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .content-title {
+        font-size: 20px;
+    }
+
+    .inquiries-table-container {
+        overflow-x: scroll;
+    }
+
+    .inquiries-table {
+        font-size: 12px;
+    }
+
+    .inquiries-table th,
+    .inquiries-table td {
+        padding: 0.5rem;
+    }
+}
+

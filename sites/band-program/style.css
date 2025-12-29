@@ -1120,35 +1120,38 @@ body {
     }
 }
 
-/* 문의폼 스타일 */
+/* 문의폼 스타일 - 네이버 스타일 (블랙 & 초록) */
 .inquiry-section {
     padding: 4rem 0;
-    background-color: #f8f9fa;
 }
 
 .inquiry-container {
     max-width: 1080px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 2.5rem 20px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+    border-radius: 12px;
 }
 
 .inquiry-title {
     font-size: 32px;
     font-weight: bold;
-    color: #333;
+    color: #fff;
     text-align: center;
     margin-bottom: 3rem;
     padding-bottom: 1.5rem;
-    border-bottom: 3px solid #007bff;
+    border-bottom: 3px solid #03C75A;
+    text-shadow: 0 2px 8px rgba(3, 199, 90, 0.3);
 }
 
 .inquiry-form {
-    max-width: 600px;
+    max-width: 1080px;
     margin: 0 auto;
-    background-color: #fff;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
     padding: 2.5rem;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(3, 199, 90, 0.2);
+    border: 1px solid rgba(3, 199, 90, 0.3);
 }
 
 .form-group {
@@ -1159,7 +1162,7 @@ body {
     display: block;
     font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: #fff;
     margin-bottom: 0.5rem;
 }
 
@@ -1168,20 +1171,34 @@ body {
     width: 100%;
     padding: 0.875rem 1rem;
     font-size: 16px;
-    border: 2px solid #ddd;
+    background-color: #0a0a0a;
+    color: #fff;
+    border: 2px solid #333;
     border-radius: 8px;
-    transition: border-color 0.3s;
+    transition: all 0.3s;
     font-family: inherit;
 }
 
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: #03C75A;
+    box-shadow: 0 0 0 3px rgba(3, 199, 90, 0.2);
+    background-color: #111;
 }
 
 .form-group input::placeholder {
-    color: #999;
+    color: #666;
+}
+
+.form-group select {
+    color: #fff;
+    cursor: pointer;
+}
+
+.form-group select option {
+    background-color: #1a1a1a;
+    color: #fff;
 }
 
 .submit-btn {
@@ -1190,21 +1207,24 @@ body {
     font-size: 18px;
     font-weight: 600;
     color: #fff;
-    background-color: #007bff;
+    background-color: #03C75A;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: all 0.3s;
     margin-top: 1rem;
+    box-shadow: 0 4px 12px rgba(3, 199, 90, 0.3);
 }
 
 .submit-btn:hover {
-    background-color: #0056b3;
+    background-color: #02b350;
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(3, 199, 90, 0.4);
 }
 
 .submit-btn:active {
     transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(3, 199, 90, 0.3);
 }
 
 /* 문의폼 반응형 */

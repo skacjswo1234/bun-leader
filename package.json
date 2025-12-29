@@ -1,0 +1,27 @@
+{
+  "name": "bun-leader",
+  "version": "1.0.0",
+  "description": "9개 사이트 통합 관리 시스템",
+  "main": "api/index.js",
+  "scripts": {
+    "dev": "wrangler pages dev public",
+    "deploy": "wrangler pages deploy public --project-name=bun-leader",
+    "migrate": "wrangler d1 execute bun-leader-db --file=./migrations/schema.sql",
+    "db:create": "wrangler d1 create bun-leader-db",
+    "db:execute": "wrangler d1 execute bun-leader-db"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "d1"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20240101.0"
+  }
+}
+
