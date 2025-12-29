@@ -76,6 +76,32 @@
                 <img src="images/program/h-7.png" alt="h-7">
             </div>
         </section>
+
+        <!-- 문의폼 -->
+        <section class="content-section inquiry-section">
+            <div class="inquiry-container">
+                <h2 class="inquiry-title">문의하기</h2>
+                <form class="inquiry-form" id="inquiryForm">
+                    <div class="form-group">
+                        <label for="name">이름</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">연락처</label>
+                        <input type="tel" id="contact" name="contact" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productType">상품유형</label>
+                        <select id="productType" name="productType" required>
+                            <option value="">선택해주세요</option>
+                            <option value="normal">밴드프로그램 - 일반버전(100만원)</option>
+                            <option value="pro">밴드프로그램 - 프로버전(200만원)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="submit-btn">문의하기</button>
+                </form>
+            </div>
+        </section>
     </main>
 
     <!-- Footer -->

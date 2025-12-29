@@ -58,6 +58,33 @@
                 <img src="images/band/b-4.png" alt="b-4">
             </div>
         </section>
+
+        <!-- 문의폼 -->
+        <section class="content-section inquiry-section">
+            <div class="inquiry-container">
+                <h2 class="inquiry-title">문의하기</h2>
+                <form class="inquiry-form" id="inquiryForm">
+                    <div class="form-group">
+                        <label for="name">이름</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">연락처</label>
+                        <input type="tel" id="contact" name="contact" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productType">상품유형</label>
+                        <select id="productType" name="productType" required>
+                            <option value="">선택해주세요</option>
+                            <option value="basic">밴드홍보대행 - 베이직(100만원)</option>
+                            <option value="premium">밴드홍보대행 - 프리미엄(200만원)</option>
+                            <option value="vip">밴드홍보대행 - VIP(300만원)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="submit-btn">문의하기</button>
+                </form>
+            </div>
+        </section>
     </main>
 
     <!-- Footer -->
