@@ -299,9 +299,14 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
             submitBtn.textContent = '전송 중...';
             
+            console.log('[문의 폼] 제출 시작');
+            console.log('[문의 폼] 전송 데이터:', formData);
+            
             try {
                 // Cloudflare Pages Functions API 엔드포인트
                 const apiUrl = '/api/inquiries';
+                console.log('[문의 폼] API 요청 시작:', apiUrl);
+                
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
@@ -310,16 +315,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify(formData)
                 });
                 
+                console.log('[문의 폼] API 응답 상태:', response.status, response.statusText);
+                
                 const result = await response.json();
+                console.log('[문의 폼] API 응답 데이터:', result);
                 
                 if (result.success) {
+                    console.log('[문의 폼] ✅ 문의 접수 성공 - ID:', result.id);
+                    console.log('[문의 폼] 💡 텔레그램 알림 전송 여부는 Cloudflare Dashboard Logs에서 확인하세요');
                     showModal('문의 접수 완료', '문의가 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
                     inquiryForm.reset();
                 } else {
+                    console.error('[문의 폼] ❌ 문의 접수 실패:', result.error);
                     showModal('접수 실패', result.error || '문의 접수에 실패했습니다.\n다시 시도해주세요.', true);
                 }
             } catch (error) {
-                console.error('Inquiry submission error:', error);
+                console.error('[문의 폼] ❌ 오류 발생:', error);
+                console.error('[문의 폼] 에러 상세:', error.message, error.stack);
                 showModal('오류 발생', '오류가 발생했습니다.\n잠시 후 다시 시도해주세요.', true);
             } finally {
                 // 제출 버튼 복원
