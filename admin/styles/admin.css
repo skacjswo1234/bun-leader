@@ -527,3 +527,79 @@ body {
         padding: 0.5rem;
     }
 }
+
+/* 비밀번호 변경 섹션 */
+.password-change-section {
+    margin-top: 2rem;
+}
+
+.password-change-container {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(124, 58, 237, 0.1) 100%);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.password-change-form {
+    max-width: 500px;
+    margin-top: 1.5rem;
+}
+
+.password-change-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.password-change-form label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #A78BFA;
+    margin-bottom: 0.5rem;
+}
+
+.password-change-form .form-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.password-change-form .form-input:focus {
+    outline: none;
+    border-color: #8B5CF6;
+    background: rgba(139, 92, 246, 0.2);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.password-change-form .form-input::placeholder {
+    color: #666;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.form-actions .refresh-btn {
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    .password-change-container {
+        padding: 1.5rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .refresh-btn {
+        width: 100%;
+    }
+}

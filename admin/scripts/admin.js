@@ -55,12 +55,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // 이벤트 리스너
     document.querySelectorAll('.sidebar-item').forEach(btn => {
         btn.addEventListener('click', () => {
+            // 비밀번호 변경 버튼은 별도 처리
+            if (btn.id === 'passwordChangeBtn') {
+                return;
+            }
+            
             document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentSite = btn.dataset.site;
             currentPage = 1;
             updateContentTitle();
             loadInquiries();
+            
+            // 문의 목록 표시, 비밀번호 변경 섹션 숨기기
+            document.querySelector('.inquiries-table-container').style.display = 'block';
+            document.querySelector('.pagination').style.display = 'flex';
+            document.querySelector('.content-header').style.display = 'flex';
+            document.getElementById('passwordChangeSection').style.display = 'none';
             
             // 모바일에서 메뉴 항목 클릭 시 메뉴 닫기
             if (window.innerWidth <= 768) {
@@ -98,6 +109,102 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Logout error:', error);
             alert('오류가 발생했습니다.');
+        }
+    });
+
+    // 비밀번호 변경 섹션 토글
+    const passwordChangeBtn = document.getElementById('passwordChangeBtn');
+    const passwordChangeSection = document.getElementById('passwordChangeSection');
+    const cancelPasswordChange = document.getElementById('cancelPasswordChange');
+
+    passwordChangeBtn.addEventListener('click', () => {
+        // 다른 사이드바 항목 비활성화
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        passwordChangeBtn.classList.add('active');
+        
+        // 문의 목록 숨기기, 비밀번호 변경 섹션 표시
+        document.querySelector('.inquiries-table-container').style.display = 'none';
+        document.querySelector('.pagination').style.display = 'none';
+        document.querySelector('.content-header').style.display = 'none';
+        passwordChangeSection.style.display = 'block';
+        
+        // 모바일에서 메뉴 닫기
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+
+    cancelPasswordChange.addEventListener('click', () => {
+        // 문의 목록 표시, 비밀번호 변경 섹션 숨기기
+        document.querySelector('.inquiries-table-container').style.display = 'block';
+        document.querySelector('.pagination').style.display = 'flex';
+        document.querySelector('.content-header').style.display = 'flex';
+        passwordChangeSection.style.display = 'none';
+        
+        // 사이드바 항목 복원
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector('[data-site="band-program"]').classList.add('active');
+        
+        // 폼 리셋
+        document.getElementById('passwordChangeForm').reset();
+    });
+
+    // 비밀번호 변경 폼 제출
+    document.getElementById('passwordChangeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const oldPassword = document.getElementById('oldPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            alert('모든 필드를 입력해주세요.');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = '변경 중...';
+
+        try {
+            const response = await fetch(`${API_BASE}/password`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    oldPassword: oldPassword,
+                    newPassword: newPassword
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('비밀번호가 성공적으로 변경되었습니다.');
+                document.getElementById('passwordChangeForm').reset();
+                cancelPasswordChange.click(); // 취소 버튼 클릭하여 섹션 닫기
+            } else {
+                alert(result.error || '비밀번호 변경에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Password change error:', error);
+            alert('오류가 발생했습니다.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
         }
     });
 });

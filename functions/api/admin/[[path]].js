@@ -237,7 +237,8 @@ export async function onRequest(context) {
 
       if (!oldPassword || !newPassword) {
         return new Response(JSON.stringify({ 
-          error: 'oldPassword and newPassword are required' 
+          success: false,
+          error: '현재 비밀번호와 새 비밀번호를 입력해주세요.' 
         }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -253,6 +254,7 @@ export async function onRequest(context) {
 
       if (!admin || admin.password !== oldPassword) {
         return new Response(JSON.stringify({ 
+          success: false,
           error: '현재 비밀번호가 올바르지 않습니다.' 
         }), {
           status: 401,
