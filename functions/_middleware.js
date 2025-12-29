@@ -67,17 +67,9 @@ export async function onRequest(context) {
     return Response.redirect(`${url.origin}${newPath}`, 301);
   }
 
-  // 디렉토리 경로를 index.html로 명시적 리다이렉트
-  // 예: /sites/band-program/ → /sites/band-program/index.html
-  if (url.pathname.endsWith('/') && url.pathname !== '/') {
-    const pathWithoutTrailingSlash = url.pathname.slice(0, -1);
-    // 이미 index.html로 끝나지 않는 경우에만 리다이렉트
-    if (!url.pathname.endsWith('/index.html')) {
-      return Response.redirect(`${url.origin}${pathWithoutTrailingSlash}/index.html`, 301);
-    }
-  }
-
   // 기본 동작 (기존 파일 서빙)
+  // Cloudflare Pages가 자동으로 디렉토리 경로를 index.html로 처리하므로
+  // 명시적 리다이렉트는 필요 없음
   return next();
 }
 
