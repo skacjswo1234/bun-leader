@@ -16,9 +16,21 @@ export async function onRequest(context) {
   }
 
   try {
+    // 데이터베이스 바인딩 확인
+    const db = env.DB || env['bun-leader-db'];
+    if (!db) {
+      return new Response(JSON.stringify({ 
+        error: 'Database binding not found. Please check D1 binding name in Cloudflare Pages settings.',
+        availableBindings: Object.keys(env).filter(key => key.includes('DB') || key.includes('db') || key.includes('database'))
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     // 사이트 목록 조회: /api/admin/sites
     if (path === 'sites' && method === 'GET') {
-      const result = await env.DB.prepare('SELECT * FROM sites ORDER BY created_at DESC').all();
+      const result = await db.prepare('SELECT * FROM sites ORDER BY created_at DESC').all();
       return new Response(JSON.stringify({ 
         success: true,
         data: result.results 
@@ -41,7 +53,7 @@ export async function onRequest(context) {
         });
       }
 
-      await env.DB.prepare(
+      await db.prepare(
         `INSERT INTO sites (id, name, domain, config) VALUES (?, ?, ?, ?)`
       )
       .bind(id, name, domain || null, config || null)
@@ -62,7 +74,7 @@ export async function onRequest(context) {
       const body = await request.json();
       const { name, domain, config } = body;
 
-      await env.DB.prepare(
+      await db.prepare(
         `UPDATE sites SET name = ?, domain = ?, config = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
       )
       .bind(name || null, domain || null, config || null, siteId)
@@ -77,7 +89,7 @@ export async function onRequest(context) {
 
     // 통계 조회: /api/admin/stats
     if (path === 'stats' && method === 'GET') {
-      const stats = await env.DB.prepare(`
+      const stats = await db.prepare(`
         SELECT 
           site_id,
           COUNT(*) as total,
@@ -88,7 +100,7 @@ export async function onRequest(context) {
         GROUP BY site_id
       `).all();
 
-      const totalStats = await env.DB.prepare(`
+      const totalStats = await db.prepare(`
         SELECT 
           COUNT(*) as total,
           SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending
@@ -130,7 +142,7 @@ export async function onRequest(context) {
       query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
       params.push(limit, offset);
 
-      const result = await env.DB.prepare(query)
+      const result = await db.prepare(query)
         .bind(...params)
         .all();
 
@@ -148,7 +160,7 @@ export async function onRequest(context) {
         countParams.push(status);
       }
 
-      const countResult = await env.DB.prepare(countQuery)
+      const countResult = await db.prepare(countQuery)
         .bind(...countParams)
         .first();
 
@@ -182,7 +194,7 @@ export async function onRequest(context) {
         });
       }
 
-      await env.DB.prepare(
+      await db.prepare(
         `UPDATE inquiries SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
       )
       .bind(status, id)
@@ -200,7 +212,7 @@ export async function onRequest(context) {
     if (deleteMatch && method === 'DELETE') {
       const id = deleteMatch[1];
 
-      await env.DB.prepare('DELETE FROM inquiries WHERE id = ?')
+      await db.prepare('DELETE FROM inquiries WHERE id = ?')
         .bind(id)
         .run();
 

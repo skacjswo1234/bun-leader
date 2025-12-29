@@ -15,6 +15,18 @@ export async function onRequest(context) {
   }
 
   try {
+    // 데이터베이스 바인딩 확인
+    const db = env.DB || env['bun-leader-db'];
+    if (!db) {
+      return new Response(JSON.stringify({ 
+        error: 'Database binding not found. Please check D1 binding name in Cloudflare Pages settings.',
+        availableBindings: Object.keys(env).filter(key => key.includes('DB') || key.includes('db') || key.includes('database'))
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     if (method === 'POST') {
       // 문의 생성
       const body = await request.json();
@@ -37,7 +49,7 @@ export async function onRequest(context) {
           : JSON.stringify(custom_fields);
       }
 
-      const result = await env.DB.prepare(
+      const result = await db.prepare(
         `INSERT INTO inquiries (site_id, name, contact, message, custom_fields, status)
          VALUES (?, ?, ?, ?, ?, 'pending')`
       )
@@ -67,7 +79,7 @@ export async function onRequest(context) {
 
       query += ' ORDER BY created_at DESC LIMIT 100';
 
-      const result = await env.DB.prepare(query)
+      const result = await db.prepare(query)
         .bind(...params)
         .all();
 
