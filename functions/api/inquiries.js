@@ -3,6 +3,7 @@
  * /api/inquiries 엔드포인트
  */
 import { corsHeaders } from '../_utils/cors.js';
+import { sendTelegramMessage, formatInquiryNotification } from '../_utils/telegram.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -55,6 +56,30 @@ export async function onRequest(context) {
       )
       .bind(site_id, name, contact, message || null, customFieldsJson)
       .run();
+
+      // 텔레그램 알림 전송 (band-program 사이트인 경우만)
+      if (site_id === 'band-program') {
+        const telegramBotToken = env.TELEGRAM_BOT_TOKEN;
+        const telegramChatId = env.TELEGRAM_CHAT_ID;
+        
+        if (telegramBotToken && telegramChatId) {
+          const inquiryData = {
+            site_id,
+            name,
+            contact,
+            message,
+            custom_fields: customFieldsJson
+          };
+          
+          const notificationMessage = formatInquiryNotification(inquiryData);
+          
+          // 비동기로 전송 (응답을 기다리지 않음)
+          sendTelegramMessage(telegramBotToken, telegramChatId, notificationMessage)
+            .catch(error => {
+              console.error('Telegram notification failed:', error);
+            });
+        }
+      }
 
       return new Response(JSON.stringify({ 
         success: true,
