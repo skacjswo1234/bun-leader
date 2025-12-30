@@ -547,6 +547,17 @@ body {
     box-shadow: 0 6px 20px rgba(3, 199, 90, 0.4);
 }
 
+.kakao-btn {
+    background: linear-gradient(135deg, #FEE500 0%, #FDD835 100%);
+    color: #3C1E1E;
+}
+
+.kakao-btn:hover {
+    background: linear-gradient(135deg, #FDD835 0%, #FEE500 100%);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(253, 216, 53, 0.4);
+}
+
 .top-btn {
     background: linear-gradient(135deg, #666 0%, #555 100%);
     opacity: 0;
