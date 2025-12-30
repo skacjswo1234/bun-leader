@@ -144,12 +144,46 @@
         .footer {
             background-color: #fff;
             border-top: 1px solid #e0e0e0;
-            padding: 2rem 0;
+            padding: 3rem 0 2rem;
             margin-top: 4rem;
-            text-align: center;
         }
 
-        .footer-text {
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: #03C75A;
+        }
+
+        .footer-copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
             color: #666;
             font-size: 14px;
         }
@@ -175,6 +209,15 @@
 
             .sites-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .footer-container {
+                padding: 0 1rem;
             }
         }
     </style>
@@ -210,7 +253,28 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p class="footer-text">&copy; 2024 분양리더. All rights reserved.</p>
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>회사정보</h4>
+                    <p>회사명 : (주)한가람디앤씨 - HangaramD&C</p>
+                    <p>사업자 등록번호 : 208-81-31159</p>
+                    <p>법인등록번호 : 280211-0237723</p>
+                </div>
+                <div class="footer-section">
+                    <h4>연락처</h4>
+                    <p>전화번호 : <a href="tel:18774911">1877-4911</a></p>
+                    <p>개인정보보호문의 : <a href="mailto:exoth@naver.com">exoth@naver.com</a></p>
+                </div>
+                <div class="footer-section">
+                    <h4>본사소재지</h4>
+                    <p>경기도 의정부시 신흥로231번길 11, 5층<br>(의정부동, 서경빌딩)</p>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>Copyright &copy; 2022 (주)한가람디앤씨 - HangaramD&C</p>
+            </div>
+        </div>
     </footer>
 </body>
 </html>
