@@ -13,16 +13,16 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
+            background-color: #000;
+            color: #fff;
             min-height: 100vh;
             line-height: 1.6;
         }
 
         /* Header */
         .header {
-            background-color: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background-color: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
             padding: 1rem 0;
             position: sticky;
             top: 0;
@@ -33,6 +33,19 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex: 1;
+        }
+
+        .header-right {
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -48,6 +61,122 @@
             width: auto;
         }
 
+        /* Quick Links */
+        .quick-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+            flex-wrap: wrap;
+        }
+
+        .quick-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: #03C75A;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .quick-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 버튼별 색상 */
+        .quick-link.meta {
+            background-color: #1877f2;
+        }
+        .quick-link.meta:hover {
+            background-color: #166fe5;
+            box-shadow: 0 4px 8px rgba(24, 119, 242, 0.3);
+        }
+
+        .quick-link.gdn {
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+        .quick-link.gdn:hover {
+            background-color: #f5f5f5;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .quick-link.danggun {
+            background-color: #ff6f0f;
+        }
+        .quick-link.danggun:hover {
+            background-color: #e6640d;
+            box-shadow: 0 4px 8px rgba(255, 111, 15, 0.3);
+        }
+
+        .quick-link.hogang {
+            background-color: #8b5cf6;
+        }
+        .quick-link.hogang:hover {
+            background-color: #7c3aed;
+            box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+        }
+
+        .quick-link.blog {
+            background-color: #03C75A;
+        }
+        .quick-link.blog:hover {
+            background-color: #02b350;
+            box-shadow: 0 4px 8px rgba(3, 199, 90, 0.3);
+        }
+
+        .quick-link.lms {
+            background-color: #06b6d4;
+        }
+        .quick-link.lms:hover {
+            background-color: #0891b2;
+            box-shadow: 0 4px 8px rgba(6, 182, 212, 0.3);
+        }
+
+        .quick-link-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        /* 문의하기 버튼 */
+        .inquiry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.5rem;
+            background: linear-gradient(135deg, #03C75A 0%, #02B350 100%);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(3, 199, 90, 0.3);
+        }
+
+        .inquiry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(3, 199, 90, 0.4);
+        }
+
+        .inquiry-btn-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
 
         /* Main Container */
         .main-container {
@@ -59,14 +188,14 @@
         .page-title {
             font-size: 36px;
             font-weight: 700;
-            color: #333;
+            color: #fff;
             margin-bottom: 0.5rem;
             text-align: center;
         }
 
         .page-subtitle {
             font-size: 18px;
-            color: #666;
+            color: #ccc;
             text-align: center;
             margin-bottom: 3rem;
         }
@@ -79,7 +208,7 @@
         .section-title {
             font-size: 24px;
             font-weight: 600;
-            color: #333;
+            color: #fff;
             margin-bottom: 1.5rem;
             padding-bottom: 0.75rem;
             border-bottom: 2px solid #03C75A;
@@ -92,18 +221,18 @@
         }
 
         .site-card {
-            background: #fff;
-            border: 1px solid #e0e0e0;
+            background: #1a1a1a;
+            border: 1px solid #333;
             border-radius: 12px;
             padding: 2rem;
             text-decoration: none;
-            color: #333;
+            color: #fff;
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(255, 255, 255, 0.05);
         }
 
         .site-card:hover {
@@ -135,15 +264,293 @@
 
         .site-description {
             font-size: 14px;
-            color: #666;
+            color: #ccc;
             line-height: 1.6;
         }
 
+        /* 회사소개 섹션 */
+        .about-section {
+            margin-top: 4rem;
+            padding: 3rem 0;
+        }
+
+        .about-content {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .about-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .about-subtitle {
+            font-size: 20px;
+            font-weight: 600;
+            color: #03C75A;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-highlight {
+            font-size: 18px;
+            color: #fff;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(3, 199, 90, 0.1);
+            border-left: 4px solid #03C75A;
+            border-radius: 8px;
+            line-height: 1.8;
+        }
+
+        .about-description {
+            font-size: 16px;
+            color: #ccc;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .about-description strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* 핵심 차별화 전략 & 경쟁력 섹션 */
+        .strategy-section,
+        .competitiveness-section {
+            margin-top: 4rem;
+            padding: 3rem 0;
+        }
+
+        .strategy-container,
+        .competitiveness-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .strategy-title,
+        .competitiveness-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2rem;
+            text-align: center;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #03C75A;
+        }
+
+        .strategy-intro,
+        .competitiveness-intro {
+            font-size: 16px;
+            color: #ccc;
+            line-height: 1.8;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .strategy-list,
+        .competitiveness-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .strategy-item,
+        .competitiveness-item {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .strategy-item:hover,
+        .competitiveness-item:hover {
+            border-color: #03C75A;
+            box-shadow: 0 4px 12px rgba(3, 199, 90, 0.2);
+        }
+
+        .strategy-item-header,
+        .competitiveness-item-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .strategy-item-number,
+        .competitiveness-item-number {
+            background: linear-gradient(135deg, #03C75A 0%, #02B350 100%);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .strategy-item-title,
+        .competitiveness-item-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 0;
+        }
+
+        .strategy-item-content,
+        .competitiveness-item-content {
+            font-size: 16px;
+            color: #ccc;
+            line-height: 1.8;
+            margin-top: 1rem;
+            padding-left: 3rem;
+        }
+
+        .strategy-item-content p,
+        .competitiveness-item-content p {
+            margin-bottom: 0.75rem;
+        }
+
+        .strategy-item-content p:last-child,
+        .competitiveness-item-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .strategy-conclusion,
+        .competitiveness-conclusion {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: rgba(3, 199, 90, 0.1);
+            border-left: 4px solid #03C75A;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .strategy-conclusion p,
+        .competitiveness-conclusion p {
+            font-size: 18px;
+            color: #fff;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .strategy-conclusion p:last-child,
+        .competitiveness-conclusion p:last-child {
+            margin-bottom: 0;
+        }
+
+
+        /* Mobile Menu Button */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-left: auto;
+            z-index: 101;
+        }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100vh;
+            background-color: #1a1a1a;
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease-in-out;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            right: 0;
+        }
+
+        .side-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 999;
+        }
+
+        .side-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .side-menu-content {
+            padding: 2rem 1.5rem;
+        }
+
+        .menu-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 2rem;
+        }
+
+        .menu-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .menu-link:hover {
+            background-color: #2a2a2a;
+            color: #03C75A;
+        }
+
+        .menu-link-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
 
         /* Footer */
         .footer {
-            background-color: #fff;
-            border-top: 1px solid #e0e0e0;
+            background-color: #1a1a1a;
+            border-top: 1px solid #333;
             padding: 3rem 0 2rem;
             margin-top: 4rem;
         }
@@ -164,14 +571,14 @@
         .footer-section h4 {
             font-size: 16px;
             font-weight: 600;
-            color: #333;
+            color: #fff;
             margin-bottom: 1rem;
         }
 
         .footer-section p,
         .footer-section a {
             font-size: 14px;
-            color: #666;
+            color: #ccc;
             line-height: 1.8;
             text-decoration: none;
         }
@@ -183,21 +590,39 @@
         .footer-copyright {
             text-align: center;
             padding-top: 2rem;
-            border-top: 1px solid #e0e0e0;
-            color: #666;
+            border-top: 1px solid #333;
+            color: #ccc;
             font-size: 14px;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .header-container {
-                padding: 0 1rem;
+                padding: 0.75rem 1rem;
+                position: relative;
+                flex-wrap: wrap;
+            }
+
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
             }
 
             .logo img {
                 height: 40px;
             }
 
+            .menu-toggle {
+                display: block;
+            }
+
+            .quick-links {
+                display: none;
+            }
+
+            .inquiry-btn {
+                display: none;
+            }
 
             .main-container {
                 padding: 2rem 1rem;
@@ -211,6 +636,66 @@
                 grid-template-columns: 1fr;
             }
 
+            .about-section {
+                margin-top: 3rem;
+                padding: 2rem 0;
+            }
+
+            .about-title {
+                font-size: 26px;
+            }
+
+            .about-subtitle {
+                font-size: 18px;
+            }
+
+            .about-highlight {
+                font-size: 16px;
+                padding: 1.25rem;
+            }
+
+            .about-description {
+                font-size: 15px;
+            }
+
+            .strategy-section,
+            .competitiveness-section {
+                margin-top: 3rem;
+                padding: 2rem 0;
+            }
+
+            .strategy-title,
+            .competitiveness-title {
+                font-size: 26px;
+            }
+
+            .strategy-item-title,
+            .competitiveness-item-title {
+                font-size: 20px;
+            }
+
+            .strategy-item-content,
+            .competitiveness-item-content {
+                padding-left: 0;
+                font-size: 15px;
+            }
+
+            .strategy-item-header,
+            .competitiveness-item-header {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .strategy-conclusion,
+            .competitiveness-conclusion {
+                padding: 1.5rem;
+            }
+
+            .strategy-conclusion p,
+            .competitiveness-conclusion p {
+                font-size: 16px;
+            }
+
             .footer-content {
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
@@ -220,23 +705,335 @@
                 padding: 0 1rem;
             }
         }
+
+        @media (max-width: 480px) {
+            .side-menu {
+                width: 260px;
+            }
+        }
+
+        /* 문의하기 모달 스타일 */
+        .inquiry-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .inquiry-modal-content-container {
+            background: #1a1a1a;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        .inquiry-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .inquiry-modal-header h3 {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .inquiry-modal-close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .inquiry-modal-close-btn:hover {
+            background: #333;
+        }
+
+        .inquiry-form {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group .required {
+            color: #ff4444;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #03C75A;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .inquiry-submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #03C75A 0%, #02B350 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        .inquiry-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(3, 199, 90, 0.4);
+        }
+
+        .inquiry-submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <div class="header-container">
-            <div class="logo">
-                <img src="/sites/band-program/logo.png" alt="분양리더 로고">
+            <div class="header-left">
+                <div class="logo">
+                    <img src="/logo-white.png" alt="분양리더 로고">
+                </div>
+                <button class="inquiry-btn" id="inquiryBtn">
+                    <svg class="inquiry-btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
+                    </svg>
+                    문의남기기
+                </button>
+            </div>
+            <div class="header-right">
+                <nav class="quick-links">
+                <a href="/sites/marketing/meta.html" class="quick-link meta">
+                    <svg class="quick-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+                    </svg>
+                    메타광고
+                </a>
+                <a href="/sites/marketing/gdn.html" class="quick-link gdn">
+                    <svg class="quick-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    구글광고
+                </a>
+                <a href="/sites/marketing/danggun.html" class="quick-link danggun">
+                    <svg class="quick-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.89s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" fill="currentColor"/>
+                    </svg>
+                    당근광고
+                </a>
+                <a href="/sites/marketing/hogang.html" class="quick-link hogang">
+                    <svg class="quick-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                    호갱노노
+                </a>
+                <a href="/sites/marketing/blog.html" class="quick-link blog">
+                    <svg class="quick-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 3h18v18H3V3zm16 16V5H5v14h14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z" fill="currentColor"/>
+                    </svg>
+                    블로그광고
+                </a>
+                <a href="/sites/marketing/lms.html" class="quick-link lms">
+                    <svg class="quick-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
+                    </svg>
+                    LMS문자
+                </a>
+                </nav>
+                <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기">☰</button>
             </div>
         </div>
     </header>
 
+    <!-- Side Menu -->
+    <div class="side-menu-overlay" id="menuOverlay"></div>
+    <nav class="side-menu" id="sideMenu">
+        <div class="side-menu-content">
+            <button class="menu-close" id="menuClose" aria-label="메뉴 닫기">×</button>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="/sites/marketing/meta.html" class="menu-link">
+                        <svg class="menu-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+                        </svg>
+                        메타광고
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/sites/marketing/gdn.html" class="menu-link">
+                        <svg class="menu-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        구글광고
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/sites/marketing/danggun.html" class="menu-link">
+                        <svg class="menu-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.89s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" fill="currentColor"/>
+                        </svg>
+                        당근광고
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/sites/marketing/hogang.html" class="menu-link">
+                        <svg class="menu-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                        호갱노노 광고
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/sites/marketing/blog.html" class="menu-link">
+                        <svg class="menu-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3h18v18H3V3zm16 16V5H5v14h14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z" fill="currentColor"/>
+                        </svg>
+                        블로그 광고
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/sites/marketing/lms.html" class="menu-link">
+                        <svg class="menu-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
+                        </svg>
+                        LMS문자광고
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <button class="menu-link inquiry-menu-btn" style="width: 100%; background: linear-gradient(135deg, #03C75A 0%, #02B350 100%); justify-content: center; margin-top: 1rem; border-radius: 8px;">
+                        <svg class="menu-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
+                        </svg>
+                        문의남기기
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 문의하기 모달 -->
+    <div id="inquiryModalOverlay" class="inquiry-modal-overlay" style="display: none;">
+        <div class="inquiry-modal-content-container">
+            <div class="inquiry-modal-header">
+                <h3>문의하기</h3>
+                <button class="inquiry-modal-close-btn" id="closeInquiryModal">×</button>
+            </div>
+            <form class="inquiry-form" id="inquiryForm">
+                <div class="form-group">
+                    <label for="inquiryName">이름 <span class="required">*</span></label>
+                    <input type="text" id="inquiryName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="inquiryContact">전화번호 <span class="required">*</span></label>
+                    <input type="tel" id="inquiryContact" name="contact" required>
+                </div>
+                <div class="form-group">
+                    <label for="inquiryType">문의 유형</label>
+                    <select id="inquiryType" name="inquiryType">
+                        <option value="">선택해주세요</option>
+                        <option value="밴드홍보대행">밴드홍보대행</option>
+                        <option value="메타광고">메타광고</option>
+                        <option value="당근광고">당근광고</option>
+                        <option value="구글GDN광고">구글GDN광고</option>
+                        <option value="호갱노노광고">호갱노노광고</option>
+                        <option value="블로그광고">블로그광고</option>
+                        <option value="LMS문자광고">LMS문자광고</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="inquiryMessage">문의내용</label>
+                    <textarea id="inquiryMessage" name="message" rows="4" placeholder="문의하실 내용을 입력해주세요"></textarea>
+                </div>
+                <button type="submit" class="inquiry-submit-btn">문의하기</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Main Container -->
     <main class="main-container">
-        <h2 class="page-title">사이트 선택</h2>
-        <p class="page-subtitle">원하는 서비스를 선택하세요</p>
-
         <!-- Sites Section -->
         <section class="sites-section">
             <h3 class="section-title">서비스 사이트</h3>
@@ -251,6 +1048,136 @@
                     <div class="site-name">분양리더마케팅</div>
                     <div class="site-description">#메타광고 #구글GDN광고 #당근광고 #호갱노노광고 #LMS문자광고 #블로그광고</div>
                 </a>
+            </div>
+        </section>
+
+        <!-- 회사소개 섹션 -->
+        <section class="about-section">
+            <div class="about-content">
+                <h3 class="about-title">회사소개</h3>
+                <p class="about-subtitle">경쟁사가 따라올 수 없는, 결과로 증명하는 분양 마케팅 솔루션</p>
+                <p class="about-highlight">"성공 분양의 핵심, 저희와 함께하십시오. 압도적인 결과로 증명합니다."</p>
+                <div class="about-description">
+                    <p>대부분의 마케팅 회사는 비슷한 채널(메타, 구글, 당근 등)을 사용합니다.</p>
+                    <p style="margin-top: 1rem;"><strong>하지만 왜 저희와 함께해야 할까요?</strong></p>
+                    <p style="margin-top: 1rem;">저희는 단순한 채널 운영 대행사가 아닙니다.</p>
+                    <p style="margin-top: 1rem;"><strong>경쟁사와는 근본적으로 다른 3가지 핵심 차별화와 5가지 핵심경쟁력</strong>으로 귀사의 분양 사업을 성공으로 이끕니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 핵심 차별화 전략 섹션 -->
+        <section class="strategy-section">
+            <div class="strategy-container">
+                <h3 class="strategy-title">분양리더만의 핵심 차별화 전략 3가지</h3>
+                <div class="strategy-intro">
+                    <p>효과적인 분양 마케팅 전략 수립에 집중합니다.</p>
+                    <p><strong>실질적인 결과로 보여드립니다.</strong></p>
+                </div>
+                <div class="strategy-list">
+                    <div class="strategy-item">
+                        <div class="strategy-item-header">
+                            <div class="strategy-item-number">1</div>
+                            <h4 class="strategy-item-title">데이터 기반의 심층 분석</h4>
+                        </div>
+                        <div class="strategy-item-content">
+                            <p>단순한 광고 데이터 제시를 넘어, 분양 시장에 특화된 분석을 통해 잠재 고객의 의사결정 과정을 이해합니다.</p>
+                            <p>관심을 보이는 대상을 파악하는 것과 더불어, 계약을 망설이는 요인을 분석하여 광고 메시지와 타겟팅을 최적화합니다.</p>
+                            <p>이를 통해 실질적인 계약 전환율 향상을 기대할 수 있습니다.</p>
+                        </div>
+                    </div>
+                    <div class="strategy-item">
+                        <div class="strategy-item-header">
+                            <div class="strategy-item-number">2</div>
+                            <h4 class="strategy-item-title">지역 특색을 반영한 전략</h4>
+                        </div>
+                        <div class="strategy-item-content">
+                            <p>획일적인 전국 단위 접근 방식이 아닌, 현장 인근 지역에 대한 깊이 있는 이해를 바탕으로 전략을 수립합니다.</p>
+                            <p>지역 플랫폼 및 채널의 특성을 활용하여 지역 주민에게 효과적으로 도달하는 유입 경로를 설계합니다.</p>
+                            <p>모델하우스 방문 가능성이 높은 지역 실수요자를 대상으로 마케팅 효율을 높입니다.</p>
+                        </div>
+                    </div>
+                    <div class="strategy-item">
+                        <div class="strategy-item-header">
+                            <div class="strategy-item-number">3</div>
+                            <h4 class="strategy-item-title">통합적인 채널 관리</h4>
+                        </div>
+                        <div class="strategy-item-content">
+                            <p>다양한 광고 채널(메타, 구글, 당근, LMS 등)을 분산시키지 않고 하나의 프로젝트 매니저가 통합적으로 관리합니다.</p>
+                            <p>각 채널의 시너지를 극대화하여 고객 여정 전반에 걸쳐 일관된 메시지를 전달합니다.</p>
+                            <p>광고 예산의 효율적인 배분과 낭비 최소화를 목표로 합니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="strategy-conclusion">
+                    <p>저희는 단순한 광고 대행을 넘어, 분양 시장의 특수성을 깊이 이해하고 타겟 고객에게 정확하게 도달하는 맞춤형 마케팅 전략을 제공합니다. 획일적인 접근 방식이 아닌, 각 상품의 잠재 고객을 분석하여 최적의 채널을 조합하고 효율적인 비용으로 최대의 효과를 이끌어냅니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 핵심 경쟁력 섹션 -->
+        <section class="competitiveness-section">
+            <div class="competitiveness-container">
+                <h3 class="competitiveness-title">분양리더만의 핵심 경쟁력 5가지</h3>
+                <div class="competitiveness-list">
+                    <div class="competitiveness-item">
+                        <div class="competitiveness-item-header">
+                            <div class="competitiveness-item-number">1</div>
+                            <h4 class="competitiveness-item-title">데이터 기반의 빈틈없는 타겟팅 (메타광고 & Google GDN)</h4>
+                        </div>
+                        <div class="competitiveness-item-content">
+                            <p><strong>잠재 고객 발굴:</strong> 분양에 관심 있는 고객의 온라인 행동 패턴을 분석하여 잠재 고객을 정확하게 타겟팅합니다.</p>
+                            <p><strong>리타겟팅 극대화:</strong> 이미 관심을 보인 고객에게 GDN(Google Display Network)을 통해 지속적으로 노출하여 이탈을 방지하고 전환율을 높입니다.</p>
+                            <p><strong>장점:</strong> 불특정 다수에게 뿌려지는 비효율적인 광고비를 절감하고, 실제 계약으로 이어질 가능성이 높은 잠재 고객(DB)을 확보합니다.</p>
+                        </div>
+                    </div>
+                    <div class="competitiveness-item">
+                        <div class="competitiveness-item-header">
+                            <div class="competitiveness-item-number">2</div>
+                            <h4 class="competitiveness-item-title">지역 맞춤형 하이퍼로컬 마케팅 (당근광고 & 호갱노노광고)</h4>
+                        </div>
+                        <div class="competitiveness-item-content">
+                            <p><strong>지역 밀착형 접점:</strong> 당근마켓을 활용하여 현장 인근 또는 관심 지역 거주자들에게 친근하게 접근합니다.</p>
+                            <p><strong>실수요자 공략:</strong> 호갱노노 플랫폼을 통해 해당 지역의 부동산 시세 및 분양 정보에 관심이 많은 실수요자를 직접 공략합니다.</p>
+                            <p><strong>장점:</strong> 현장 방문 및 모델하우스 유치에 유리한 지역 기반의 확실한 잠재 고객을 빠르게 모객합니다.</p>
+                        </div>
+                    </div>
+                    <div class="competitiveness-item">
+                        <div class="competitiveness-item-header">
+                            <div class="competitiveness-item-number">3</div>
+                            <h4 class="competitiveness-item-title">강력한 후속 관리 및 직접 소통 채널 확보 (LMS광고)</h4>
+                        </div>
+                        <div class="competitiveness-item-content">
+                            <p><strong>즉각적인 정보 전달:</strong> 이벤트, 청약 일정, 계약 조건 변경 등 중요한 정보를 LMS(장문 문자 메시지)로 즉각적이고 정확하게 전달합니다.</p>
+                            <p><strong>신뢰 구축:</strong> 단순 홍보를 넘어 고객과의 직접적인 소통 창구를 마련하여 신뢰도를 높이고 유대관계를 형성합니다.</p>
+                            <p><strong>장점:</strong> 확보된 DB의 이탈을 최소화하고, 지속적인 관심 유지를 통해 최종 계약 전환율을 높이는 데 기여합니다.</p>
+                        </div>
+                    </div>
+                    <div class="competitiveness-item">
+                        <div class="competitiveness-item-header">
+                            <div class="competitiveness-item-number">4</div>
+                            <h4 class="competitiveness-item-title">신뢰를 기반으로 한 콘텐츠 마케팅 (블로그광고)</h4>
+                        </div>
+                        <div class="competitiveness-item-content">
+                            <p><strong>정보성 콘텐츠 제공:</strong> 단순 광고성 글이 아닌, 고객이 궁금해하는 분양 정보, 입지 분석, 미래 가치 등에 대한 전문적인 콘텐츠를 제공합니다.</p>
+                            <p><strong>자발적 유입 유도:</strong> 검색 엔진 최적화(SEO)를 통해 잠재 고객이 스스로 정보를 찾아 유입되도록 유도합니다.</p>
+                            <p><strong>장점:</strong> 광고에 대한 거부감을 줄이고, 신뢰할 수 있는 정보 제공을 통해 잠재 고객의 긍정적인 인식을 확보합니다.</p>
+                        </div>
+                    </div>
+                    <div class="competitiveness-item">
+                        <div class="competitiveness-item-header">
+                            <div class="competitiveness-item-number">5</div>
+                            <h4 class="competitiveness-item-title">유연하고 통합적인 전략 실행</h4>
+                        </div>
+                        <div class="competitiveness-item-content">
+                            <p>저희는 위 모든 채널을 개별적으로 운영하는 것이 아닌, 하나의 유기적인 전략으로 묶어 운영합니다. 시장 반응과 데이터 분석을 기반으로 실시간으로 광고 예산과 전략을 유연하게 조정하며, 광고 효율을 최적화합니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="competitiveness-conclusion">
+                    <p><strong>지금 바로 저희와 함께 성공적인 분양 결과를 만들어가세요.</strong></p>
+                    <p>결과가 입증하는 차별화된 마케팅 솔루션을 경험해 보십시오.</p>
+                </div>
             </div>
         </section>
 
@@ -281,5 +1208,139 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // 사이트 ID 설정
+        window.SITE_ID = 'main';
+        window.INQUIRY_TYPE = '일반문의';
+
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const menuClose = document.getElementById('menuClose');
+        const sideMenu = document.getElementById('sideMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+
+        function openMenu() {
+            sideMenu.classList.add('active');
+            menuOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            sideMenu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        menuToggle.addEventListener('click', openMenu);
+        menuClose.addEventListener('click', closeMenu);
+        menuOverlay.addEventListener('click', closeMenu);
+
+        // Close menu when clicking on menu links
+        const menuLinks = document.querySelectorAll('.menu-link:not(.inquiry-menu-btn)');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+
+        // 문의하기 모달
+        const inquiryBtn = document.getElementById('inquiryBtn');
+        const inquiryMenuBtn = document.querySelector('.inquiry-menu-btn');
+        const inquiryModalOverlay = document.getElementById('inquiryModalOverlay');
+        const closeInquiryModal = document.getElementById('closeInquiryModal');
+        const inquiryForm = document.getElementById('inquiryForm');
+
+        function openInquiryModal() {
+            inquiryModalOverlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeInquiryModalFunc() {
+            inquiryModalOverlay.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        if (inquiryBtn) {
+            inquiryBtn.addEventListener('click', openInquiryModal);
+        }
+
+        if (inquiryMenuBtn) {
+            inquiryMenuBtn.addEventListener('click', () => {
+                closeMenu();
+                setTimeout(openInquiryModal, 300);
+            });
+        }
+
+        if (closeInquiryModal) {
+            closeInquiryModal.addEventListener('click', closeInquiryModalFunc);
+        }
+
+        if (inquiryModalOverlay) {
+            inquiryModalOverlay.addEventListener('click', (e) => {
+                if (e.target === inquiryModalOverlay) {
+                    closeInquiryModalFunc();
+                }
+            });
+        }
+
+        // 문의 폼 제출
+        if (inquiryForm) {
+            inquiryForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const submitBtn = inquiryForm.querySelector('.inquiry-submit-btn');
+                const originalText = submitBtn.textContent;
+                
+                const name = document.getElementById('inquiryName').value.trim();
+                const contact = document.getElementById('inquiryContact').value.trim();
+                const inquiryType = document.getElementById('inquiryType').value;
+                const message = document.getElementById('inquiryMessage').value.trim();
+                
+                if (!name || !contact) {
+                    alert('이름과 전화번호를 입력해주세요.');
+                    return;
+                }
+                
+                const formData = {
+                    site_id: 'main',
+                    name: name,
+                    contact: contact,
+                    message: message || null,
+                    custom_fields: {
+                        inquiry_type: inquiryType || '일반문의'
+                    }
+                };
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = '전송 중...';
+                
+                try {
+                    const response = await fetch('/api/inquiries', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert('문의가 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
+                        inquiryForm.reset();
+                        closeInquiryModalFunc();
+                    } else {
+                        alert(result.error || '문의 접수에 실패했습니다.\n다시 시도해주세요.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            });
+        }
+    </script>
+    <script src="/shared/scripts/inquiry-form.js"></script>
 </body>
 </html>
