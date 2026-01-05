@@ -72,9 +72,9 @@ export async function onRequest(context) {
     if (isMainDomain) {
       return next(); // 루트 index.html 표시
     }
-    // marketing 도메인으로 접속한 경우 메타광고 페이지로 리다이렉트
+    // marketing 도메인으로 접속한 경우 marketing 폴더의 index.html로 리다이렉트
     if (siteId === 'marketing') {
-      return Response.redirect(`${url.origin}/sites/marketing/meta.html`, 301);
+      return Response.redirect(`${url.origin}/sites/marketing/`, 301);
     }
     // 별도 도메인으로 접속한 경우 해당 사이트로 리다이렉트
     if (siteId) {
