@@ -57,9 +57,9 @@ export async function onRequest(context) {
       .bind(site_id, name, contact, message || null, customFieldsJson)
       .run();
 
-      // 텔레그램 알림 전송 (band-program 사이트인 경우만)
+      // 텔레그램 알림 전송 (band-program 및 marketing 사이트인 경우)
       let telegramStatus = null;
-      if (site_id === 'band-program') {
+      if (site_id === 'band-program' || site_id === 'marketing') {
         const telegramBotToken = env.TELEGRAM_BOT_TOKEN;
         const telegramChatId = env.TELEGRAM_CHAT_ID;
         
@@ -100,7 +100,7 @@ export async function onRequest(context) {
           telegramStatus = 'not_configured';
         }
       } else {
-        console.log('[Telegram] 알림 전송 건너뜀 - site_id:', site_id, '(band-program이 아님)');
+        console.log('[Telegram] 알림 전송 건너뜀 - site_id:', site_id, '(band-program 또는 marketing이 아님)');
         telegramStatus = 'skipped';
       }
 

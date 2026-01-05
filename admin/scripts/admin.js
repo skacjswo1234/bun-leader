@@ -311,6 +311,20 @@ function displayInquiries(inquiries) {
 
 // 문의 타입 추출 함수
 function getInquiryType(inquiry, customFields) {
+    // site_id로 먼저 판단
+    if (inquiry.site_id === 'marketing') {
+        // marketing 사이트의 경우 product_type을 문의 타입으로 사용
+        const productType = customFields.product_type || customFields.productType;
+        if (productType) {
+            return productType;
+        }
+        // custom_fields에서 inquiry_type 찾기
+        if (customFields.inquiry_type) {
+            return customFields.inquiry_type;
+        }
+        return '마케팅광고';
+    }
+    
     // custom_fields에서 inquiry_type 찾기
     if (customFields.inquiry_type) {
         return customFields.inquiry_type;
