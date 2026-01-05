@@ -49,25 +49,55 @@ export async function onRequest(context) {
     'www.band-program.com': 'band-program',
     'xn--9m1b22at9hd2c62blxw.com': 'band-program',  // band-program 전용 도메인
     'www.xn--9m1b22at9hd2c62blxw.com': 'band-program',
+    'xn--9m1b22at9hpuer8llia.com': 'marketing',  // 분양리더애드.com (marketing 전용 도메인)
+    'www.xn--9m1b22at9hpuer8llia.com': 'marketing',
+    '분양리더애드.com': 'marketing',  // 한글 도메인 (punycode로 변환되어 올 수 있음)
   };
+
+  // 메인 홈페이지 도메인 (루트 index.html 표시)
+  const mainDomainList = [
+    'bunyangleader.com',
+    'www.bunyangleader.com'
+  ];
+
+  // 메인 홈페이지 도메인인지 확인
+  const isMainDomain = mainDomainList.includes(hostname);
 
   // 도메인에 매핑된 사이트 찾기
   const siteId = domainMapping[hostname];
 
   // 루트 경로 처리
   if (url.pathname === '/' || url.pathname === '') {
+    // 메인 홈페이지 도메인(bunyangleader.com)은 루트 index.html 표시
+    if (isMainDomain) {
+      return next(); // 루트 index.html 표시
+    }
+    // marketing 도메인으로 접속한 경우 메타광고 페이지로 리다이렉트
+    if (siteId === 'marketing') {
+      return Response.redirect(`${url.origin}/sites/marketing/meta.html`, 301);
+    }
     // 별도 도메인으로 접속한 경우 해당 사이트로 리다이렉트
     if (siteId) {
       return Response.redirect(`${url.origin}/sites/${siteId}/`, 301);
     }
-    // 루트 도메인은 허브(index.html) 표시
-    // next()로 계속 진행하여 루트 index.html 표시
+    // 기본적으로 루트 index.html 표시 (bunyangleader.com 등)
+    return next();
   }
 
   // 매핑된 도메인이 있고, /sites/ 경로가 아닌 경우
   // 예: band-program.com/program.html → /sites/band-program/program.html
+  // 예: 분양리더애드.com/gdn.html → /sites/marketing/gdn.html
   if (siteId && !url.pathname.startsWith('/sites/') && !url.pathname.startsWith('/api/') && !url.pathname.startsWith('/admin/') && !url.pathname.startsWith('/shared/')) {
-    // 해당 사이트 경로로 리다이렉트
+    // marketing 사이트의 경우, HTML 파일들도 처리
+    if (siteId === 'marketing') {
+      // marketing 폴더에 있는 파일들 (.html, 이미지 등)
+      // 정적 리소스는 그대로 경로 매핑
+      const newPath = url.pathname.startsWith('/') 
+        ? `/sites/marketing${url.pathname}`
+        : `/sites/marketing/${url.pathname}`;
+      return Response.redirect(`${url.origin}${newPath}`, 301);
+    }
+    // 다른 사이트는 기존 로직대로 처리
     const newPath = url.pathname.startsWith('/') 
       ? `/sites/${siteId}${url.pathname}`
       : `/sites/${siteId}/${url.pathname}`;
