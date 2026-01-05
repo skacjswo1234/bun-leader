@@ -149,6 +149,10 @@
 
         /* 문의하기 버튼 */
         .inquiry-btn {
+            display: none;
+        }
+
+        .inquiry-btn.pc-only {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
@@ -177,6 +181,51 @@
             flex-shrink: 0;
         }
 
+        /* Banner Section */
+        .banner-section {
+            width: 100%;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .banner-container {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+        }
+
+        .banner-item {
+            flex: 1;
+            min-width: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        .banner-link {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            cursor: pointer;
+            transition: background 0.3s;
+            z-index: 1;
+        }
+
+        .banner-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
 
         /* Main Container */
         .main-container {
@@ -451,14 +500,21 @@
         /* Mobile Menu Button */
         .menu-toggle {
             display: none;
-            background: none;
+            background: linear-gradient(135deg, #1877f2 0%, #166fe5 100%);
             border: none;
             color: #fff;
-            font-size: 24px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            padding: 0.5rem;
+            padding: 0.625rem 1rem;
             margin-left: auto;
             z-index: 101;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .menu-toggle:hover {
+            background: linear-gradient(135deg, #166fe5 0%, #1457c7 100%);
         }
 
         /* Side Menu */
@@ -624,6 +680,10 @@
                 display: none;
             }
 
+            .inquiry-btn.pc-only {
+                display: none;
+            }
+
             .main-container {
                 padding: 2rem 1rem;
             }
@@ -703,6 +763,60 @@
 
             .footer-container {
                 padding: 0 1rem;
+            }
+
+            .banner-container {
+                flex-direction: column;
+            }
+
+            .banner-item {
+                flex: none;
+                width: 100%;
+            }
+        }
+
+        /* TOP 버튼 */
+        .top-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #03C75A 0%, #02B350 100%);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(3, 199, 90, 0.4);
+            transition: all 0.3s;
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .top-button.visible {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .top-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(3, 199, 90, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .top-button {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
             }
         }
 
@@ -870,15 +984,21 @@
                 <div class="logo">
                     <img src="/logo-white.png" alt="분양리더 로고">
                 </div>
-                <button class="inquiry-btn" id="inquiryBtn">
-                    <svg class="inquiry-btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
-                    </svg>
-                    문의남기기
-                </button>
             </div>
             <div class="header-right">
                 <nav class="quick-links">
+                <a href="/sites/band-program/" class="quick-link">
+                    <svg class="quick-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                    밴드홍보대행
+                </a>
+                <a href="/sites/band-program/" class="quick-link">
+                    <svg class="quick-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                    밴드프로그램판매
+                </a>
                 <a href="/sites/marketing/meta.html" class="quick-link meta">
                     <svg class="quick-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
@@ -919,10 +1039,40 @@
                     LMS문자
                 </a>
                 </nav>
-                <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기">☰</button>
+                <button class="menu-toggle" id="menuToggle" aria-label="상품목록 열기">상품목록</button>
             </div>
         </div>
     </header>
+
+    <!-- Banner Section -->
+    <section class="banner-section">
+        <div class="banner-container">
+            <div class="banner-item">
+                <img src="/banner/meta-banner.png" alt="메타광고 배너">
+                <a href="/sites/marketing/meta.html" class="banner-link" aria-label="메타광고 페이지로 이동"></a>
+            </div>
+            <div class="banner-item">
+                <img src="/banner/gdn-banner.png" alt="구글GDN 배너">
+                <a href="/sites/marketing/gdn.html" class="banner-link" aria-label="구글GDN 페이지로 이동"></a>
+            </div>
+            <div class="banner-item">
+                <img src="/banner/danggun-banner.png" alt="당근광고 배너">
+                <a href="/sites/marketing/danggun.html" class="banner-link" aria-label="당근광고 페이지로 이동"></a>
+            </div>
+            <div class="banner-item">
+                <img src="/banner/hogang-banner.png" alt="호갱노노 배너">
+                <a href="/sites/marketing/hogang.html" class="banner-link" aria-label="호갱노노 페이지로 이동"></a>
+            </div>
+            <div class="banner-item">
+                <img src="/banner/lms-banner.png" alt="문자광고 배너">
+                <a href="/sites/marketing/lms.html" class="banner-link" aria-label="문자광고 페이지로 이동"></a>
+            </div>
+            <div class="banner-item">
+                <img src="/banner/blog-banner.png" alt="블로그광고 배너">
+                <a href="/sites/marketing/blog.html" class="banner-link" aria-label="블로그광고 페이지로 이동"></a>
+            </div>
+        </div>
+    </section>
 
     <!-- Side Menu -->
     <div class="side-menu-overlay" id="menuOverlay"></div>
@@ -930,6 +1080,22 @@
         <div class="side-menu-content">
             <button class="menu-close" id="menuClose" aria-label="메뉴 닫기">×</button>
             <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="/sites/band-program/" class="menu-link">
+                        <svg class="menu-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                        밴드홍보대행
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/sites/band-program/" class="menu-link">
+                        <svg class="menu-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                        밴드프로그램판매
+                    </a>
+                </li>
                 <li class="menu-item">
                     <a href="/sites/marketing/meta.html" class="menu-link">
                         <svg class="menu-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -982,12 +1148,12 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <button class="menu-link inquiry-menu-btn" style="width: 100%; background: linear-gradient(135deg, #03C75A 0%, #02B350 100%); justify-content: center; margin-top: 1rem; border-radius: 8px;">
+                    <a href="tel:01041387559" class="menu-link inquiry-menu-btn" style="width: 100%; background: linear-gradient(135deg, #03C75A 0%, #02B350 100%); justify-content: center; margin-top: 1rem; border-radius: 8px; text-decoration: none;">
                         <svg class="menu-link-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="currentColor"/>
                         </svg>
-                        문의남기기
-                    </button>
+                        전화하기
+                    </a>
                 </li>
             </ul>
         </div>
@@ -1183,31 +1349,6 @@
 
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>회사정보</h4>
-                    <p>회사명 : (주)한가람디앤씨 - HangaramD&C</p>
-                    <p>사업자 등록번호 : 208-81-31159</p>
-                    <p>법인등록번호 : 280211-0237723</p>
-                </div>
-                <div class="footer-section">
-                    <h4>연락처</h4>
-                    <p>전화번호 : <a href="tel:18774911">1877-4911</a></p>
-                    <p>개인정보보호문의 : <a href="mailto:exoth@naver.com">exoth@naver.com</a></p>
-                </div>
-                <div class="footer-section">
-                    <h4>본사소재지</h4>
-                    <p>경기도 의정부시 신흥로231번길 11, 5층<br>(의정부동, 서경빌딩)</p>
-                </div>
-            </div>
-            <div class="footer-copyright">
-                <p>Copyright &copy; 2022 (주)한가람디앤씨 - HangaramD&C</p>
-            </div>
-        </div>
-    </footer>
 
     <script>
         // 사이트 ID 설정
@@ -1242,9 +1383,30 @@
             link.addEventListener('click', closeMenu);
         });
 
+        // TOP 버튼
+        const topButton = document.getElementById('topButton');
+        
+        // 스크롤 감지하여 TOP 버튼 표시/숨김
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                topButton.classList.add('visible');
+            } else {
+                topButton.classList.remove('visible');
+            }
+        });
+
+        // TOP 버튼 클릭 시 맨 위로 스크롤
+        if (topButton) {
+            topButton.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+
         // 문의하기 모달
         const inquiryBtn = document.getElementById('inquiryBtn');
-        const inquiryMenuBtn = document.querySelector('.inquiry-menu-btn');
         const inquiryModalOverlay = document.getElementById('inquiryModalOverlay');
         const closeInquiryModal = document.getElementById('closeInquiryModal');
         const inquiryForm = document.getElementById('inquiryForm');
@@ -1261,13 +1423,6 @@
 
         if (inquiryBtn) {
             inquiryBtn.addEventListener('click', openInquiryModal);
-        }
-
-        if (inquiryMenuBtn) {
-            inquiryMenuBtn.addEventListener('click', () => {
-                closeMenu();
-                setTimeout(openInquiryModal, 300);
-            });
         }
 
         if (closeInquiryModal) {

@@ -51,23 +51,49 @@ body {
     display: block;
 }
 
+.inquiry-header-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #03C75A 0%, #02B350 100%);
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    padding: 0.625rem 1rem;
+    border-radius: 6px;
+    transition: all 0.3s;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    margin-left: auto;
+    margin-right: 0.5rem;
+}
+
+.inquiry-header-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(3, 199, 90, 0.4);
+}
+
 .menu-toggle {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: none;
+    background: linear-gradient(135deg, #1877f2 0%, #166fe5 100%);
     border: none;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: 700;
-    color: #333;
-    padding: 8px 12px;
-    transition: color 0.3s;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    padding: 0.625rem 1rem;
+    border-radius: 6px;
+    transition: all 0.3s;
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .menu-toggle:hover {
-    color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(24, 119, 242, 0.4);
+    background: linear-gradient(135deg, #166fe5 0%, #1457c7 100%);
 }
 
 .menu-icon {
@@ -633,8 +659,13 @@ body {
         height: 50px;
     }
 
-    .menu-toggle span:first-child {
-        display: none;
+    .inquiry-header-btn {
+        margin-right: 0.5rem;
+        margin-left: 0;
+    }
+
+    .menu-toggle {
+        display: flex;
     }
 
     .side-menu {

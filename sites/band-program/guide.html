@@ -42,10 +42,8 @@
             <div class="logo">
                 <img src="logo.png" alt="분양리더 로고">
             </div>
-            <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기">
-                <span>메뉴</span>
-                <span class="menu-icon">☰</span>
-            </button>
+            <button class="inquiry-header-btn" id="inquiryHeaderBtn">문의하기</button>
+            <button class="menu-toggle" id="menuToggle" aria-label="상품목록 열기">상품목록</button>
         </div>
     </header>
 
@@ -194,9 +192,21 @@
                 <path d="M12 3C6.48 3 2 6.58 2 11c0 2.54 1.82 4.78 4.54 6.13L6 21l3.95-2.17c1.04.28 2.13.44 3.05.44 5.52 0 10-3.58 10-8s-4.48-8-10-8z" fill="currentColor"/>
             </svg>
         </a>
+        <button class="fixed-btn top-btn" id="topBtn" aria-label="맨 위로 이동">TOP</button>
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // 문의하기 버튼 클릭 시 index.html의 문의폼으로 이동
+        document.addEventListener('DOMContentLoaded', function() {
+            const inquiryBtn = document.getElementById('inquiryHeaderBtn');
+            if (inquiryBtn) {
+                inquiryBtn.addEventListener('click', function() {
+                    window.location.href = 'index.html#inquiry-section';
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 

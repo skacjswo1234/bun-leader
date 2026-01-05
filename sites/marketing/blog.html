@@ -37,10 +37,8 @@
             <a href="https://bun-leader.pages.dev/" class="logo">
                 <img src="../band-program/logo.png" alt="분양리더 로고">
             </a>
-            <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기">
-                <span>메뉴</span>
-                <span class="menu-icon">☰</span>
-            </button>
+            <button class="inquiry-header-btn" id="inquiryHeaderBtn">문의하기</button>
+            <button class="menu-toggle" id="menuToggle" aria-label="상품목록 열기">상품목록</button>
         </div>
     </header>
 
@@ -136,6 +134,7 @@
                 <path d="M12 3C6.48 3 2 6.58 2 11c0 2.54 1.82 4.78 4.54 6.13L6 21l3.95-2.17c1.04.28 2.13.44 3.05.44 5.52 0 10-3.58 10-8s-4.48-8-10-8z" fill="currentColor"/>
             </svg>
         </a>
+        <button class="fixed-btn top-btn" id="topBtn" aria-label="맨 위로 이동">TOP</button>
     </div>
 
     <script>
@@ -143,6 +142,40 @@
         window.SITE_ID = 'marketing';
         // 문의 타입 설정
         window.INQUIRY_TYPE = '마케팅광고';
+
+        // 문의하기 버튼 클릭 시 문의폼으로 스크롤
+        document.addEventListener('DOMContentLoaded', function() {
+            const inquiryBtn = document.getElementById('inquiryHeaderBtn');
+            if (inquiryBtn) {
+                inquiryBtn.addEventListener('click', function() {
+                    const inquirySection = document.querySelector('.inquiry-section');
+                    if (inquirySection) {
+                        inquirySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            }
+
+            // TOP 버튼 기능
+            const topBtn = document.getElementById('topBtn');
+            if (topBtn) {
+                // 스크롤 시 Top 버튼 표시/숨김
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 300) {
+                        topBtn.classList.add('show');
+                    } else {
+                        topBtn.classList.remove('show');
+                    }
+                });
+
+                // Top 버튼 클릭 시 맨 위로 스크롤
+                topBtn.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+        });
     </script>
     <script src="script.js"></script>
     <script src="/shared/scripts/inquiry-form.js"></script>
