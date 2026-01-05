@@ -1,0 +1,11 @@
+# 밴드홍보대행 도메인 (band-program.com) robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://band-program.com/sitemap.xml
+
+# Disallow admin and API
+Disallow: /admin/
+Disallow: /api/
+
