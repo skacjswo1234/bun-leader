@@ -4,9 +4,9 @@
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
     
-    <!-- 메타광고 (메인) -->
+    <!-- 메타광고 (메인) (xn--9m1b22at9hpuer8llia.com 전용) -->
     <url>
-        <loc>https://분양리더애드.com/meta.html</loc>
+        <loc>https://xn--9m1b22at9hpuer8llia.com/meta.html</loc>
         <lastmod>2024-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
@@ -14,7 +14,7 @@
     
     <!-- 구글GDN광고 -->
     <url>
-        <loc>https://분양리더애드.com/gdn.html</loc>
+        <loc>https://xn--9m1b22at9hpuer8llia.com/gdn.html</loc>
         <lastmod>2024-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
@@ -22,7 +22,7 @@
     
     <!-- 당근광고 -->
     <url>
-        <loc>https://분양리더애드.com/danggun.html</loc>
+        <loc>https://xn--9m1b22at9hpuer8llia.com/danggun.html</loc>
         <lastmod>2024-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
@@ -30,7 +30,7 @@
     
     <!-- 호갱노노광고 -->
     <url>
-        <loc>https://분양리더애드.com/hogang.html</loc>
+        <loc>https://xn--9m1b22at9hpuer8llia.com/hogang.html</loc>
         <lastmod>2024-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
@@ -38,7 +38,7 @@
     
     <!-- LMS문자광고 -->
     <url>
-        <loc>https://분양리더애드.com/lms.html</loc>
+        <loc>https://xn--9m1b22at9hpuer8llia.com/lms.html</loc>
         <lastmod>2024-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
@@ -46,7 +46,7 @@
     
     <!-- 블로그광고 -->
     <url>
-        <loc>https://분양리더애드.com/blog.html</loc>
+        <loc>https://xn--9m1b22at9hpuer8llia.com/blog.html</loc>
         <lastmod>2024-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>

@@ -1,9 +1,9 @@
-# 마케팅 도메인 (분양리더애드.com) robots.txt
+# 마케팅 도메인 (xn--9m1b22at9hpuer8llia.com) robots.txt
 User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://분양리더애드.com/sitemap.xml
+Sitemap: https://xn--9m1b22at9hpuer8llia.com/sitemap.xml
 
 # Disallow admin and API
 Disallow: /admin/
