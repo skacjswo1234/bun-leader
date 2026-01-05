@@ -50,6 +50,37 @@ export async function onRequest(context) {
           : JSON.stringify(custom_fields);
       }
 
+      // sites 테이블에 site_id가 존재하는지 확인하고, 없으면 자동 생성
+      const existingSite = await db.prepare(
+        'SELECT id FROM sites WHERE id = ?'
+      )
+      .bind(site_id)
+      .first();
+
+      if (!existingSite) {
+        // 사이트 이름 설정
+        let siteName = site_id;
+        if (site_id === 'band-program') {
+          siteName = '밴드홍보대행/프로그램판매';
+        } else if (site_id === 'marketing') {
+          siteName = '분양리더마케팅';
+        }
+
+        // sites 테이블에 사이트 자동 생성
+        try {
+          await db.prepare(
+            `INSERT INTO sites (id, name, created_at, updated_at)
+             VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
+          )
+          .bind(site_id, siteName)
+          .run();
+          console.log(`[Inquiries API] 사이트 자동 생성: ${site_id} (${siteName})`);
+        } catch (insertError) {
+          console.error(`[Inquiries API] 사이트 생성 실패: ${site_id}`, insertError);
+          // 사이트 생성 실패해도 문의 생성은 시도 (FOREIGN KEY 제약 조건이 없는 경우를 대비)
+        }
+      }
+
       const result = await db.prepare(
         `INSERT INTO inquiries (site_id, name, contact, message, custom_fields, status)
          VALUES (?, ?, ?, ?, ?, 'pending')`
