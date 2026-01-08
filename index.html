@@ -254,6 +254,54 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
+        /* 띠지 배너 섹션 (PC: 중앙 배치, 모바일: meta-banner 위) */
+        .ribbon-banner-section {
+            width: 100%;
+            background-color: #000;
+            overflow: hidden;
+            display: none; /* 모바일에서만 표시 */
+        }
+
+        .ribbon-banner-container {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+        }
+
+        .ribbon-banner-item {
+            flex: 1;
+            min-width: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ribbon-banner-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        .ribbon-banner-link {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            cursor: pointer;
+            transition: background 0.3s;
+            z-index: 1;
+        }
+
+        .ribbon-banner-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
         /* Main Container */
         .main-container {
             max-width: 1200px;
@@ -800,6 +848,32 @@
                 flex: none;
                 width: 100%;
             }
+
+            /* 모바일: 띠지 배너를 meta-banner 위에 표시 */
+            .ribbon-banner-section {
+                display: block;
+            }
+
+            /* 모바일: PC용 띠지 배너는 숨김 */
+            .ribbon-banner-section.pc-only {
+                display: none !important;
+            }
+
+            .ribbon-banner-container {
+                flex-direction: column;
+            }
+
+            .ribbon-banner-item {
+                flex: none;
+                width: 100%;
+            }
+        }
+
+        /* PC: 띠지 배너를 main-container 위에 중앙 배치 */
+        @media (min-width: 769px) {
+            .ribbon-banner-section.pc-only {
+                display: block;
+            }
         }
 
         /* TOP 버튼 */
@@ -1071,6 +1145,20 @@
         </div>
     </header>
 
+    <!-- 띠지 배너 섹션 (모바일: meta-banner 위) -->
+    <section class="ribbon-banner-section">
+        <div class="ribbon-banner-container">
+            <div class="ribbon-banner-item">
+                <img src="/banner/band-banner.png" alt="밴드홍보대행 배너">
+                <a href="/sites/band-program/" class="ribbon-banner-link" aria-label="밴드홍보대행 페이지로 이동"></a>
+            </div>
+            <div class="ribbon-banner-item">
+                <img src="/banner/program-banner.png" alt="밴드프로그램판매 배너">
+                <a href="/sites/band-program/" class="ribbon-banner-link" aria-label="밴드프로그램판매 페이지로 이동"></a>
+            </div>
+        </div>
+    </section>
+
     <!-- Banner Section -->
     <section class="banner-section">
         <div class="banner-container">
@@ -1097,6 +1185,20 @@
             <div class="banner-item">
                 <img src="/banner/blog-banner.png" alt="블로그광고 배너">
                 <a href="/sites/marketing/blog.html" class="banner-link" aria-label="블로그광고 페이지로 이동"></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 띠지 배너 섹션 (PC: main-container 위 중앙 배치) -->
+    <section class="ribbon-banner-section pc-only">
+        <div class="ribbon-banner-container">
+            <div class="ribbon-banner-item">
+                <img src="/banner/band-banner.png" alt="밴드홍보대행 배너">
+                <a href="/sites/band-program/" class="ribbon-banner-link" aria-label="밴드홍보대행 페이지로 이동"></a>
+            </div>
+            <div class="ribbon-banner-item">
+                <img src="/banner/program-banner.png" alt="밴드프로그램판매 배너">
+                <a href="/sites/band-program/" class="ribbon-banner-link" aria-label="밴드프로그램판매 페이지로 이동"></a>
             </div>
         </div>
     </section>
@@ -1414,13 +1516,15 @@
         const topButton = document.getElementById('topButton');
         
         // 스크롤 감지하여 TOP 버튼 표시/숨김
-        window.addEventListener('scroll', function() {
-            if (window.pageYOffset > 300) {
-                topButton.classList.add('visible');
-            } else {
-                topButton.classList.remove('visible');
-            }
-        });
+        if (topButton) {
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    topButton.classList.add('visible');
+                } else {
+                    topButton.classList.remove('visible');
+                }
+            });
+        }
 
         // TOP 버튼 클릭 시 맨 위로 스크롤
         if (topButton) {
