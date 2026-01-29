@@ -64,6 +64,8 @@ export async function onRequest(context) {
           siteName = '밴드홍보대행/프로그램판매';
         } else if (site_id === 'marketing') {
           siteName = '분양리더마케팅';
+        } else if (site_id === 'bun-partner') {
+          siteName = '분양파트너';
         }
 
         // sites 테이블에 사이트 자동 생성
@@ -88,9 +90,9 @@ export async function onRequest(context) {
       .bind(site_id, name, contact, message || null, customFieldsJson)
       .run();
 
-      // 텔레그램 알림 전송 (band-program 및 marketing 사이트인 경우)
+      // 텔레그램 알림 전송 (band-program, marketing, bun-partner 사이트인 경우)
       let telegramStatus = null;
-      if (site_id === 'band-program' || site_id === 'marketing') {
+      if (site_id === 'band-program' || site_id === 'marketing' || site_id === 'bun-partner') {
         const telegramBotToken = env.TELEGRAM_BOT_TOKEN;
         const telegramChatId = env.TELEGRAM_CHAT_ID;
         
