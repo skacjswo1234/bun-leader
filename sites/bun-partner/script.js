@@ -188,6 +188,8 @@ function initHeaderNav() {
         overlay.classList.remove('open');
         btn.setAttribute('aria-label', '메뉴 열기');
     }
+    const closeBtn = document.getElementById('headerNavClose');
+    if (closeBtn) closeBtn.addEventListener('click', close);
     btn.addEventListener('click', () => {
         if (mobile.classList.contains('open')) close();
         else open();

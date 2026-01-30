@@ -21,7 +21,7 @@
     <header class="header">
         <div class="header-inner">
             <a href="#" class="logo" aria-label="분양파트너 홈">
-                <img src="images/partner-logo.png" alt="분양파트너BP" class="logo-img">
+                <img src="logo/logo-white.png" alt="분양파트너BP" class="logo-img">
             </a>
             <nav class="header-nav" aria-label="섹션 메뉴">
                 <a href="#overview">회사개요</a>
@@ -34,11 +34,12 @@
                 <a href="#lead-partner" class="nav-cta">파트너 신청</a>
                 <a href="#lead-investor" class="nav-cta">투자자 신청</a>
             </nav>
-            <button type="button" class="header-menu-btn" id="headerMenuBtn" aria-label="메뉴 열기">≡</button>
             <a href="#lead-partner" class="header-cta">파트너 지원 신청</a>
+            <button type="button" class="header-menu-btn" id="headerMenuBtn" aria-label="메뉴 열기">≡</button>
         </div>
         <div class="header-nav-overlay" id="headerNavOverlay" aria-hidden="true"></div>
         <div class="header-nav-mobile" id="headerNavMobile">
+            <button type="button" class="header-nav-close" id="headerNavClose" aria-label="메뉴 닫기">✕</button>
             <a href="#overview">📋 회사개요</a>
             <a href="#market">📈 시장흐름</a>
             <a href="#philosophy">★ 운영철학</a>
@@ -48,42 +49,37 @@
             <a href="#vision">✧ 비전</a>
             <a href="#lead-partner">▶ 파트너 신청</a>
             <a href="#lead-investor">◉ 투자자 신청</a>
+            <div class="header-nav-mobile-logo">
+                <img src="logo/logo-white.png" alt="분양파트너BP">
+            </div>
         </div>
     </header>
 
     <main>
         <!-- HERO SECTION -->
         <section id="hero" class="section hero">
+            <video class="hero-bg-video" autoplay muted loop playsinline aria-hidden="true">
+                <source src="hero-bg.mp4" type="video/mp4">
+            </video>
             <div class="hero-bg-accent"></div>
-            <div class="hero-emojis" aria-hidden="true">
-                <span class="hero-emoji">💰</span>
-                <span class="hero-emoji">🏦</span>
-                <span class="hero-emoji">📈</span>
-                <span class="hero-emoji">💵</span>
-                <span class="hero-emoji">📊</span>
-                <span class="hero-emoji">💎</span>
-                <span class="hero-emoji">📉</span>
-                <span class="hero-emoji">🏛️</span>
-            </div>
-            <div class="hero-mascot" aria-hidden="true">
-                <span class="hero-mascot-char">🦊</span>
-                <span class="hero-mascot-label">BP와 함께</span>
-            </div>
-            <div class="container">
-                <span class="hero-icon" aria-hidden="true">◇</span>
+            <div class="container hero-container">
                 <h1 class="hero-title">분양은, 자본으로 실적을 증명합니다</h1>
                 <p class="hero-sub hero-sub-large">
                     분양파트너는<br>
                     분양 현장에 직접 자본을 투입해<br>
                     수익 구조를 함께 만드는 전문 투자(REITs)사입니다.
                 </p>
+                <a href="#lead-partner" class="hero-cta">신청하기</a>
             </div>
         </section>
 
-        <!-- 이미지 h-1 -->
+        <!-- 이미지 h-1 (모바일: h-1-m) -->
         <div class="section-image section-reveal">
             <div class="container">
-                <img src="images/h-1.png" alt="" class="section-img">
+                <picture>
+                    <source media="(max-width: 640px)" srcset="mobile/h-1-m.png">
+                    <img src="images/h-1.png" alt="" class="section-img">
+                </picture>
             </div>
         </div>
 
@@ -106,10 +102,13 @@
             </div>
         </section>
 
-        <!-- 이미지 h-2 -->
+        <!-- 이미지 h-2 (모바일: h-2-m) -->
         <div class="section-image section-reveal">
             <div class="container">
-                <img src="images/h-2.png" alt="" class="section-img">
+                <picture>
+                    <source media="(max-width: 640px)" srcset="mobile/h-2-m.png">
+                    <img src="images/h-2.png" alt="" class="section-img">
+                </picture>
             </div>
         </div>
 
@@ -129,10 +128,13 @@
             </div>
         </section>
 
-        <!-- 이미지 h-3 -->
+        <!-- 이미지 h-3 (모바일: h-3-m) -->
         <div class="section-image section-reveal">
             <div class="container">
-                <img src="images/h-3.png" alt="" class="section-img">
+                <picture>
+                    <source media="(max-width: 640px)" srcset="mobile/h-3-m.png">
+                    <img src="images/h-3.png" alt="" class="section-img">
+                </picture>
             </div>
         </div>
 
@@ -166,10 +168,13 @@
             </div>
         </section>
 
-        <!-- 이미지 h-4 -->
+        <!-- 이미지 h-4 (모바일: h-4-m) -->
         <div class="section-image section-reveal">
             <div class="container">
-                <img src="images/h-4.png" alt="" class="section-img">
+                <picture>
+                    <source media="(max-width: 640px)" srcset="mobile/h-4-m.png">
+                    <img src="images/h-4.png" alt="" class="section-img">
+                </picture>
             </div>
         </div>
 
@@ -191,10 +196,13 @@
             </div>
         </section>
 
-        <!-- 이미지 h-5 -->
+        <!-- 이미지 h-5 (모바일: h-5-m) -->
         <div class="section-image section-reveal">
             <div class="container">
-                <img src="images/h-5.png" alt="" class="section-img">
+                <picture>
+                    <source media="(max-width: 640px)" srcset="mobile/h-5-m.png">
+                    <img src="images/h-5.png" alt="" class="section-img">
+                </picture>
             </div>
         </div>
 
@@ -218,10 +226,13 @@
             </div>
         </section>
 
-        <!-- 이미지 h-6 -->
+        <!-- 이미지 h-6 (모바일: h-6-m) -->
         <div class="section-image section-reveal">
             <div class="container">
-                <img src="images/h-6.png" alt="" class="section-img">
+                <picture>
+                    <source media="(max-width: 640px)" srcset="mobile/h-6-m.png">
+                    <img src="images/h-6.png" alt="" class="section-img">
+                </picture>
             </div>
         </div>
 
@@ -242,10 +253,13 @@
             </div>
         </section>
 
-        <!-- 이미지 h-7 -->
+        <!-- 이미지 h-7 (모바일: h-7-m) -->
         <div class="section-image section-reveal">
             <div class="container">
-                <img src="images/h-7.png" alt="" class="section-img">
+                <picture>
+                    <source media="(max-width: 640px)" srcset="mobile/h-7-m.png">
+                    <img src="images/h-7.png" alt="" class="section-img">
+                </picture>
             </div>
         </div>
 
@@ -264,10 +278,13 @@
             </div>
         </section>
 
-        <!-- 이미지 h-8 -->
+        <!-- 이미지 h-8 (모바일: h-8-m) -->
         <div class="section-image section-reveal">
             <div class="container">
-                <img src="images/h-8.png" alt="" class="section-img">
+                <picture>
+                    <source media="(max-width: 640px)" srcset="mobile/h-8-m.png">
+                    <img src="images/h-8.png" alt="" class="section-img">
+                </picture>
             </div>
         </div>
 
@@ -303,10 +320,13 @@
             </div>
         </section>
 
-        <!-- 이미지 h-9 -->
+        <!-- 이미지 h-9 (모바일: h-9-m) -->
         <div class="section-image section-reveal">
             <div class="container">
-                <img src="images/h-9.png" alt="" class="section-img">
+                <picture>
+                    <source media="(max-width: 640px)" srcset="mobile/h-9-m.png">
+                    <img src="images/h-9.png" alt="" class="section-img">
+                </picture>
             </div>
         </div>
 
@@ -334,16 +354,22 @@
             </div>
         </section>
 
-        <!-- 이미지 h-10 -->
+        <!-- 이미지 h-10 (모바일: h-10-m) -->
         <div class="section-image section-reveal">
             <div class="container">
-                <img src="images/h-10.png" alt="" class="section-img">
+                <picture>
+                    <source media="(max-width: 640px)" srcset="mobile/h-10-m.png">
+                    <img src="images/h-10.png" alt="" class="section-img">
+                </picture>
             </div>
         </div>
     </main>
 
     <footer class="footer">
         <div class="container">
+            <a href="#" class="footer-logo" aria-label="분양파트너 홈">
+                <img src="logo/logo-black.png" alt="분양파트너BP" class="footer-logo-img">
+            </a>
             <p class="footer-text">© 분양파트너. All rights reserved.</p>
         </div>
     </footer>

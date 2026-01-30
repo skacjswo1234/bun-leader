@@ -247,6 +247,38 @@ body {
     display: flex;
     transform: translateX(0);
 }
+.header-nav-close {
+    position: absolute;
+    top: 16px;
+    right: 40px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--text);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.header-nav-close:hover {
+    background: rgba(201, 162, 39, 0.15);
+    color: var(--gold);
+}
+.header-nav-mobile-logo {
+    margin-top: auto;
+    padding-top: 24px;
+    text-align: center;
+}
+.header-nav-mobile-logo img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+    opacity: 0.9;
+}
 .header-nav-mobile a {
     font-size: 1rem;
     font-weight: 600;
@@ -262,7 +294,10 @@ body {
 }
 @media (max-width: 1024px) {
     .header-nav { display: none; }
-    .header-menu-btn { display: flex; }
+    .header-menu-btn {
+        display: flex;
+        margin-right: -9px;
+    }
 }
 @media (min-width: 1025px) {
     .header-nav-mobile { display: none !important; }
@@ -413,7 +448,45 @@ body {
 .section-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    justify-items: center;
+    gap: 20px;
+    align-items: start;
+}
+/* PC: 시장 흐름 섹션 카드 4열 고정 + 텍스트·이모지 중앙정렬 */
+@media (min-width: 769px) {
+    #market .section-char,
+    #market .section-title {
+        text-align: center;
+    }
+    #market .section-title .section-icon {
+        display: inline-block;
+    }
+    .section-cards-grid {
+        grid-template-columns: repeat(4, 1fr);
+        justify-items: stretch;
+    }
+    .section-cards-grid .section-card {
+        width: 100%;
+        max-width: none;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .section-cards-grid .section-card .section-card-emoji {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .section-cards-grid .section-card .card-text-large,
+    .section-cards-grid .section-card p {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .section-cards-grid .section-card-wide {
+        grid-column: 1 / -1;
+        max-width: 100%;
+    }
 }
 .section-card {
     background: linear-gradient(145deg, rgba(18, 18, 22, 0.9) 0%, var(--bg-card) 100%);
@@ -573,7 +646,33 @@ body {
     padding-top: 120px;
     padding-bottom: 80px;
     position: relative;
+    overflow: hidden;
 }
+/* 히어로 배경 영상 */
+.hero-bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+}
+/* 영상 위 어두운 오버레이 (텍스트 가독) */
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(180deg,
+        rgba(5, 5, 8, 0.5) 0%,
+        rgba(5, 5, 8, 0.7) 40%,
+        rgba(5, 5, 8, 0.85) 100%
+    );
+    pointer-events: none;
+}
+.hero .container,
+.hero-bg-accent { position: relative; z-index: 2; }
 .hero-bg-accent {
     position: absolute;
     bottom: 0;
@@ -583,83 +682,60 @@ body {
     background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
     opacity: 0.4;
 }
-.hero .container {
+.hero .container.hero-container {
     position: relative;
-}
-.hero-emojis {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-}
-.hero-emoji {
-    position: absolute;
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    opacity: 0.5;
-    animation: heroEmojiFloat 8s ease-in-out infinite;
-}
-.hero-emoji:nth-child(1) { left: 8%; top: 15%; animation-delay: 0s; }
-.hero-emoji:nth-child(2) { left: 22%; top: 25%; animation-delay: -1.5s; }
-.hero-emoji:nth-child(3) { left: 75%; top: 20%; animation-delay: -3s; }
-.hero-emoji:nth-child(4) { left: 88%; top: 35%; animation-delay: -4.5s; }
-.hero-emoji:nth-child(5) { left: 12%; top: 55%; animation-delay: -2s; }
-.hero-emoji:nth-child(6) { left: 85%; top: 60%; animation-delay: -5s; }
-.hero-emoji:nth-child(7) { left: 45%; top: 12%; animation-delay: -1s; }
-.hero-emoji:nth-child(8) { left: 55%; top: 70%; animation-delay: -6s; }
-@keyframes heroEmojiFloat {
-    0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
-    50% { transform: translateY(-12px) scale(1.08); opacity: 0.65; }
-}
-.hero-mascot {
-    position: absolute;
-    top: 24px;
-    right: 24px;
+    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    animation: mascotFloat 4s ease-in-out infinite;
-}
-.hero-mascot-char {
-    font-size: 4rem;
-    filter: drop-shadow(0 4px 12px var(--gold-glow));
-}
-.hero-mascot-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--gold);
-    letter-spacing: 0.05em;
-}
-@keyframes mascotFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-.hero-icon {
-    display: inline-block;
-    font-size: 1.25rem;
-    color: var(--gold);
-    opacity: 0.9;
-    margin-bottom: 16px;
-    animation: heroIconPulse 2.5s ease-in-out infinite;
 }
 .hero-title {
     font-weight: 800;
     font-size: clamp(1.75rem, 4vw, 2.5rem);
-    color: var(--text);
+    color: #f2f2f4;
     line-height: 1.3;
     margin-bottom: 24px;
     letter-spacing: -0.02em;
     animation: heroReveal 0.9s ease-out;
+    text-shadow:
+        0 0 20px rgba(0, 0, 0, 0.8),
+        0 2px 8px rgba(0, 0, 0, 0.9),
+        0 1px 3px rgba(0, 0, 0, 0.95);
 }
 .hero-sub {
     font-size: clamp(1rem, 2vw, 1.15rem);
-    color: var(--text-muted);
+    color: #d8d8dc;
     line-height: 1.8;
     animation: heroReveal 0.9s ease-out 0.2s both;
+    text-shadow:
+        0 0 16px rgba(0, 0, 0, 0.7),
+        0 2px 6px rgba(0, 0, 0, 0.85),
+        0 1px 2px rgba(0, 0, 0, 0.9);
 }
 .hero-sub-large {
     font-size: clamp(1.08rem, 2.2vw, 1.25rem);
     line-height: 1.85;
+}
+.hero-cta {
+    display: inline-block;
+    margin-top: 28px;
+    padding: 14px 32px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--gold);
+    background: transparent;
+    border: 2px solid var(--gold);
+    border-radius: var(--radius);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+    animation: heroReveal 0.9s ease-out 0.3s both;
+}
+.hero-cta:hover {
+    background: var(--gold);
+    color: var(--bg);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px var(--gold-glow);
 }
 @keyframes heroReveal {
     from {
@@ -670,10 +746,6 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
-}
-@keyframes heroIconPulse {
-    0%, 100% { opacity: 0.7; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
 }
 
 /* ----- Cards (Section 3) ----- */
@@ -993,11 +1065,22 @@ body {
 /* ----- Footer ----- */
 .footer {
     padding: 32px 0;
-    border-top: 1px solid var(--border);
+    background: #fff;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+.footer-logo {
+    display: block;
+    text-align: center;
+    margin-bottom: 16px;
+}
+.footer-logo-img {
+    height: 44px;
+    width: auto;
+    object-fit: contain;
 }
 .footer-text {
     font-size: 0.9rem;
-    color: var(--text-muted);
+    color: #666;
     text-align: center;
 }
 
@@ -1030,6 +1113,11 @@ body {
     background: var(--gold-light);
     transform: translateY(-2px);
     box-shadow: 0 6px 24px var(--gold-glow);
+}
+@media (max-width: 1024px) {
+    .top-btn {
+        right: 36px;
+    }
 }
 
 /* ----- Modal ----- */
@@ -1167,13 +1255,6 @@ body {
     .flow-cards {
         grid-template-columns: 1fr;
     }
-    .hero-emoji { font-size: 1.25rem !important; }
-    .hero-mascot {
-        top: 14px;
-        right: 14px;
-    }
-    .hero-mascot-char { font-size: 2.5rem; }
-    .hero-mascot-label { font-size: 0.75rem; }
     .section-char { font-size: 2.25rem; }
     .card-text-large { font-size: 1rem !important; }
     .section-image {
