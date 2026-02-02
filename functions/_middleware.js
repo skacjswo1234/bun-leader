@@ -31,7 +31,12 @@ export async function onRequest(context) {
     // 다른 관리자 페이지는 인증 체크
     if (!checkAuth(request)) {
       // 미인증 시 로그인 페이지로 리다이렉트
-      return Response.redirect(`${url.origin}/admin/login.html`, 302);
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': `${url.origin}/admin/login.html`
+        }
+      });
     }
     
     return next();
@@ -74,11 +79,21 @@ export async function onRequest(context) {
     }
     // marketing 도메인으로 접속한 경우 marketing 폴더의 index.html로 리다이렉트
     if (siteId === 'marketing') {
-      return Response.redirect(`${url.origin}/sites/marketing/`, 301);
+      return new Response(null, {
+        status: 301,
+        headers: {
+          'Location': `${url.origin}/sites/marketing/`
+        }
+      });
     }
     // 별도 도메인으로 접속한 경우 해당 사이트로 리다이렉트
     if (siteId) {
-      return Response.redirect(`${url.origin}/sites/${siteId}/`, 301);
+      return new Response(null, {
+        status: 301,
+        headers: {
+          'Location': `${url.origin}/sites/${siteId}/`
+        }
+      });
     }
     // 기본적으로 루트 index.html 표시 (bunyangleader.com 등)
     return next();
@@ -95,13 +110,23 @@ export async function onRequest(context) {
       const newPath = url.pathname.startsWith('/') 
         ? `/sites/marketing${url.pathname}`
         : `/sites/marketing/${url.pathname}`;
-      return Response.redirect(`${url.origin}${newPath}`, 301);
+      return new Response(null, {
+        status: 301,
+        headers: {
+          'Location': `${url.origin}${newPath}`
+        }
+      });
     }
     // 다른 사이트는 기존 로직대로 처리
     const newPath = url.pathname.startsWith('/') 
       ? `/sites/${siteId}${url.pathname}`
       : `/sites/${siteId}/${url.pathname}`;
-    return Response.redirect(`${url.origin}${newPath}`, 301);
+    return new Response(null, {
+      status: 301,
+      headers: {
+        'Location': `${url.origin}${newPath}`
+      }
+    });
   }
 
   // 기본 동작 (기존 파일 서빙)

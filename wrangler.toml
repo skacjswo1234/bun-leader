@@ -1,5 +1,6 @@
 # Cloudflare Pages Functions 설정
 # Pages Functions는 자동으로 functions/ 폴더를 인식합니다
+# pages_build_output_dir은 Pages Functions에서는 필요 없습니다 (자동 감지)
 
 name = "bun-leader"
 compatibility_date = "2024-01-01"
