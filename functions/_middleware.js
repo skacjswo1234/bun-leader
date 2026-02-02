@@ -149,25 +149,75 @@ export async function onRequest(context) {
     const currentOrigin = url.origin;
     const imageUrl = `${currentOrigin}/sites/bun-partner/images/partner-logo.png`;
     
-    // 메타 태그 URL들을 현재 도메인으로 교체
+    // 모든 하드코딩된 도메인을 현재 도메인으로 교체
+    // 1. punycode 도메인 (www 포함/미포함 모두) - 전체 URL 교체
     html = html.replace(
-      /https:\/\/xn--h50bt0vxig27n8la\.com\//g,
+      /https:\/\/(www\.)?xn--h50bt0vxig27n8la\.com\//g,
       `${currentOrigin}/`
     );
     
-    // og:image, twitter:image 등 이미지 URL도 업데이트 (현재 도메인 + 올바른 경로)
+    // 2. 한글 도메인도 교체 (만약 HTML에 있다면)
     html = html.replace(
-      /https:\/\/xn--h50bt0vxig27n8la\.com\/sites\/bun-partner\/images\/partner-logo\.png/g,
+      /https:\/\/(www\.)?분양파트너\.com\//g,
+      `${currentOrigin}/`
+    );
+    
+    // 3. og:image, twitter:image 등 이미지 URL 업데이트 (모든 가능한 형식)
+    // punycode 도메인 + 올바른 경로 (이미 위에서 교체되었을 수 있으므로 다시 확인)
+    html = html.replace(
+      /https:\/\/(www\.)?xn--h50bt0vxig27n8la\.com\/sites\/bun-partner\/images\/partner-logo\.png/g,
+      imageUrl
+    );
+    
+    // 한글 도메인 + 올바른 경로
+    html = html.replace(
+      /https:\/\/(www\.)?분양파트너\.com\/sites\/bun-partner\/images\/partner-logo\.png/g,
       imageUrl
     );
     
     // 이전 경로 형식도 지원 (하위 호환성)
     html = html.replace(
-      /https:\/\/xn--h50bt0vxig27n8la\.com\/images\/partner-logo\.png/g,
+      /https:\/\/(www\.)?xn--h50bt0vxig27n8la\.com\/images\/partner-logo\.png/g,
       imageUrl
     );
     
-    // 상대 경로로 된 이미지도 절대 경로로 변경
+    html = html.replace(
+      /https:\/\/(www\.)?분양파트너\.com\/images\/partner-logo\.png/g,
+      imageUrl
+    );
+    
+    // 4. JSON-LD 스크립트 내부의 URL도 교체
+    html = html.replace(
+      /"url":\s*"https:\/\/(www\.)?xn--h50bt0vxig27n8la\.com\/"/g,
+      `"url": "${currentOrigin}/"`
+    );
+    
+    html = html.replace(
+      /"url":\s*"https:\/\/(www\.)?분양파트너\.com\/"/g,
+      `"url": "${currentOrigin}/"`
+    );
+    
+    html = html.replace(
+      /"logo":\s*"https:\/\/(www\.)?xn--h50bt0vxig27n8la\.com\/sites\/bun-partner\/images\/partner-logo\.png"/g,
+      `"logo": "${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /"logo":\s*"https:\/\/(www\.)?분양파트너\.com\/sites\/bun-partner\/images\/partner-logo\.png"/g,
+      `"logo": "${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /"target":\s*"https:\/\/(www\.)?xn--h50bt0vxig27n8la\.com\/\?q=/g,
+      `"target": "${currentOrigin}/?q=`
+    );
+    
+    html = html.replace(
+      /"target":\s*"https:\/\/(www\.)?분양파트너\.com\/\?q=/g,
+      `"target": "${currentOrigin}/?q=`
+    );
+    
+    // 5. 상대 경로로 된 이미지도 절대 경로로 변경
     html = html.replace(
       /content="\/images\/partner-logo\.png"/g,
       `content="${imageUrl}"`
@@ -176,6 +226,32 @@ export async function onRequest(context) {
     html = html.replace(
       /content="\/sites\/bun-partner\/images\/partner-logo\.png"/g,
       `content="${imageUrl}"`
+    );
+    
+    // 6. property 속성의 이미지 URL도 명시적으로 교체 (카카오톡 등에서 사용)
+    html = html.replace(
+      /property="og:image"\s+content="[^"]*partner-logo\.png"/g,
+      `property="og:image" content="${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /property="og:image:url"\s+content="[^"]*partner-logo\.png"/g,
+      `property="og:image:url" content="${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /property="og:image:secure_url"\s+content="[^"]*partner-logo\.png"/g,
+      `property="og:image:secure_url" content="${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /name="og:image"\s+content="[^"]*partner-logo\.png"/g,
+      `name="og:image" content="${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /name="twitter:image"\s+content="[^"]*partner-logo\.png"/g,
+      `name="twitter:image" content="${imageUrl}"`
     );
     
     return new Response(html, {
