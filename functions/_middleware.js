@@ -81,6 +81,21 @@ export async function onRequest(context) {
     if (isMainDomain) {
       return next(); // 루트 index.html 표시
     }
+    // bun-partner 도메인은 301 리다이렉트 없이 내부적으로 파일 서빙 (SEO 최적화)
+    if (siteId === 'bun-partner') {
+      // 내부적으로 /sites/bun-partner/ 경로로 라우팅하되 리다이렉트 없이 서빙
+      // 새로운 URL로 Request 생성하여 내부 라우팅
+      const internalUrl = new URL('/sites/bun-partner/', url.origin);
+      const internalRequest = new Request(internalUrl.toString(), {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+        cf: request.cf
+      });
+      const response = await next(internalRequest);
+      // 응답 후 meta 태그 교체 로직이 적용되도록 반환
+      return response;
+    }
     // marketing 도메인으로 접속한 경우 marketing 폴더의 index.html로 리다이렉트
     if (siteId === 'marketing') {
       return new Response(null, {
@@ -90,7 +105,7 @@ export async function onRequest(context) {
         }
       });
     }
-    // 별도 도메인으로 접속한 경우 해당 사이트로 리다이렉트
+    // 다른 별도 도메인으로 접속한 경우 해당 사이트로 리다이렉트
     if (siteId) {
       return new Response(null, {
         status: 301,
