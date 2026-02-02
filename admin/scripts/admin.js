@@ -325,6 +325,14 @@ function getInquiryType(inquiry, customFields) {
         return '마케팅광고';
     }
     
+    if (inquiry.site_id === 'bun-partner') {
+        // bun-partner 사이트의 경우 inquiry_type을 문의 타입으로 사용
+        if (customFields.inquiry_type) {
+            return customFields.inquiry_type;
+        }
+        return '분양파트너';
+    }
+    
     // custom_fields에서 inquiry_type 찾기
     if (customFields.inquiry_type) {
         return customFields.inquiry_type;
