@@ -365,6 +365,26 @@ body {
     position: relative;
     text-align: center;
 }
+/* PC: h-8 이미지 1개만 표시 / 모바일: h-8-1-m, h-8-2-m, h-8-3-m만 표시 */
+.h-8-pc-only {
+    display: block;
+}
+.h-8-mobile-only {
+    display: none;
+}
+@media (max-width: 640px) {
+    .h-8-pc-only {
+        display: none;
+    }
+    .h-8-mobile-only {
+        display: block;
+    }
+}
+@media (min-width: 641px) {
+    .h-8-mobile-only {
+        display: none;
+    }
+}
 .section-img {
     max-width: 100%;
     height: auto;
