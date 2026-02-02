@@ -57,6 +57,10 @@ export async function onRequest(context) {
     'xn--9m1b22at9hpuer8llia.com': 'marketing',  // 분양리더애드.com (marketing 전용 도메인)
     'www.xn--9m1b22at9hpuer8llia.com': 'marketing',
     '분양리더애드.com': 'marketing',  // 한글 도메인 (punycode로 변환되어 올 수 있음)
+    'xn--h50bt0vxig27n8la.com': 'bun-partner',  // 분양파트너.com (punycode)
+    'www.xn--h50bt0vxig27n8la.com': 'bun-partner',  // www.분양파트너.com (punycode)
+    '분양파트너.com': 'bun-partner',  // 분양파트너 한글 도메인
+    'www.분양파트너.com': 'bun-partner',  // www.분양파트너 한글 도메인
   };
 
   // 메인 홈페이지 도메인 (루트 index.html 표시)
@@ -132,6 +136,55 @@ export async function onRequest(context) {
   // 기본 동작 (기존 파일 서빙)
   // Cloudflare Pages가 자동으로 디렉토리 경로를 index.html로 처리하므로
   // 명시적 리다이렉트는 필요 없음
-  return next();
+  const response = await next();
+  
+  // bun-partner 사이트의 HTML 응답인 경우 메타 태그 동적 업데이트
+  // siteId가 있거나, /sites/bun-partner/ 경로인 경우 처리
+  const isBunPartnerSite = siteId === 'bun-partner' || url.pathname.startsWith('/sites/bun-partner/');
+  
+  if (isBunPartnerSite && response.headers.get('content-type')?.includes('text/html')) {
+    let html = await response.text();
+    
+    // 현재 호스트명으로 메타 태그 URL 업데이트 (www 포함)
+    const currentOrigin = url.origin;
+    const imageUrl = `${currentOrigin}/sites/bun-partner/images/partner-logo.png`;
+    
+    // 메타 태그 URL들을 현재 도메인으로 교체
+    html = html.replace(
+      /https:\/\/xn--h50bt0vxig27n8la\.com\//g,
+      `${currentOrigin}/`
+    );
+    
+    // og:image, twitter:image 등 이미지 URL도 업데이트 (현재 도메인 + 올바른 경로)
+    html = html.replace(
+      /https:\/\/xn--h50bt0vxig27n8la\.com\/sites\/bun-partner\/images\/partner-logo\.png/g,
+      imageUrl
+    );
+    
+    // 이전 경로 형식도 지원 (하위 호환성)
+    html = html.replace(
+      /https:\/\/xn--h50bt0vxig27n8la\.com\/images\/partner-logo\.png/g,
+      imageUrl
+    );
+    
+    // 상대 경로로 된 이미지도 절대 경로로 변경
+    html = html.replace(
+      /content="\/images\/partner-logo\.png"/g,
+      `content="${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /content="\/sites\/bun-partner\/images\/partner-logo\.png"/g,
+      `content="${imageUrl}"`
+    );
+    
+    return new Response(html, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers
+    });
+  }
+  
+  return response;
 }
 
