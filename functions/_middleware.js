@@ -153,6 +153,42 @@ export async function onRequest(context) {
   // 명시적 리다이렉트는 필요 없음
   const response = await next();
   
+  // 메인 홈페이지(bunyangleader.com)의 HTML 응답인 경우 www 도메인 지원
+  if (isMainDomain && response.headers.get('content-type')?.includes('text/html')) {
+    let html = await response.text();
+    const currentOrigin = url.origin;
+    const imageUrl = `${currentOrigin}/index-web-link.png`;
+    
+    // bunyangleader.com 도메인을 현재 도메인(www 포함)으로 교체
+    html = html.replace(
+      /https:\/\/bunyangleader\.com\//g,
+      `${currentOrigin}/`
+    );
+    
+    // og:image, twitter:image URL 업데이트
+    html = html.replace(
+      /https:\/\/bunyangleader\.com\/index-web-link\.png/g,
+      imageUrl
+    );
+    
+    // 메타 태그의 URL 속성 업데이트
+    html = html.replace(
+      /content="https:\/\/bunyangleader\.com\/"/g,
+      `content="${currentOrigin}/"`
+    );
+    
+    html = html.replace(
+      /href="https:\/\/bunyangleader\.com\/"/g,
+      `href="${currentOrigin}/"`
+    );
+    
+    return new Response(html, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers
+    });
+  }
+  
   // bun-partner 사이트의 HTML 응답인 경우 메타 태그 동적 업데이트
   // siteId가 있거나, /sites/bun-partner/ 경로인 경우 처리
   const isBunPartnerSite = siteId === 'bun-partner' || url.pathname.startsWith('/sites/bun-partner/');

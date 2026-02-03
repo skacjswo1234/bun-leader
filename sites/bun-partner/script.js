@@ -62,10 +62,15 @@ function handlePartnerSubmit(e) {
         return;
     }
 
+    const referrer = form.querySelector('#partner-referrer').value.trim();
+    const referrerContact = form.querySelector('#partner-referrer-contact').value.trim();
+
     const custom_fields = { inquiry_type: '파트너 지원 신청' };
     if (rank) custom_fields.rank = rank;
     if (siteName) custom_fields.site_name = siteName;
     if (adAmount) custom_fields.ad_amount = adAmount;
+    if (referrer) custom_fields.referrer = referrer;
+    if (referrerContact) custom_fields.referrer_contact = referrerContact;
 
     const formData = {
         site_id: SITE_ID,
