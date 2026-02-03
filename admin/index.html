@@ -71,6 +71,7 @@
                             <option value="completed">처리 완료</option>
                         </select>
                         <button class="refresh-btn" id="refreshBtn">새로고침</button>
+                        <button class="refresh-btn" id="excelDownloadBtn" style="background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.3); color: #86EFAC;">엑셀 다운로드</button>
                         <button class="refresh-btn" id="logoutBtn" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.3); color: #FCA5A5;">로그아웃</button>
                     </div>
                 </div>
@@ -127,6 +128,8 @@
         </div>
     </div>
 
+    <!-- SheetJS 라이브러리 (엑셀 다운로드용) -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script src="/admin/scripts/admin.js"></script>
     <script>
         // 로그인 체크

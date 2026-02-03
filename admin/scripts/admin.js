@@ -91,6 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
         loadInquiries();
     });
 
+    document.getElementById('excelDownloadBtn').addEventListener('click', () => {
+        downloadExcel();
+    });
+
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         if (!confirm('로그아웃 하시겠습니까?')) return;
 
@@ -662,5 +666,193 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// 엑셀 다운로드 함수
+async function downloadExcel() {
+    try {
+        // 모든 문의 데이터 가져오기 (페이지네이션 없이)
+        const params = new URLSearchParams({
+            limit: 10000, // 충분히 큰 수
+            site_id: currentSite
+        });
+
+        if (currentStatus) {
+            params.append('status', currentStatus);
+        }
+
+        const response = await fetch(`${API_BASE}/inquiries?${params}`);
+        const result = await response.json();
+
+        if (!result.success || !result.data || result.data.length === 0) {
+            alert('다운로드할 데이터가 없습니다.');
+            return;
+        }
+
+        const inquiries = result.data;
+        
+        // 분양파트너인 경우 문의타입별로 다른 구조 사용
+        let headers = [];
+        let rows = [];
+
+        if (currentSite === 'bun-partner') {
+            // 첫 번째 문의의 타입으로 구조 결정
+            let customFields = {};
+            if (inquiries[0].custom_fields) {
+                try {
+                    customFields = typeof inquiries[0].custom_fields === 'string' 
+                        ? JSON.parse(inquiries[0].custom_fields) 
+                        : inquiries[0].custom_fields;
+                } catch (e) {
+                    console.error('Failed to parse custom_fields:', e);
+                }
+            }
+            const inquiryType = getInquiryType(inquiries[0], customFields);
+
+            if (inquiryType === '파트너 지원 신청') {
+                headers = ['ID', '문의타입', '성명', '전화번호', '직급', '현장명', '광고지원금액', '추천인', '추천인 전화번호', '상태', '등록일시'];
+                
+                rows = inquiries.map(inquiry => {
+                    let fields = {};
+                    if (inquiry.custom_fields) {
+                        try {
+                            fields = typeof inquiry.custom_fields === 'string' 
+                                ? JSON.parse(inquiry.custom_fields) 
+                                : inquiry.custom_fields;
+                        } catch (e) {
+                            console.error('Failed to parse custom_fields:', e);
+                        }
+                    }
+                    const type = getInquiryType(inquiry, fields);
+                    
+                    return [
+                        inquiry.id,
+                        type,
+                        inquiry.name,
+                        inquiry.contact,
+                        fields.rank || '',
+                        fields.site_name || '',
+                        fields.ad_amount || '',
+                        fields.referrer || '',
+                        fields.referrer_contact || '',
+                        getStatusText(inquiry.status),
+                        formatDate(inquiry.created_at)
+                    ];
+                });
+            } else if (inquiryType === '투자자 지원 신청') {
+                headers = ['ID', '문의타입', '성명', '전화번호', '투자금', '상태', '등록일시'];
+                
+                rows = inquiries.map(inquiry => {
+                    let fields = {};
+                    if (inquiry.custom_fields) {
+                        try {
+                            fields = typeof inquiry.custom_fields === 'string' 
+                                ? JSON.parse(inquiry.custom_fields) 
+                                : inquiry.custom_fields;
+                        } catch (e) {
+                            console.error('Failed to parse custom_fields:', e);
+                        }
+                    }
+                    const type = getInquiryType(inquiry, fields);
+                    
+                    return [
+                        inquiry.id,
+                        type,
+                        inquiry.name,
+                        inquiry.contact,
+                        fields.invest_amount || '',
+                        getStatusText(inquiry.status),
+                        formatDate(inquiry.created_at)
+                    ];
+                });
+            } else {
+                // 기본 구조
+                headers = ['ID', '문의타입', '이름', '연락처', '상품유형', '상태', '등록일시'];
+                
+                rows = inquiries.map(inquiry => {
+                    let customFields = {};
+                    if (inquiry.custom_fields) {
+                        try {
+                            customFields = typeof inquiry.custom_fields === 'string' 
+                                ? JSON.parse(inquiry.custom_fields) 
+                                : inquiry.custom_fields;
+                        } catch (e) {
+                            console.error('Failed to parse custom_fields:', e);
+                        }
+                    }
+                    const inquiryType = getInquiryType(inquiry, customFields);
+                    const productType = customFields.product_type || customFields.productType || '';
+                    
+                    return [
+                        inquiry.id,
+                        inquiryType,
+                        inquiry.name,
+                        inquiry.contact,
+                        productType,
+                        getStatusText(inquiry.status),
+                        formatDate(inquiry.created_at)
+                    ];
+                });
+            }
+        } else {
+            // 다른 사이트는 기본 구조
+            headers = ['ID', '문의타입', '이름', '연락처', '상품유형', '상태', '등록일시'];
+            
+            rows = inquiries.map(inquiry => {
+                let customFields = {};
+                if (inquiry.custom_fields) {
+                    try {
+                        customFields = typeof inquiry.custom_fields === 'string' 
+                            ? JSON.parse(inquiry.custom_fields) 
+                            : inquiry.custom_fields;
+                    } catch (e) {
+                        console.error('Failed to parse custom_fields:', e);
+                    }
+                }
+                const inquiryType = getInquiryType(inquiry, customFields);
+                const productType = customFields.product_type || customFields.productType || '';
+                
+                return [
+                    inquiry.id,
+                    inquiryType,
+                    inquiry.name,
+                    inquiry.contact,
+                    productType,
+                    getStatusText(inquiry.status),
+                    formatDate(inquiry.created_at)
+                ];
+            });
+        }
+
+        // SheetJS를 사용하여 워크북 생성
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+        
+        // 컬럼 너비 자동 조정
+        const colWidths = headers.map((_, i) => {
+            const maxLength = Math.max(
+                headers[i].length,
+                ...rows.map(row => String(row[i] || '').length)
+            );
+            return { wch: Math.min(maxLength + 2, 50) };
+        });
+        ws['!cols'] = colWidths;
+        
+        XLSX.utils.book_append_sheet(wb, ws, '문의목록');
+        
+        // 파일명 생성
+        const siteName = currentSite === 'band-program' ? '밴드홍보대행' :
+                        currentSite === 'marketing' ? '분양리더마케팅' :
+                        currentSite === 'bun-partner' ? '분양파트너' : '문의';
+        const statusText = currentStatus ? `_${getStatusText(currentStatus)}` : '';
+        const fileName = `${siteName}_문의목록${statusText}_${new Date().toISOString().split('T')[0]}.xlsx`;
+        
+        // 엑셀 파일 다운로드
+        XLSX.writeFile(wb, fileName);
+        
+    } catch (error) {
+        console.error('Excel download error:', error);
+        alert('엑셀 다운로드 중 오류가 발생했습니다.');
+    }
 }
 
