@@ -97,15 +97,17 @@ export function formatInquiryNotification(inquiryData) {
         text += `• 상품유형: ${customData.product_type}\n`;
       }
       
-      // 분양파트너: 직급, 현장명, 광고지원금액, 투자금
+      // 분양파트너: 직급, 현장명, 광고지원금액, 투자금, 추천인
       if (customData.rank) text += `• 직급: ${customData.rank}\n`;
       if (customData.site_name) text += `• 현장명: ${customData.site_name}\n`;
       if (customData.ad_amount) text += `• 광고지원금액: ${customData.ad_amount}\n`;
       if (customData.invest_amount) text += `• 투자금: ${customData.invest_amount}\n`;
+      if (customData.referrer) text += `• 추천인: ${customData.referrer}\n`;
+      if (customData.referrer_contact) text += `• 추천인 전화번호: ${customData.referrer_contact}\n`;
       
       // 기타 커스텀 필드
       Object.entries(customData).forEach(([key, value]) => {
-        if (!['inquiry_type', 'product_type', 'rank', 'site_name', 'ad_amount', 'invest_amount'].includes(key) && value) {
+        if (!['inquiry_type', 'product_type', 'rank', 'site_name', 'ad_amount', 'invest_amount', 'referrer', 'referrer_contact'].includes(key) && value) {
           text += `• ${key}: ${value}\n`;
         }
       });
