@@ -102,8 +102,15 @@ export function formatInquiryNotification(inquiryData) {
       if (customData.site_name) text += `• 현장명: ${customData.site_name}\n`;
       if (customData.ad_amount) text += `• 광고지원금액: ${customData.ad_amount}\n`;
       if (customData.invest_amount) text += `• 투자금: ${customData.invest_amount}\n`;
-      if (customData.referrer) text += `• 추천인: ${customData.referrer}\n`;
-      if (customData.referrer_contact) text += `• 추천인 전화번호: ${customData.referrer_contact}\n`;
+      // 추천인 정보는 파트너 지원 신청인 경우 항상 표시
+      if (customData.inquiry_type === '파트너 지원 신청') {
+        text += `• 추천인: ${customData.referrer || '-'}\n`;
+        text += `• 추천인 전화번호: ${customData.referrer_contact || '-'}\n`;
+      } else if (customData.referrer || customData.referrer_contact) {
+        // 다른 타입이지만 추천인 정보가 있는 경우
+        if (customData.referrer) text += `• 추천인: ${customData.referrer}\n`;
+        if (customData.referrer_contact) text += `• 추천인 전화번호: ${customData.referrer_contact}\n`;
+      }
       
       // 기타 커스텀 필드
       Object.entries(customData).forEach(([key, value]) => {
