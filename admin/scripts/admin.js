@@ -271,6 +271,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     memoForm.addEventListener('submit', saveMemo);
 
+    // 상세보기 모달 이벤트 리스너
+    const detailModalOverlay = document.getElementById('detailModalOverlay');
+    const detailModalClose = document.getElementById('detailModalClose');
+    const closeDetailBtn = document.getElementById('closeDetailBtn');
+
+    detailModalClose.addEventListener('click', closeDetailModal);
+    closeDetailBtn.addEventListener('click', closeDetailModal);
+    detailModalOverlay.addEventListener('click', (e) => {
+        if (e.target === detailModalOverlay) {
+            closeDetailModal();
+        }
+    });
+
     // ESC 키로 모달 닫기
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -279,6 +292,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (memoModalOverlay.style.display === 'flex') {
                 closeMemoModal();
+            }
+            if (detailModalOverlay.style.display === 'flex') {
+                closeDetailModal();
             }
         }
     });
@@ -302,7 +318,7 @@ async function loadStats() {
 // 문의 목록 로드
 async function loadInquiries() {
     const tbody = document.getElementById('inquiriesTableBody');
-    tbody.innerHTML = '<tr><td colspan="8" class="loading">로딩 중...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="loading">로딩 중...</td></tr>';
 
     try {
         const params = new URLSearchParams({
@@ -327,11 +343,11 @@ async function loadInquiries() {
             displayInquiries(result.data);
             displayPagination(result.pagination);
         } else {
-            tbody.innerHTML = '<tr><td colspan="8" class="loading">데이터를 불러올 수 없습니다.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="loading">데이터를 불러올 수 없습니다.</td></tr>';
         }
     } catch (error) {
         console.error('Inquiries load error:', error);
-        tbody.innerHTML = '<tr><td colspan="8" class="loading">오류가 발생했습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="loading">오류가 발생했습니다.</td></tr>';
     }
 }
 
@@ -341,247 +357,57 @@ function displayInquiries(inquiries) {
     const thead = document.querySelector('.inquiries-table thead tr');
     
     if (inquiries.length === 0) {
-        // 분양파트너인 경우 동적으로 colspan 계산
-        const colspan = currentSite === 'bun-partner' ? 9 : 8;
-        tbody.innerHTML = `<tr><td colspan="${colspan}" class="loading">문의가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="loading">문의가 없습니다.</td></tr>`;
         return;
     }
 
-    // 분양파트너 사이트인 경우 문의타입별로 다른 헤더/컬럼 사용
-    if (currentSite === 'bun-partner') {
-        // 첫 번째 문의의 타입으로 헤더 결정 (모든 문의가 같은 타입이라고 가정)
+    // 모든 사이트에 대해 간소화된 리스트 표시
+    thead.innerHTML = `
+        <th>ID</th>
+        <th>이름</th>
+        <th>연락처</th>
+        <th>상태</th>
+        <th>등록일시</th>
+        <th>작업</th>
+    `;
+    
+    tbody.innerHTML = inquiries.map(inquiry => {
+        // custom_fields 파싱
         let customFields = {};
-        if (inquiries[0].custom_fields) {
+        if (inquiry.custom_fields) {
             try {
-                customFields = typeof inquiries[0].custom_fields === 'string' 
-                    ? JSON.parse(inquiries[0].custom_fields) 
-                    : inquiries[0].custom_fields;
+                customFields = typeof inquiry.custom_fields === 'string' 
+                    ? JSON.parse(inquiry.custom_fields) 
+                    : inquiry.custom_fields;
             } catch (e) {
                 console.error('Failed to parse custom_fields:', e);
             }
         }
-        const inquiryType = getInquiryType(inquiries[0], customFields);
-        
-        if (inquiryType === '파트너 지원 신청') {
-            // 파트너 지원 신청 헤더
-            thead.innerHTML = `
-                <th>ID</th>
-                <th>문의타입</th>
-                <th>성명</th>
-                <th>전화번호</th>
-                <th>직급</th>
-                <th>현장명</th>
-                <th>광고지원금액</th>
-                <th>추천인</th>
-                <th>추천인 전화번호</th>
-                <th>상태</th>
-                <th>등록일시</th>
-                <th>작업</th>
-            `;
-            
-            tbody.innerHTML = inquiries.map(inquiry => {
-                let fields = {};
-                if (inquiry.custom_fields) {
-                    try {
-                        fields = typeof inquiry.custom_fields === 'string' 
-                            ? JSON.parse(inquiry.custom_fields) 
-                            : inquiry.custom_fields;
-                    } catch (e) {
-                        console.error('Failed to parse custom_fields:', e);
-                    }
-                }
-                const type = getInquiryType(inquiry, fields);
-                
-                return `
-                <tr>
-                    <td>${inquiry.id}</td>
-                    <td><span class="inquiry-type-badge">${escapeHtml(type)}</span></td>
-                    <td>${escapeHtml(inquiry.name)}</td>
-                    <td>${escapeHtml(inquiry.contact)}</td>
-                    <td>${escapeHtml(fields.rank || '-')}</td>
-                    <td>${escapeHtml(fields.site_name || '-')}</td>
-                    <td>${escapeHtml(fields.ad_amount || '-')}</td>
-                    <td>${escapeHtml(fields.referrer || '-')}</td>
-                    <td>${escapeHtml(fields.referrer_contact || '-')}</td>
-                    <td><span class="status-badge ${inquiry.status}">${getStatusText(inquiry.status)}</span></td>
-                    <td>${formatDate(inquiry.created_at)}</td>
-                    <td>
-                        <div class="action-buttons">
-                            ${inquiry.status === 'pending' ? `
-                                <button class="action-btn contact" onclick="updateStatus(${inquiry.id}, 'contacted')">연락완료</button>
-                            ` : ''}
-                            ${inquiry.status !== 'completed' ? `
-                                <button class="action-btn complete" onclick="updateStatus(${inquiry.id}, 'completed')">처리완료</button>
-                            ` : ''}
-                            <button class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
-                            <button class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
-                            <button class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
-                        </div>
-                    </td>
-                </tr>
-                `;
-            }).join('');
-        } else if (inquiryType === '투자자 지원 신청') {
-            // 투자자 지원 신청 헤더
-            thead.innerHTML = `
-                <th>ID</th>
-                <th>문의타입</th>
-                <th>성명</th>
-                <th>전화번호</th>
-                <th>투자금</th>
-                <th>상태</th>
-                <th>등록일시</th>
-                <th>작업</th>
-            `;
-            
-            tbody.innerHTML = inquiries.map(inquiry => {
-                let fields = {};
-                if (inquiry.custom_fields) {
-                    try {
-                        fields = typeof inquiry.custom_fields === 'string' 
-                            ? JSON.parse(inquiry.custom_fields) 
-                            : inquiry.custom_fields;
-                    } catch (e) {
-                        console.error('Failed to parse custom_fields:', e);
-                    }
-                }
-                const type = getInquiryType(inquiry, fields);
-                
-                return `
-                <tr>
-                    <td>${inquiry.id}</td>
-                    <td><span class="inquiry-type-badge">${escapeHtml(type)}</span></td>
-                    <td>${escapeHtml(inquiry.name)}</td>
-                    <td>${escapeHtml(inquiry.contact)}</td>
-                    <td>${escapeHtml(fields.invest_amount || '-')}</td>
-                    <td><span class="status-badge ${inquiry.status}">${getStatusText(inquiry.status)}</span></td>
-                    <td>${formatDate(inquiry.created_at)}</td>
-                    <td>
-                        <div class="action-buttons">
-                            ${inquiry.status === 'pending' ? `
-                                <button class="action-btn contact" onclick="updateStatus(${inquiry.id}, 'contacted')">연락완료</button>
-                            ` : ''}
-                            ${inquiry.status !== 'completed' ? `
-                                <button class="action-btn complete" onclick="updateStatus(${inquiry.id}, 'completed')">처리완료</button>
-                            ` : ''}
-                            <button class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
-                            <button class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
-                            <button class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
-                        </div>
-                    </td>
-                </tr>
-                `;
-            }).join('');
-        } else {
-            // 기본 헤더 (기타 타입)
-            thead.innerHTML = `
-                <th>ID</th>
-                <th>문의타입</th>
-                <th>이름</th>
-                <th>연락처</th>
-                <th>상품유형</th>
-                <th>상태</th>
-                <th>등록일시</th>
-                <th>작업</th>
-            `;
-            
-            tbody.innerHTML = inquiries.map(inquiry => {
-                let customFields = {};
-                if (inquiry.custom_fields) {
-                    try {
-                        customFields = typeof inquiry.custom_fields === 'string' 
-                            ? JSON.parse(inquiry.custom_fields) 
-                            : inquiry.custom_fields;
-                    } catch (e) {
-                        console.error('Failed to parse custom_fields:', e);
-                    }
-                }
-                const inquiryType = getInquiryType(inquiry, customFields);
-                const productType = customFields.product_type || customFields.productType || '-';
 
-                return `
-                <tr>
-                    <td>${inquiry.id}</td>
-                    <td><span class="inquiry-type-badge">${escapeHtml(inquiryType)}</span></td>
-                    <td>${escapeHtml(inquiry.name)}</td>
-                    <td>${escapeHtml(inquiry.contact)}</td>
-                    <td>${escapeHtml(productType)}</td>
-                    <td><span class="status-badge ${inquiry.status}">${getStatusText(inquiry.status)}</span></td>
-                    <td>${formatDate(inquiry.created_at)}</td>
-                    <td>
-                        <div class="action-buttons">
-                            ${inquiry.status === 'pending' ? `
-                                <button class="action-btn contact" onclick="updateStatus(${inquiry.id}, 'contacted')">연락완료</button>
-                            ` : ''}
-                            ${inquiry.status !== 'completed' ? `
-                                <button class="action-btn complete" onclick="updateStatus(${inquiry.id}, 'completed')">처리완료</button>
-                            ` : ''}
-                            <button class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
-                            <button class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
-                            <button class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
-                        </div>
-                    </td>
-                </tr>
-                `;
-            }).join('');
-        }
-    } else {
-        // 다른 사이트는 기존 로직 유지
-        thead.innerHTML = `
-            <th>ID</th>
-            <th>문의타입</th>
-            <th>이름</th>
-            <th>연락처</th>
-            <th>상품유형</th>
-            <th>상태</th>
-            <th>등록일시</th>
-            <th>작업</th>
+        return `
+        <tr>
+            <td>${inquiry.id}</td>
+            <td>${escapeHtml(inquiry.name)}</td>
+            <td>${escapeHtml(inquiry.contact)}</td>
+            <td><span class="status-badge ${inquiry.status}">${getStatusText(inquiry.status)}</span></td>
+            <td>${formatDate(inquiry.created_at)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="openDetailModal(${inquiry.id})" style="background: rgba(139, 92, 246, 0.2); color: #A78BFA; border: 1px solid rgba(139, 92, 246, 0.3);">상세</button>
+                    ${inquiry.status === 'pending' ? `
+                        <button class="action-btn contact" onclick="updateStatus(${inquiry.id}, 'contacted')">연락완료</button>
+                    ` : ''}
+                    ${inquiry.status !== 'completed' ? `
+                        <button class="action-btn complete" onclick="updateStatus(${inquiry.id}, 'completed')">처리완료</button>
+                    ` : ''}
+                    <button class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
+                    <button class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
+                    <button class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
+                </div>
+            </td>
+        </tr>
         `;
-        
-        tbody.innerHTML = inquiries.map(inquiry => {
-            // custom_fields 파싱
-            let customFields = {};
-            if (inquiry.custom_fields) {
-                try {
-                    customFields = typeof inquiry.custom_fields === 'string' 
-                        ? JSON.parse(inquiry.custom_fields) 
-                        : inquiry.custom_fields;
-                } catch (e) {
-                    console.error('Failed to parse custom_fields:', e);
-                }
-            }
-
-            // 문의 타입 추출 (페이지 경로나 다른 방법으로 판단)
-            // 현재는 custom_fields에서 추출하거나 기본값 사용
-            const inquiryType = getInquiryType(inquiry, customFields);
-            const productType = customFields.product_type || customFields.productType || '-';
-
-            return `
-            <tr>
-                <td>${inquiry.id}</td>
-                <td><span class="inquiry-type-badge">${escapeHtml(inquiryType)}</span></td>
-                <td>${escapeHtml(inquiry.name)}</td>
-                <td>${escapeHtml(inquiry.contact)}</td>
-                <td>${escapeHtml(productType)}</td>
-                <td><span class="status-badge ${inquiry.status}">${getStatusText(inquiry.status)}</span></td>
-                <td>${formatDate(inquiry.created_at)}</td>
-                <td>
-                    <div class="action-buttons">
-                        ${inquiry.status === 'pending' ? `
-                            <button class="action-btn contact" onclick="updateStatus(${inquiry.id}, 'contacted')">연락완료</button>
-                        ` : ''}
-                        ${inquiry.status !== 'completed' ? `
-                            <button class="action-btn complete" onclick="updateStatus(${inquiry.id}, 'completed')">처리완료</button>
-                        ` : ''}
-                        <button class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
-                        <button class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
-                        <button class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
-                    </div>
-                </td>
-            </tr>
-            `;
-        }).join('');
-    }
+    }).join('');
 }
 
 // 문의 타입 추출 함수
@@ -903,6 +729,131 @@ async function saveMemo(e) {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
     }
+}
+
+// 상세보기 모달 열기
+async function openDetailModal(id) {
+    try {
+        const response = await fetch(`${API_BASE}/inquiries/${id}`);
+        const result = await response.json();
+
+        if (!result.success || !result.data) {
+            alert('문의 정보를 불러올 수 없습니다.');
+            return;
+        }
+
+        const inquiry = result.data;
+        const detailContent = document.getElementById('detailModalContent');
+        
+        // custom_fields 파싱
+        let customFields = {};
+        if (inquiry.custom_fields) {
+            try {
+                customFields = typeof inquiry.custom_fields === 'string' 
+                    ? JSON.parse(inquiry.custom_fields) 
+                    : inquiry.custom_fields;
+            } catch (e) {
+                console.error('Failed to parse custom_fields:', e);
+            }
+        }
+
+        const inquiryType = getInquiryType(inquiry, customFields);
+        const adminNotes = customFields.admin_notes || '';
+
+        // 상세 정보 HTML 생성
+        let detailHtml = `
+            <div class="detail-section">
+                <h4 style="color: #A78BFA; margin-bottom: 1rem; border-bottom: 1px solid rgba(139, 92, 246, 0.2); padding-bottom: 0.5rem;">기본 정보</h4>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>ID</label>
+                        <div>${inquiry.id}</div>
+                    </div>
+                    <div class="detail-item">
+                        <label>문의타입</label>
+                        <div><span class="inquiry-type-badge">${escapeHtml(inquiryType)}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <label>이름</label>
+                        <div>${escapeHtml(inquiry.name || '-')}</div>
+                    </div>
+                    <div class="detail-item">
+                        <label>연락처</label>
+                        <div>${escapeHtml(inquiry.contact || '-')}</div>
+                    </div>
+                    <div class="detail-item">
+                        <label>상태</label>
+                        <div><span class="status-badge ${inquiry.status}">${getStatusText(inquiry.status)}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <label>등록일시</label>
+                        <div>${formatDate(inquiry.created_at)}</div>
+                    </div>
+                    ${inquiry.updated_at ? `
+                    <div class="detail-item">
+                        <label>수정일시</label>
+                        <div>${formatDate(inquiry.updated_at)}</div>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+
+        // 메시지가 있는 경우
+        if (inquiry.message) {
+            detailHtml += `
+                <div class="detail-section" style="margin-top: 1.5rem;">
+                    <h4 style="color: #A78BFA; margin-bottom: 1rem; border-bottom: 1px solid rgba(139, 92, 246, 0.2); padding-bottom: 0.5rem;">메시지</h4>
+                    <div style="background: rgba(139, 92, 246, 0.05); padding: 1rem; border-radius: 8px; white-space: pre-wrap; word-break: break-word;">${escapeHtml(inquiry.message)}</div>
+                </div>
+            `;
+        }
+
+        // custom_fields 항목들 표시 (admin_notes 제외)
+        const customFieldKeys = Object.keys(customFields).filter(key => key !== 'admin_notes');
+        if (customFieldKeys.length > 0) {
+            detailHtml += `
+                <div class="detail-section" style="margin-top: 1.5rem;">
+                    <h4 style="color: #A78BFA; margin-bottom: 1rem; border-bottom: 1px solid rgba(139, 92, 246, 0.2); padding-bottom: 0.5rem;">추가 정보</h4>
+                    <div class="detail-grid">
+            `;
+            customFieldKeys.forEach(key => {
+                const value = customFields[key];
+                detailHtml += `
+                    <div class="detail-item">
+                        <label>${escapeHtml(key)}</label>
+                        <div style="word-break: break-word;">${escapeHtml(String(value || '-'))}</div>
+                    </div>
+                `;
+            });
+            detailHtml += `
+                    </div>
+                </div>
+            `;
+        }
+
+        // 관리자 메모가 있는 경우
+        if (adminNotes) {
+            detailHtml += `
+                <div class="detail-section" style="margin-top: 1.5rem;">
+                    <h4 style="color: #A78BFA; margin-bottom: 1rem; border-bottom: 1px solid rgba(139, 92, 246, 0.2); padding-bottom: 0.5rem;">관리자 메모</h4>
+                    <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; white-space: pre-wrap; word-break: break-word; border-left: 3px solid rgba(59, 130, 246, 0.5);">${escapeHtml(adminNotes)}</div>
+                </div>
+            `;
+        }
+
+        detailContent.innerHTML = detailHtml;
+        document.getElementById('detailModalOverlay').style.display = 'flex';
+    } catch (error) {
+        console.error('Load inquiry error:', error);
+        alert('문의 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+}
+
+// 상세보기 모달 닫기
+function closeDetailModal() {
+    document.getElementById('detailModalOverlay').style.display = 'none';
+    document.getElementById('detailModalContent').innerHTML = '';
 }
 
 // 콘텐츠 제목 업데이트

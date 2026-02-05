@@ -224,6 +224,33 @@ export async function onRequest(context) {
       });
     }
 
+    // 개별 문의 조회: /api/admin/inquiries/:id
+    const getInquiryMatch = path.match(/^inquiries\/(\d+)$/);
+    if (getInquiryMatch && method === 'GET') {
+      const id = getInquiryMatch[1];
+      
+      const inquiry = await db.prepare('SELECT * FROM inquiries WHERE id = ?')
+        .bind(id)
+        .first();
+
+      if (!inquiry) {
+        return new Response(JSON.stringify({ 
+          success: false,
+          error: 'Inquiry not found' 
+        }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      return new Response(JSON.stringify({ 
+        success: true,
+        data: inquiry 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     // 문의 상태 업데이트 및 내용 수정: /api/admin/inquiries/:id
     const updateMatch = path.match(/^inquiries\/(\d+)$/);
     if (updateMatch && method === 'PUT') {

@@ -91,10 +91,8 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>문의타입</th>
                                 <th>이름</th>
                                 <th>연락처</th>
-                                <th>상품유형</th>
                                 <th>상태</th>
                                 <th>등록일시</th>
                                 <th>작업</th>
@@ -158,6 +156,22 @@
                                 <button type="button" class="refresh-btn" id="cancelMemoBtn" style="background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(100, 100, 100, 0.5);">취소</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <!-- 상세보기 모달 -->
+                <div class="modal-overlay" id="detailModalOverlay" style="display: none;">
+                    <div class="modal-content" style="max-width: 800px;">
+                        <div class="modal-header">
+                            <h3>문의 상세 정보</h3>
+                            <button class="modal-close" id="detailModalClose">✕</button>
+                        </div>
+                        <div class="modal-form" id="detailModalContent">
+                            <!-- 동적으로 채워짐 -->
+                        </div>
+                        <div class="form-actions" style="justify-content: flex-end; margin-top: 1rem;">
+                            <button type="button" class="refresh-btn" id="closeDetailBtn" style="background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(100, 100, 100, 0.5);">닫기</button>
+                        </div>
                     </div>
                 </div>
 

@@ -750,6 +750,40 @@ textarea.form-input {
     flex: 1;
 }
 
+/* 상세보기 스타일 */
+.detail-section {
+    margin-bottom: 1.5rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-item label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #A78BFA;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-item div {
+    font-size: 14px;
+    color: #fff;
+    padding: 0.5rem;
+    background: rgba(139, 92, 246, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
 @media (max-width: 768px) {
     .modal-content {
         max-width: 100%;
@@ -763,5 +797,18 @@ textarea.form-input {
     .search-input {
         flex: 1;
         min-width: 150px;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        font-size: 11px;
+        padding: 0.4rem 0.8rem;
     }
 }
