@@ -819,9 +819,10 @@ async function openDetailModal(id) {
             `;
             customFieldKeys.forEach(key => {
                 const value = customFields[key];
+                const koreanLabel = getKoreanFieldLabel(key);
                 detailHtml += `
                     <div class="detail-item">
-                        <label>${escapeHtml(key)}</label>
+                        <label>${escapeHtml(koreanLabel)}</label>
                         <div style="word-break: break-word;">${escapeHtml(String(value || '-'))}</div>
                     </div>
                 `;
@@ -892,6 +893,57 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// 영어 필드명을 한글로 변환
+function getKoreanFieldLabel(key) {
+    const fieldLabelMap = {
+        'product_type': '상품유형',
+        'productType': '상품유형',
+        'inquiry_type': '문의타입',
+        'inquiryType': '문의타입',
+        'rank': '직급',
+        'position': '직급',
+        'site_name': '현장명',
+        'siteName': '현장명',
+        'ad_amount': '광고지원금액',
+        'adAmount': '광고지원금액',
+        'referrer': '추천인',
+        'referrer_contact': '추천인 전화번호',
+        'referrerContact': '추천인 전화번호',
+        'invest_amount': '투자금액',
+        'investAmount': '투자금액',
+        'investment_amount': '투자금액',
+        'investmentAmount': '투자금액',
+        'company': '회사명',
+        'company_name': '회사명',
+        'companyName': '회사명',
+        'email': '이메일',
+        'address': '주소',
+        'message': '메시지',
+        'memo': '메모',
+        'note': '메모',
+        'notes': '메모',
+        'admin_notes': '관리자 메모',
+        'adminNotes': '관리자 메모',
+        'created_at': '등록일시',
+        'createdAt': '등록일시',
+        'updated_at': '수정일시',
+        'updatedAt': '수정일시',
+        'status': '상태',
+        'name': '이름',
+        'contact': '연락처',
+        'phone': '전화번호',
+        'phone_number': '전화번호',
+        'phoneNumber': '전화번호',
+        'tel': '전화번호',
+        'mobile': '휴대폰',
+        'mobile_number': '휴대폰번호',
+        'mobileNumber': '휴대폰번호'
+    };
+    
+    // 매핑된 한글 레이블이 있으면 반환, 없으면 원본 키 반환
+    return fieldLabelMap[key] || key;
 }
 
 // 엑셀 다운로드 함수
