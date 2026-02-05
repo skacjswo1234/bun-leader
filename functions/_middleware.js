@@ -153,6 +153,55 @@ export async function onRequest(context) {
   // 명시적 리다이렉트는 필요 없음
   const response = await next();
   
+  // bun-partner 사이트의 HTML 응답인 경우 메타 태그 동적 교체
+  if (siteId === 'bun-partner' && response.headers.get('content-type')?.includes('text/html')) {
+    let html = await response.text();
+    const currentOrigin = url.origin;
+    const imageUrl = `${currentOrigin}/sites/bun-partner/thumbnail.png`;
+    
+    // og:image 메타 태그 교체
+    html = html.replace(
+      /<meta\s+property=["']og:image["']\s+content=["'][^"']+["']/gi,
+      `<meta property="og:image" content="${imageUrl}"`
+    );
+    html = html.replace(
+      /<meta\s+property=["']og:image:url["']\s+content=["'][^"']+["']/gi,
+      `<meta property="og:image:url" content="${imageUrl}"`
+    );
+    html = html.replace(
+      /<meta\s+property=["']og:image:secure_url["']\s+content=["'][^"']+["']/gi,
+      `<meta property="og:image:secure_url" content="${imageUrl}"`
+    );
+    html = html.replace(
+      /<meta\s+name=["']og:image["']\s+content=["'][^"']+["']/gi,
+      `<meta name="og:image" content="${imageUrl}"`
+    );
+    html = html.replace(
+      /<meta\s+name=["']twitter:image["']\s+content=["'][^"']+["']/gi,
+      `<meta name="twitter:image" content="${imageUrl}"`
+    );
+    
+    // og:url, canonical, twitter:url 교체
+    html = html.replace(
+      /<meta\s+property=["']og:url["']\s+content=["'][^"']+["']/gi,
+      `<meta property="og:url" content="${currentOrigin}/"`
+    );
+    html = html.replace(
+      /<link\s+rel=["']canonical["']\s+href=["'][^"']+["']/gi,
+      `<link rel="canonical" href="${currentOrigin}/"`
+    );
+    html = html.replace(
+      /<meta\s+name=["']twitter:url["']\s+content=["'][^"']+["']/gi,
+      `<meta name="twitter:url" content="${currentOrigin}/"`
+    );
+    
+    return new Response(html, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers
+    });
+  }
+  
   // 메인 홈페이지(bunyangleader.com)의 HTML 응답인 경우 www 도메인 지원
   if (isMainDomain && response.headers.get('content-type')?.includes('text/html')) {
     let html = await response.text();
@@ -198,7 +247,7 @@ export async function onRequest(context) {
     
     // 현재 호스트명으로 메타 태그 URL 업데이트 (www 포함)
     const currentOrigin = url.origin;
-    const imageUrl = `${currentOrigin}/sites/bun-partner/images/partner-logo.png`;
+    const imageUrl = `${currentOrigin}/sites/bun-partner/thumbnail.png`;
     
     // 모든 하드코딩된 도메인을 현재 도메인으로 교체
     // 1. punycode 도메인 (www 포함/미포함 모두) - 전체 URL 교체
@@ -214,19 +263,28 @@ export async function onRequest(context) {
     );
     
     // 3. og:image, twitter:image 등 이미지 URL 업데이트 (모든 가능한 형식)
-    // punycode 도메인 + 올바른 경로 (이미 위에서 교체되었을 수 있으므로 다시 확인)
+    // thumbnail.png 경로로 교체
+    html = html.replace(
+      /https:\/\/(www\.)?xn--h50bt0vxig27n8la\.com\/sites\/bun-partner\/thumbnail\.png/g,
+      imageUrl
+    );
+    
+    html = html.replace(
+      /https:\/\/(www\.)?분양파트너\.com\/sites\/bun-partner\/thumbnail\.png/g,
+      imageUrl
+    );
+    
+    // 이전 경로 형식도 지원 (partner-logo.png -> thumbnail.png로 교체)
     html = html.replace(
       /https:\/\/(www\.)?xn--h50bt0vxig27n8la\.com\/sites\/bun-partner\/images\/partner-logo\.png/g,
       imageUrl
     );
     
-    // 한글 도메인 + 올바른 경로
     html = html.replace(
       /https:\/\/(www\.)?분양파트너\.com\/sites\/bun-partner\/images\/partner-logo\.png/g,
       imageUrl
     );
     
-    // 이전 경로 형식도 지원 (하위 호환성)
     html = html.replace(
       /https:\/\/(www\.)?xn--h50bt0vxig27n8la\.com\/images\/partner-logo\.png/g,
       imageUrl
@@ -249,6 +307,17 @@ export async function onRequest(context) {
     );
     
     html = html.replace(
+      /"logo":\s*"https:\/\/(www\.)?xn--h50bt0vxig27n8la\.com\/sites\/bun-partner\/thumbnail\.png"/g,
+      `"logo": "${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /"logo":\s*"https:\/\/(www\.)?분양파트너\.com\/sites\/bun-partner\/thumbnail\.png"/g,
+      `"logo": "${imageUrl}"`
+    );
+    
+    // 이전 partner-logo.png 경로도 교체
+    html = html.replace(
       /"logo":\s*"https:\/\/(www\.)?xn--h50bt0vxig27n8la\.com\/sites\/bun-partner\/images\/partner-logo\.png"/g,
       `"logo": "${imageUrl}"`
     );
@@ -270,6 +339,11 @@ export async function onRequest(context) {
     
     // 5. 상대 경로로 된 이미지도 절대 경로로 변경
     html = html.replace(
+      /content="\/sites\/bun-partner\/thumbnail\.png"/g,
+      `content="${imageUrl}"`
+    );
+    
+    html = html.replace(
       /content="\/images\/partner-logo\.png"/g,
       `content="${imageUrl}"`
     );
@@ -280,6 +354,33 @@ export async function onRequest(context) {
     );
     
     // 6. property 속성의 이미지 URL도 명시적으로 교체 (카카오톡 등에서 사용)
+    // thumbnail.png 경로
+    html = html.replace(
+      /property="og:image"\s+content="[^"]*thumbnail\.png"/g,
+      `property="og:image" content="${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /property="og:image:url"\s+content="[^"]*thumbnail\.png"/g,
+      `property="og:image:url" content="${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /property="og:image:secure_url"\s+content="[^"]*thumbnail\.png"/g,
+      `property="og:image:secure_url" content="${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /name="og:image"\s+content="[^"]*thumbnail\.png"/g,
+      `name="og:image" content="${imageUrl}"`
+    );
+    
+    html = html.replace(
+      /name="twitter:image"\s+content="[^"]*thumbnail\.png"/g,
+      `name="twitter:image" content="${imageUrl}"`
+    );
+    
+    // 이전 partner-logo.png 경로도 교체
     html = html.replace(
       /property="og:image"\s+content="[^"]*partner-logo\.png"/g,
       `property="og:image" content="${imageUrl}"`

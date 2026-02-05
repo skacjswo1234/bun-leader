@@ -133,13 +133,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (result.success) {
-                window.location.href = '/admin/login.html';
+                showNotification('success', '로그아웃', '로그아웃되었습니다.', false);
+                setTimeout(() => {
+                    window.location.href = '/admin/login.html';
+                }, 1500);
             } else {
-                alert('로그아웃에 실패했습니다.');
+                showNotification('error', '로그아웃 실패', '로그아웃에 실패했습니다.');
             }
         } catch (error) {
             console.error('Logout error:', error);
-            alert('오류가 발생했습니다.');
+            showNotification('error', '오류 발생', '오류가 발생했습니다.');
         }
     });
 
@@ -195,12 +198,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmPassword = document.getElementById('confirmPassword').value;
 
         if (!oldPassword || !newPassword || !confirmPassword) {
-            alert('모든 필드를 입력해주세요.');
+            showNotification('warning', '입력 필요', '모든 필드를 입력해주세요.');
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
+            showNotification('warning', '비밀번호 불일치', '새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
             return;
         }
 
@@ -224,17 +227,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (response.ok && result.success) {
-                alert('비밀번호가 성공적으로 변경되었습니다.');
+                showNotification('success', '변경 완료', '비밀번호가 성공적으로 변경되었습니다.');
                 document.getElementById('passwordChangeForm').reset();
                 cancelPasswordChange.click(); // 취소 버튼 클릭하여 섹션 닫기
             } else {
                 // 401 에러 또는 기타 에러 처리
                 const errorMessage = result.error || result.message || '비밀번호 변경에 실패했습니다.';
-                alert(errorMessage);
+                showNotification('error', '변경 실패', errorMessage);
             }
         } catch (error) {
             console.error('Password change error:', error);
-            alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+            showNotification('error', '오류 발생', '오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
@@ -284,6 +287,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 알림 모달 이벤트 리스너
+    const notificationOverlay = document.getElementById('notificationOverlay');
+    const notificationClose = document.getElementById('notificationClose');
+
+    notificationClose.addEventListener('click', () => {
+        hideNotification();
+    });
+
+    notificationOverlay.addEventListener('click', (e) => {
+        if (e.target === notificationOverlay) {
+            hideNotification();
+        }
+    });
+
     // ESC 키로 모달 닫기
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -295,6 +312,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (detailModalOverlay.style.display === 'flex') {
                 closeDetailModal();
+            }
+            if (notificationOverlay.classList.contains('show')) {
+                hideNotification();
             }
         }
     });
@@ -504,14 +524,15 @@ async function updateStatus(id, status) {
         const result = await response.json();
 
         if (result.success) {
+            showNotification('success', '변경 완료', '상태가 성공적으로 변경되었습니다.');
             loadStats();
             loadInquiries();
         } else {
-            alert('상태 변경에 실패했습니다.');
+            showNotification('error', '변경 실패', '상태 변경에 실패했습니다.');
         }
     } catch (error) {
         console.error('Status update error:', error);
-        alert('오류가 발생했습니다.');
+        showNotification('error', '오류 발생', '오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
 }
 
@@ -527,14 +548,15 @@ async function deleteInquiry(id) {
         const result = await response.json();
 
         if (result.success) {
+            showNotification('success', '삭제 완료', '문의가 성공적으로 삭제되었습니다.');
             loadStats();
             loadInquiries();
         } else {
-            alert('삭제에 실패했습니다.');
+            showNotification('error', '삭제 실패', '문의 삭제에 실패했습니다.');
         }
     } catch (error) {
         console.error('Delete error:', error);
-        alert('오류가 발생했습니다.');
+        showNotification('error', '오류 발생', '오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
 }
 
@@ -545,7 +567,7 @@ async function openEditModal(id) {
         const result = await response.json();
 
         if (!result.success || !result.data) {
-            alert('문의 정보를 불러올 수 없습니다.');
+            showNotification('error', '불러오기 실패', '문의 정보를 불러올 수 없습니다.');
             return;
         }
 
@@ -586,7 +608,7 @@ async function openEditModal(id) {
         document.getElementById('editModalOverlay').style.display = 'flex';
     } catch (error) {
         console.error('Load inquiry error:', error);
-        alert('문의 정보를 불러오는 중 오류가 발생했습니다.');
+        showNotification('error', '오류 발생', '문의 정보를 불러오는 중 오류가 발생했습니다.');
     }
 }
 
@@ -635,15 +657,15 @@ async function saveEditInquiry(e) {
         const result = await response.json();
 
         if (result.success) {
-            alert('문의 내용이 수정되었습니다.');
+            showNotification('success', '수정 완료', '문의 내용이 성공적으로 수정되었습니다.');
             closeEditModal();
             loadInquiries();
         } else {
-            alert(result.error || '수정에 실패했습니다.');
+            showNotification('error', '수정 실패', result.error || '문의 내용 수정에 실패했습니다.');
         }
     } catch (error) {
         console.error('Update error:', error);
-        alert('오류가 발생했습니다.');
+        showNotification('error', '오류 발생', '오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
@@ -657,7 +679,7 @@ async function openMemoModal(id) {
         const result = await response.json();
 
         if (!result.success || !result.data) {
-            alert('문의 정보를 불러올 수 없습니다.');
+            showNotification('error', '불러오기 실패', '문의 정보를 불러올 수 없습니다.');
             return;
         }
 
@@ -681,7 +703,7 @@ async function openMemoModal(id) {
         document.getElementById('memoModalOverlay').style.display = 'flex';
     } catch (error) {
         console.error('Load inquiry error:', error);
-        alert('문의 정보를 불러오는 중 오류가 발생했습니다.');
+        showNotification('error', '오류 발생', '문의 정보를 불러오는 중 오류가 발생했습니다.');
     }
 }
 
@@ -717,14 +739,14 @@ async function saveMemo(e) {
         const result = await response.json();
 
         if (result.success) {
-            alert('메모가 저장되었습니다.');
+            showNotification('success', '저장 완료', '메모가 성공적으로 저장되었습니다.');
             closeMemoModal();
         } else {
-            alert(result.error || '메모 저장에 실패했습니다.');
+            showNotification('error', '저장 실패', result.error || '메모 저장에 실패했습니다.');
         }
     } catch (error) {
         console.error('Memo save error:', error);
-        alert('오류가 발생했습니다.');
+        showNotification('error', '오류 발생', '오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
@@ -738,7 +760,7 @@ async function openDetailModal(id) {
         const result = await response.json();
 
         if (!result.success || !result.data) {
-            alert('문의 정보를 불러올 수 없습니다.');
+            showNotification('error', '불러오기 실패', '문의 정보를 불러올 수 없습니다.');
             return;
         }
 
@@ -847,7 +869,7 @@ async function openDetailModal(id) {
         document.getElementById('detailModalOverlay').style.display = 'flex';
     } catch (error) {
         console.error('Load inquiry error:', error);
-        alert('문의 정보를 불러오는 중 오류가 발생했습니다.');
+        showNotification('error', '오류 발생', '문의 정보를 불러오는 중 오류가 발생했습니다.');
     }
 }
 
@@ -855,6 +877,50 @@ async function openDetailModal(id) {
 function closeDetailModal() {
     document.getElementById('detailModalOverlay').style.display = 'none';
     document.getElementById('detailModalContent').innerHTML = '';
+}
+
+// 알림 모달 표시 함수
+function showNotification(type, title, message, autoClose = true) {
+    const overlay = document.getElementById('notificationOverlay');
+    const icon = document.getElementById('notificationIcon');
+    const titleEl = document.getElementById('notificationTitle');
+    const messageEl = document.getElementById('notificationMessage');
+
+    // 아이콘 설정
+    icon.className = 'notification-icon ' + type;
+    if (type === 'success') {
+        icon.textContent = '✓';
+    } else if (type === 'error') {
+        icon.textContent = '✕';
+    } else if (type === 'warning') {
+        icon.textContent = '⚠';
+    } else {
+        icon.textContent = 'ℹ';
+    }
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+
+    overlay.style.display = 'flex';
+    setTimeout(() => {
+        overlay.classList.add('show');
+    }, 10);
+
+    // 자동 닫기
+    if (autoClose) {
+        setTimeout(() => {
+            hideNotification();
+        }, 3000);
+    }
+}
+
+// 알림 모달 숨기기
+function hideNotification() {
+    const overlay = document.getElementById('notificationOverlay');
+    overlay.classList.remove('show');
+    setTimeout(() => {
+        overlay.style.display = 'none';
+    }, 300);
 }
 
 // 콘텐츠 제목 업데이트
@@ -963,7 +1029,7 @@ async function downloadExcel() {
         const result = await response.json();
 
         if (!result.success || !result.data || result.data.length === 0) {
-            alert('다운로드할 데이터가 없습니다.');
+            showNotification('warning', '데이터 없음', '다운로드할 데이터가 없습니다.');
             return;
         }
 
@@ -1130,7 +1196,7 @@ async function downloadExcel() {
         
     } catch (error) {
         console.error('Excel download error:', error);
-        alert('엑셀 다운로드 중 오류가 발생했습니다.');
+        showNotification('error', '다운로드 실패', '엑셀 다운로드 중 오류가 발생했습니다.');
     }
 }
 
