@@ -7,6 +7,8 @@ const API_BASE = '/api/admin';
 let currentSite = 'band-program';
 let currentStatus = '';
 let currentPage = 1;
+let currentSearch = '';
+let currentSearchField = 'all';
 const limit = 50;
 
 // 초기화
@@ -86,7 +88,32 @@ document.addEventListener('DOMContentLoaded', () => {
         loadInquiries();
     });
 
+    // 검색 기능
+    const searchInput = document.getElementById('searchInput');
+    const searchFieldFilter = document.getElementById('searchFieldFilter');
+    const searchBtn = document.getElementById('searchBtn');
+
+    searchBtn.addEventListener('click', () => {
+        currentSearch = searchInput.value.trim();
+        currentSearchField = searchFieldFilter.value;
+        currentPage = 1;
+        loadInquiries();
+    });
+
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            searchBtn.click();
+        }
+    });
+
     document.getElementById('refreshBtn').addEventListener('click', () => {
+        currentSearch = '';
+        searchInput.value = '';
+        currentSearchField = 'all';
+        searchFieldFilter.value = 'all';
+        currentStatus = '';
+        document.getElementById('statusFilter').value = '';
+        currentPage = 1;
         loadStats();
         loadInquiries();
     });
@@ -213,6 +240,48 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = originalText;
         }
     });
+
+    // 수정 모달 이벤트 리스너
+    const editModalOverlay = document.getElementById('editModalOverlay');
+    const editModalClose = document.getElementById('editModalClose');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const editInquiryForm = document.getElementById('editInquiryForm');
+
+    editModalClose.addEventListener('click', closeEditModal);
+    cancelEditBtn.addEventListener('click', closeEditModal);
+    editModalOverlay.addEventListener('click', (e) => {
+        if (e.target === editModalOverlay) {
+            closeEditModal();
+        }
+    });
+    editInquiryForm.addEventListener('submit', saveEditInquiry);
+
+    // 메모 모달 이벤트 리스너
+    const memoModalOverlay = document.getElementById('memoModalOverlay');
+    const memoModalClose = document.getElementById('memoModalClose');
+    const cancelMemoBtn = document.getElementById('cancelMemoBtn');
+    const memoForm = document.getElementById('memoForm');
+
+    memoModalClose.addEventListener('click', closeMemoModal);
+    cancelMemoBtn.addEventListener('click', closeMemoModal);
+    memoModalOverlay.addEventListener('click', (e) => {
+        if (e.target === memoModalOverlay) {
+            closeMemoModal();
+        }
+    });
+    memoForm.addEventListener('submit', saveMemo);
+
+    // ESC 키로 모달 닫기
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (editModalOverlay.style.display === 'flex') {
+                closeEditModal();
+            }
+            if (memoModalOverlay.style.display === 'flex') {
+                closeMemoModal();
+            }
+        }
+    });
 });
 
 // 통계 로드
@@ -244,6 +313,11 @@ async function loadInquiries() {
 
         if (currentStatus) {
             params.append('status', currentStatus);
+        }
+
+        if (currentSearch) {
+            params.append('search', currentSearch);
+            params.append('search_field', currentSearchField);
         }
 
         const response = await fetch(`${API_BASE}/inquiries?${params}`);
@@ -339,6 +413,8 @@ function displayInquiries(inquiries) {
                             ${inquiry.status !== 'completed' ? `
                                 <button class="action-btn complete" onclick="updateStatus(${inquiry.id}, 'completed')">처리완료</button>
                             ` : ''}
+                            <button class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
+                            <button class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
                             <button class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
                         </div>
                     </td>
@@ -388,6 +464,8 @@ function displayInquiries(inquiries) {
                             ${inquiry.status !== 'completed' ? `
                                 <button class="action-btn complete" onclick="updateStatus(${inquiry.id}, 'completed')">처리완료</button>
                             ` : ''}
+                            <button class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
+                            <button class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
                             <button class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
                         </div>
                     </td>
@@ -438,6 +516,8 @@ function displayInquiries(inquiries) {
                             ${inquiry.status !== 'completed' ? `
                                 <button class="action-btn complete" onclick="updateStatus(${inquiry.id}, 'completed')">처리완료</button>
                             ` : ''}
+                            <button class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
+                            <button class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
                             <button class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
                         </div>
                     </td>
@@ -493,6 +573,8 @@ function displayInquiries(inquiries) {
                         ${inquiry.status !== 'completed' ? `
                             <button class="action-btn complete" onclick="updateStatus(${inquiry.id}, 'completed')">처리완료</button>
                         ` : ''}
+                        <button class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
+                        <button class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
                         <button class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
                     </div>
                 </td>
@@ -627,6 +709,199 @@ async function deleteInquiry(id) {
     } catch (error) {
         console.error('Delete error:', error);
         alert('오류가 발생했습니다.');
+    }
+}
+
+// 수정 모달 열기
+async function openEditModal(id) {
+    try {
+        const response = await fetch(`${API_BASE}/inquiries/${id}`);
+        const result = await response.json();
+
+        if (!result.success || !result.data) {
+            alert('문의 정보를 불러올 수 없습니다.');
+            return;
+        }
+
+        const inquiry = result.data;
+        document.getElementById('editInquiryId').value = inquiry.id;
+        document.getElementById('editInquiryName').value = inquiry.name || '';
+        document.getElementById('editInquiryContact').value = inquiry.contact || '';
+        document.getElementById('editInquiryMessage').value = inquiry.message || '';
+
+        // custom_fields 처리
+        const customFieldsContainer = document.getElementById('editCustomFieldsContainer');
+        customFieldsContainer.innerHTML = '';
+        
+        if (inquiry.custom_fields) {
+            let customFields = {};
+            try {
+                customFields = typeof inquiry.custom_fields === 'string' 
+                    ? JSON.parse(inquiry.custom_fields) 
+                    : inquiry.custom_fields;
+            } catch (e) {
+                console.error('Failed to parse custom_fields:', e);
+            }
+
+            // admin_notes는 제외하고 표시
+            Object.keys(customFields).forEach(key => {
+                if (key !== 'admin_notes') {
+                    const formGroup = document.createElement('div');
+                    formGroup.className = 'form-group';
+                    formGroup.innerHTML = `
+                        <label>${key}</label>
+                        <input type="text" class="form-input" data-field="${key}" value="${escapeHtml(String(customFields[key] || ''))}">
+                    `;
+                    customFieldsContainer.appendChild(formGroup);
+                }
+            });
+        }
+
+        document.getElementById('editModalOverlay').style.display = 'flex';
+    } catch (error) {
+        console.error('Load inquiry error:', error);
+        alert('문의 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+}
+
+// 수정 모달 닫기
+function closeEditModal() {
+    document.getElementById('editModalOverlay').style.display = 'none';
+    document.getElementById('editInquiryForm').reset();
+    document.getElementById('editCustomFieldsContainer').innerHTML = '';
+}
+
+// 수정 저장
+async function saveEditInquiry(e) {
+    e.preventDefault();
+    
+    const id = document.getElementById('editInquiryId').value;
+    const name = document.getElementById('editInquiryName').value;
+    const contact = document.getElementById('editInquiryContact').value;
+    const message = document.getElementById('editInquiryMessage').value;
+
+    // custom_fields 수집
+    const customFieldsInputs = document.querySelectorAll('#editCustomFieldsContainer input[data-field]');
+    const customFields = {};
+    customFieldsInputs.forEach(input => {
+        customFields[input.dataset.field] = input.value;
+    });
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '저장 중...';
+
+    try {
+        const response = await fetch(`${API_BASE}/inquiries/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name,
+                contact,
+                message,
+                custom_fields: customFields
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert('문의 내용이 수정되었습니다.');
+            closeEditModal();
+            loadInquiries();
+        } else {
+            alert(result.error || '수정에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('Update error:', error);
+        alert('오류가 발생했습니다.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
+}
+
+// 메모 모달 열기
+async function openMemoModal(id) {
+    try {
+        const response = await fetch(`${API_BASE}/inquiries/${id}`);
+        const result = await response.json();
+
+        if (!result.success || !result.data) {
+            alert('문의 정보를 불러올 수 없습니다.');
+            return;
+        }
+
+        const inquiry = result.data;
+        document.getElementById('memoInquiryId').value = inquiry.id;
+
+        // 기존 메모 불러오기
+        let adminNotes = '';
+        if (inquiry.custom_fields) {
+            try {
+                const customFields = typeof inquiry.custom_fields === 'string' 
+                    ? JSON.parse(inquiry.custom_fields) 
+                    : inquiry.custom_fields;
+                adminNotes = customFields.admin_notes || '';
+            } catch (e) {
+                console.error('Failed to parse custom_fields:', e);
+            }
+        }
+
+        document.getElementById('memoContent').value = adminNotes;
+        document.getElementById('memoModalOverlay').style.display = 'flex';
+    } catch (error) {
+        console.error('Load inquiry error:', error);
+        alert('문의 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+}
+
+// 메모 모달 닫기
+function closeMemoModal() {
+    document.getElementById('memoModalOverlay').style.display = 'none';
+    document.getElementById('memoForm').reset();
+}
+
+// 메모 저장
+async function saveMemo(e) {
+    e.preventDefault();
+    
+    const id = document.getElementById('memoInquiryId').value;
+    const notes = document.getElementById('memoContent').value;
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '저장 중...';
+
+    try {
+        const response = await fetch(`${API_BASE}/inquiries/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                notes
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert('메모가 저장되었습니다.');
+            closeMemoModal();
+        } else {
+            alert(result.error || '메모 저장에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('Memo save error:', error);
+        alert('오류가 발생했습니다.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
     }
 }
 

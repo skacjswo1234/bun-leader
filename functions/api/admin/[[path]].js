@@ -125,10 +125,12 @@ export async function onRequest(context) {
       });
     }
 
-    // 문의 목록 조회: /api/admin/inquiries
+    // 문의 목록 조회: /api/admin/inquiries (검색 기능 포함)
     if (path === 'inquiries' && method === 'GET') {
       const site_id = url.searchParams.get('site_id');
       const status = url.searchParams.get('status');
+      const search = url.searchParams.get('search'); // 검색어
+      const searchField = url.searchParams.get('search_field') || 'all'; // 검색 항목 (all, name, contact, type)
       const page = parseInt(url.searchParams.get('page') || '1');
       const limit = parseInt(url.searchParams.get('limit') || '50');
       const offset = (page - 1) * limit;
@@ -144,6 +146,25 @@ export async function onRequest(context) {
       if (status) {
         query += ' AND status = ?';
         params.push(status);
+      }
+
+      // 검색 기능
+      if (search && search.trim()) {
+        const searchTerm = `%${search.trim()}%`;
+        if (searchField === 'name') {
+          query += ' AND name LIKE ?';
+          params.push(searchTerm);
+        } else if (searchField === 'contact') {
+          query += ' AND contact LIKE ?';
+          params.push(searchTerm);
+        } else if (searchField === 'type') {
+          query += ' AND custom_fields LIKE ?';
+          params.push(`%${search.trim()}%`);
+        } else {
+          // all: 이름, 연락처, custom_fields 모두 검색
+          query += ' AND (name LIKE ? OR contact LIKE ? OR custom_fields LIKE ?)';
+          params.push(searchTerm, searchTerm, `%${search.trim()}%`);
+        }
       }
 
       query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
@@ -167,6 +188,24 @@ export async function onRequest(context) {
         countParams.push(status);
       }
 
+      // 검색 조건도 동일하게 적용
+      if (search && search.trim()) {
+        const searchTerm = `%${search.trim()}%`;
+        if (searchField === 'name') {
+          countQuery += ' AND name LIKE ?';
+          countParams.push(searchTerm);
+        } else if (searchField === 'contact') {
+          countQuery += ' AND contact LIKE ?';
+          countParams.push(searchTerm);
+        } else if (searchField === 'type') {
+          countQuery += ' AND custom_fields LIKE ?';
+          countParams.push(`%${search.trim()}%`);
+        } else {
+          countQuery += ' AND (name LIKE ? OR contact LIKE ? OR custom_fields LIKE ?)';
+          countParams.push(searchTerm, searchTerm, `%${search.trim()}%`);
+        }
+      }
+
       const countResult = await db.prepare(countQuery)
         .bind(...countParams)
         .first();
@@ -185,26 +224,103 @@ export async function onRequest(context) {
       });
     }
 
-    // 문의 상태 업데이트: /api/admin/inquiries/:id
+    // 문의 상태 업데이트 및 내용 수정: /api/admin/inquiries/:id
     const updateMatch = path.match(/^inquiries\/(\d+)$/);
     if (updateMatch && method === 'PUT') {
       const id = updateMatch[1];
       const body = await request.json();
-      const { status } = body;
+      const { status, name, contact, message, custom_fields, notes } = body;
 
-      if (!status || !['pending', 'contacted', 'completed'].includes(status)) {
+      // 상태만 업데이트하는 경우
+      if (status && !name && !contact && !message && !custom_fields && notes === undefined) {
+        if (!['pending', 'contacted', 'completed'].includes(status)) {
+          return new Response(JSON.stringify({ 
+            error: 'Invalid status' 
+          }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        await db.prepare(
+          `UPDATE inquiries SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
+        )
+        .bind(status, id)
+        .run();
+
         return new Response(JSON.stringify({ 
-          error: 'Invalid status' 
+          success: true 
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      // 문의 내용 수정 (이름, 연락처, 메시지, custom_fields, notes)
+      let updateFields = [];
+      let updateParams = [];
+
+      if (status) {
+        updateFields.push('status = ?');
+        updateParams.push(status);
+      }
+      if (name !== undefined) {
+        updateFields.push('name = ?');
+        updateParams.push(name);
+      }
+      if (contact !== undefined) {
+        updateFields.push('contact = ?');
+        updateParams.push(contact);
+      }
+      if (message !== undefined) {
+        updateFields.push('message = ?');
+        updateParams.push(message);
+      }
+      if (custom_fields !== undefined) {
+        const customFieldsJson = typeof custom_fields === 'string' 
+          ? custom_fields 
+          : JSON.stringify(custom_fields);
+        updateFields.push('custom_fields = ?');
+        updateParams.push(customFieldsJson);
+      }
+      if (notes !== undefined) {
+        // notes를 custom_fields에 저장 (기존 custom_fields와 병합)
+        const currentInquiry = await db.prepare('SELECT custom_fields FROM inquiries WHERE id = ?')
+          .bind(id)
+          .first();
+        
+        let currentCustomFields = {};
+        if (currentInquiry && currentInquiry.custom_fields) {
+          try {
+            currentCustomFields = typeof currentInquiry.custom_fields === 'string'
+              ? JSON.parse(currentInquiry.custom_fields)
+              : currentInquiry.custom_fields;
+          } catch (e) {
+            console.error('Failed to parse custom_fields:', e);
+          }
+        }
+        
+        currentCustomFields.admin_notes = notes;
+        const updatedCustomFieldsJson = JSON.stringify(currentCustomFields);
+        updateFields.push('custom_fields = ?');
+        updateParams.push(updatedCustomFieldsJson);
+      }
+
+      if (updateFields.length === 0) {
+        return new Response(JSON.stringify({ 
+          error: 'No fields to update' 
         }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
       }
 
+      updateFields.push('updated_at = CURRENT_TIMESTAMP');
+      updateParams.push(id);
+
       await db.prepare(
-        `UPDATE inquiries SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
+        `UPDATE inquiries SET ${updateFields.join(', ')} WHERE id = ?`
       )
-      .bind(status, id)
+      .bind(...updateParams)
       .run();
 
       return new Response(JSON.stringify({ 

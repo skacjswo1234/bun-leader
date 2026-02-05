@@ -64,6 +64,16 @@
                 <div class="content-header">
                     <h2 class="content-title" id="contentTitle">밴드홍보대행/프로그램판매 문의</h2>
                     <div class="filters">
+                        <div class="search-container">
+                            <select id="searchFieldFilter" class="filter-select" style="width: 120px;">
+                                <option value="all">전체</option>
+                                <option value="name">이름</option>
+                                <option value="contact">연락처</option>
+                                <option value="type">문의타입</option>
+                            </select>
+                            <input type="text" id="searchInput" class="search-input" placeholder="검색어 입력..." style="flex: 1; padding: 8px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; background: rgba(255,255,255,0.1); color: #fff; margin-left: 8px;">
+                            <button class="refresh-btn" id="searchBtn" style="margin-left: 8px;">검색</button>
+                        </div>
                         <select id="statusFilter" class="filter-select">
                             <option value="">전체 상태</option>
                             <option value="pending">대기 중</option>
@@ -99,6 +109,57 @@
                 </div>
 
                 <div class="pagination" id="pagination"></div>
+
+                <!-- 문의 수정 모달 -->
+                <div class="modal-overlay" id="editModalOverlay" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>문의 내용 수정</h3>
+                            <button class="modal-close" id="editModalClose">✕</button>
+                        </div>
+                        <form id="editInquiryForm" class="modal-form">
+                            <input type="hidden" id="editInquiryId">
+                            <div class="form-group">
+                                <label>이름</label>
+                                <input type="text" id="editInquiryName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>연락처</label>
+                                <input type="tel" id="editInquiryContact" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>메시지</label>
+                                <textarea id="editInquiryMessage" class="form-input" rows="3"></textarea>
+                            </div>
+                            <div id="editCustomFieldsContainer"></div>
+                            <div class="form-actions">
+                                <button type="submit" class="refresh-btn">저장</button>
+                                <button type="button" class="refresh-btn" id="cancelEditBtn" style="background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(100, 100, 100, 0.5);">취소</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 메모 모달 -->
+                <div class="modal-overlay" id="memoModalOverlay" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>상담 메모</h3>
+                            <button class="modal-close" id="memoModalClose">✕</button>
+                        </div>
+                        <form id="memoForm" class="modal-form">
+                            <input type="hidden" id="memoInquiryId">
+                            <div class="form-group">
+                                <label>메모 내용</label>
+                                <textarea id="memoContent" class="form-input" rows="8" placeholder="상담 내용, 특이사항 등을 기록하세요."></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="refresh-btn">저장</button>
+                                <button type="button" class="refresh-btn" id="cancelMemoBtn" style="background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(100, 100, 100, 0.5);">취소</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
                 <!-- 비밀번호 변경 섹션 -->
                 <div class="password-change-section" id="passwordChangeSection" style="display: none;">
