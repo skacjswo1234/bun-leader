@@ -253,6 +253,14 @@ body {
     padding: 0.5rem;
 }
 
+/* 리스트 내 상태 변경 드롭다운 */
+.status-select {
+    min-width: 110px;
+    max-width: 140px;
+    padding: 0.4rem 0.6rem;
+    font-size: 13px;
+}
+
 .refresh-btn {
     padding: 0.75rem 1.5rem;
     background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);

@@ -409,17 +409,17 @@ function displayInquiries(inquiries) {
             <td>${inquiry.id}</td>
             <td>${escapeHtml(inquiry.name)}</td>
             <td>${escapeHtml(inquiry.contact)}</td>
-            <td><span class="status-badge ${inquiry.status}">${getStatusText(inquiry.status)}</span></td>
+            <td>
+                <select class="filter-select status-select" data-inquiry-id="${inquiry.id}" onchange="updateStatusFromSelect(this)" title="상태 변경">
+                    <option value="pending" ${inquiry.status === 'pending' ? 'selected' : ''}>대기 중</option>
+                    <option value="contacted" ${inquiry.status === 'contacted' ? 'selected' : ''}>연락 완료</option>
+                    <option value="completed" ${inquiry.status === 'completed' ? 'selected' : ''}>처리 완료</option>
+                </select>
+            </td>
             <td>${formatDate(inquiry.created_at)}</td>
             <td>
                 <div class="action-buttons">
                     <button class="action-btn" onclick="openDetailModal(${inquiry.id})" style="background: rgba(139, 92, 246, 0.2); color: #A78BFA; border: 1px solid rgba(139, 92, 246, 0.3);">상세</button>
-                    ${inquiry.status === 'pending' ? `
-                        <button class="action-btn contact" onclick="updateStatus(${inquiry.id}, 'contacted')">연락완료</button>
-                    ` : ''}
-                    ${inquiry.status !== 'completed' ? `
-                        <button class="action-btn complete" onclick="updateStatus(${inquiry.id}, 'completed')">처리완료</button>
-                    ` : ''}
                     <button class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
                     <button class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
                     <button class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
@@ -508,10 +508,22 @@ function changePage(page) {
     loadInquiries();
 }
 
-// 상태 업데이트
+// 상태 업데이트 (확인 창 있음)
 async function updateStatus(id, status) {
     if (!confirm('상태를 변경하시겠습니까?')) return;
+    await doUpdateStatus(id, status);
+}
 
+// 리스트에서 상태 드롭다운 변경 시 호출 (확인 없이 바로 변경)
+async function updateStatusFromSelect(selectEl) {
+    const id = selectEl.dataset.inquiryId;
+    const status = selectEl.value;
+    if (!id || !status) return;
+    await doUpdateStatus(id, status);
+}
+
+// 상태 변경 API 호출
+async function doUpdateStatus(id, status) {
     try {
         const response = await fetch(`${API_BASE}/inquiries/${id}`, {
             method: 'PUT',
@@ -573,6 +585,7 @@ async function openEditModal(id) {
 
         const inquiry = result.data;
         document.getElementById('editInquiryId').value = inquiry.id;
+        document.getElementById('editInquiryStatus').value = inquiry.status || 'pending';
         document.getElementById('editInquiryName').value = inquiry.name || '';
         document.getElementById('editInquiryContact').value = inquiry.contact || '';
         document.getElementById('editInquiryMessage').value = inquiry.message || '';
@@ -624,6 +637,7 @@ async function saveEditInquiry(e) {
     e.preventDefault();
     
     const id = document.getElementById('editInquiryId').value;
+    const status = document.getElementById('editInquiryStatus').value;
     const name = document.getElementById('editInquiryName').value;
     const contact = document.getElementById('editInquiryContact').value;
     const message = document.getElementById('editInquiryMessage').value;
@@ -647,6 +661,7 @@ async function saveEditInquiry(e) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                status,
                 name,
                 contact,
                 message,

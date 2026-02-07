@@ -118,6 +118,14 @@
                         <form id="editInquiryForm" class="modal-form">
                             <input type="hidden" id="editInquiryId">
                             <div class="form-group">
+                                <label>상태</label>
+                                <select id="editInquiryStatus" class="form-input filter-select">
+                                    <option value="pending">대기 중</option>
+                                    <option value="contacted">연락 완료</option>
+                                    <option value="completed">처리 완료</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label>이름</label>
                                 <input type="text" id="editInquiryName" class="form-input" required>
                             </div>
