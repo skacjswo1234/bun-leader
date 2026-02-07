@@ -121,7 +121,20 @@ export function formatInquiryNotification(inquiryData) {
     }
   }
   
-  text += `\n⏰ <b>접수 시간:</b> ${new Date().toLocaleString('ko-KR')}`;
+  // 한국 시간(KST, UTC+9)으로 변환
+  const now = new Date();
+  const kstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+  const kstTimeString = kstDate.toLocaleString('ko-KR', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+  
+  text += `\n⏰ <b>접수 시간:</b> ${kstTimeString}`;
   
   return text;
 }

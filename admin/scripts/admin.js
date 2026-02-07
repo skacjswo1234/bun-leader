@@ -945,13 +945,23 @@ function getStatusText(status) {
 }
 
 function formatDate(dateString) {
+    if (!dateString) return '-';
+    
+    // UTC 시간을 한국 시간(KST, UTC+9)으로 변환
     const date = new Date(dateString);
-    return date.toLocaleString('ko-KR', {
+    
+    // UTC 시간에 9시간 추가 (한국 시간)
+    const kstDate = new Date(date.getTime() + (9 * 60 * 60 * 1000));
+    
+    // 한국 시간으로 포맷팅
+    return kstDate.toLocaleString('ko-KR', {
+        timeZone: 'Asia/Seoul',
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
+        hour12: false
     });
 }
 
