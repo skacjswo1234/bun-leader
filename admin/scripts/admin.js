@@ -4,7 +4,7 @@
 
 const API_BASE = '/api/admin';
 
-let currentSite = 'band-program';
+let currentSite = 'bun-partner';
 let currentStatus = '';
 let currentPage = 1;
 let currentSearch = '';
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.sidebar-item').forEach(item => {
             item.classList.remove('active');
         });
-        document.querySelector('[data-site="band-program"]').classList.add('active');
+        document.querySelector('[data-site="bun-partner"]').classList.add('active');
         
         // 폼 리셋
         document.getElementById('passwordChangeForm').reset();
