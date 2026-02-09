@@ -518,8 +518,9 @@ function displayInquiries(inquiries, pagination) {
     `;
     
     tbody.innerHTML = inquiries.map((inquiry, index) => {
-        // 번호 계산: 전체 개수에서 현재 인덱스를 빼서 최신이 1번이 되도록
-        const displayNumber = total - offset - index;
+        // 번호 계산: 최신이 1번이 되도록 (offset + index + 1)
+        // 첫 페이지: 1, 2, 3... / 두 번째 페이지: 51, 52, 53...
+        const displayNumber = offset + index + 1;
         // custom_fields 파싱
         let customFields = {};
         if (inquiry.custom_fields) {
