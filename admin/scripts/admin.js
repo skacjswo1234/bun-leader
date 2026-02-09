@@ -518,9 +518,9 @@ function displayInquiries(inquiries, pagination) {
     `;
     
     tbody.innerHTML = inquiries.map((inquiry, index) => {
-        // 번호 계산: 최신이 1번이 되도록 (offset + index + 1)
-        // 첫 페이지: 1, 2, 3... / 두 번째 페이지: 51, 52, 53...
-        const displayNumber = offset + index + 1;
+        // 번호 계산: 최신이 마지막 숫자가 되도록 (전체 개수에서 역순)
+        // 전체 100개, 1페이지: 100, 99, 98... / 2페이지: 50, 49, 48...
+        const displayNumber = total - offset - index;
         // custom_fields 파싱
         let customFields = {};
         if (inquiry.custom_fields) {
@@ -542,8 +542,8 @@ function displayInquiries(inquiries, pagination) {
                 <select class="filter-select status-select" data-inquiry-id="${inquiry.id}" onchange="updateStatusFromSelect(this)" title="상태 변경">
                     <option value="pending" ${inquiry.status === 'pending' ? 'selected' : ''}>대기 중</option>
                     <option value="contacted" ${inquiry.status === 'contacted' ? 'selected' : ''}>연락 완료</option>
-                    <option value="partner" ${inquiry.status === 'partner' ? 'selected' : ''}>파트너</option>
                     <option value="completed" ${inquiry.status === 'completed' ? 'selected' : ''}>처리 완료</option>
+                    <option value="partner" ${inquiry.status === 'partner' ? 'selected' : ''}>파트너</option>
                 </select>
             </td>
             <td>${formatDate(inquiry.created_at)}</td>
@@ -1274,9 +1274,11 @@ async function downloadExcel() {
                         }
                     }
                     const type = getInquiryType(inquiry, fields);
+                    // 최신이 마지막 숫자가 되도록 (전체 개수에서 역순)
+                    const displayNumber = inquiries.length - index;
                     
                     return [
-                        index + 1, // 최신이 1번이 되도록
+                        displayNumber,
                         type,
                         inquiry.name,
                         inquiry.contact,
@@ -1304,9 +1306,11 @@ async function downloadExcel() {
                         }
                     }
                     const type = getInquiryType(inquiry, fields);
+                    // 최신이 마지막 숫자가 되도록 (전체 개수에서 역순)
+                    const displayNumber = inquiries.length - index;
                     
                     return [
-                        index + 1, // 최신이 1번이 되도록
+                        displayNumber,
                         type,
                         inquiry.name,
                         inquiry.contact,
@@ -1332,9 +1336,11 @@ async function downloadExcel() {
                     }
                     const inquiryType = getInquiryType(inquiry, customFields);
                     const productType = customFields.product_type || customFields.productType || '';
+                    // 최신이 마지막 숫자가 되도록 (전체 개수에서 역순)
+                    const displayNumber = inquiries.length - index;
                     
                     return [
-                        index + 1, // 최신이 1번이 되도록
+                        displayNumber,
                         inquiryType,
                         inquiry.name,
                         inquiry.contact,
@@ -1361,9 +1367,11 @@ async function downloadExcel() {
                 }
                 const inquiryType = getInquiryType(inquiry, customFields);
                 const productType = customFields.product_type || customFields.productType || '';
+                // 최신이 마지막 숫자가 되도록 (전체 개수에서 역순)
+                const displayNumber = inquiries.length - index;
                 
                 return [
-                    index + 1, // 최신이 1번이 되도록
+                    displayNumber,
                     inquiryType,
                     inquiry.name,
                     inquiry.contact,
