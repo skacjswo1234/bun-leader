@@ -44,6 +44,10 @@
                         <span class="sidebar-icon">🤝</span>
                         <span class="sidebar-text">분양파트너</span>
                     </button>
+                    <button class="sidebar-item" id="bunPartnerAdminBtn">
+                        <span class="sidebar-icon">⚙️</span>
+                        <span class="sidebar-text">분양파트너 관리자페이지</span>
+                    </button>
                     <button class="sidebar-item" data-site="band-program">
                         <span class="sidebar-icon">🎵</span>
                         <span class="sidebar-text">밴드홍보대행/프로그램판매</span>
@@ -70,6 +74,7 @@
                                 <option value="name">이름</option>
                                 <option value="contact">연락처</option>
                                 <option value="type">문의타입</option>
+                                <option value="referrer">추천인</option>
                             </select>
                             <input type="text" id="searchInput" class="search-input" placeholder="검색어 입력..." style="flex: 1; padding: 8px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; background: rgba(255,255,255,0.1); color: #fff; margin-left: 8px;">
                             <button class="refresh-btn" id="searchBtn" style="margin-left: 8px;">검색</button>
@@ -78,6 +83,7 @@
                             <option value="">전체 상태</option>
                             <option value="pending">대기 중</option>
                             <option value="contacted">연락 완료</option>
+                            <option value="partner">파트너</option>
                             <option value="completed">처리 완료</option>
                         </select>
                         <button class="refresh-btn" id="refreshBtn">새로고침</button>
@@ -122,6 +128,7 @@
                                 <select id="editInquiryStatus" class="form-input filter-select">
                                     <option value="pending">대기 중</option>
                                     <option value="contacted">연락 완료</option>
+                                    <option value="partner">파트너</option>
                                     <option value="completed">처리 완료</option>
                                 </select>
                             </div>
@@ -192,6 +199,74 @@
                             <p class="notification-message" id="notificationMessage"></p>
                         </div>
                         <button class="notification-close" id="notificationClose">확인</button>
+                    </div>
+                </div>
+
+                <!-- 분양파트너 관리자페이지 섹션 -->
+                <div class="password-change-section" id="bunPartnerAdminSection" style="display: none;">
+                    <div class="password-change-container">
+                        <h2 class="content-title">분양파트너 관리자페이지</h2>
+                        <p style="color: #aaa; margin-bottom: 1.5rem;">분양파트너 문의를 직접 추가하거나 수정할 수 있습니다.</p>
+                        <form class="password-change-form" id="bunPartnerAdminForm">
+                            <div class="form-group">
+                                <label>문의타입</label>
+                                <select id="adminInquiryType" class="form-input filter-select" required>
+                                    <option value="">선택하세요</option>
+                                    <option value="파트너 지원 신청">파트너 지원 신청</option>
+                                    <option value="투자자 지원 신청">투자자 지원 신청</option>
+                                    <option value="요청사항">요청사항</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>성명</label>
+                                <input type="text" id="adminName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>전화번호</label>
+                                <input type="tel" id="adminContact" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>직급</label>
+                                <input type="text" id="adminRank" class="form-input" placeholder="예: 본부장, 팀장">
+                            </div>
+                            <div class="form-group">
+                                <label>현장명</label>
+                                <input type="text" id="adminSiteName" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label>광고지원금액</label>
+                                <input type="text" id="adminAdAmount" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label>투자금</label>
+                                <input type="text" id="adminInvestAmount" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label>추천인</label>
+                                <input type="text" id="adminReferrer" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label>추천인 전화번호</label>
+                                <input type="tel" id="adminReferrerContact" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label>메시지</label>
+                                <textarea id="adminMessage" class="form-input" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>상태</label>
+                                <select id="adminStatus" class="form-input filter-select">
+                                    <option value="pending">대기 중</option>
+                                    <option value="contacted">연락 완료</option>
+                                    <option value="partner">파트너</option>
+                                    <option value="completed">처리 완료</option>
+                                </select>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="refresh-btn">저장</button>
+                                <button type="button" class="refresh-btn" id="cancelBunPartnerAdminBtn" style="background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(100, 100, 100, 0.5);">취소</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 

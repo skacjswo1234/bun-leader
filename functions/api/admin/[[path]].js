@@ -160,8 +160,12 @@ export async function onRequest(context) {
         } else if (searchField === 'type') {
           query += ' AND custom_fields LIKE ?';
           params.push(`%${search.trim()}%`);
+        } else if (searchField === 'referrer') {
+          // 추천인 검색: custom_fields의 referrer 필드 검색
+          query += ' AND custom_fields LIKE ?';
+          params.push(`%"referrer":"%${search.trim()}%"`);
         } else {
-          // all: 이름, 연락처, custom_fields 모두 검색
+          // all: 이름, 연락처, custom_fields(문의타입, 추천인 포함) 모두 검색
           query += ' AND (name LIKE ? OR contact LIKE ? OR custom_fields LIKE ?)';
           params.push(searchTerm, searchTerm, `%${search.trim()}%`);
         }
@@ -200,6 +204,10 @@ export async function onRequest(context) {
         } else if (searchField === 'type') {
           countQuery += ' AND custom_fields LIKE ?';
           countParams.push(`%${search.trim()}%`);
+        } else if (searchField === 'referrer') {
+          // 추천인 검색: custom_fields의 referrer 필드 검색
+          countQuery += ' AND custom_fields LIKE ?';
+          countParams.push(`%"referrer":"%${search.trim()}%"`);
         } else {
           countQuery += ' AND (name LIKE ? OR contact LIKE ? OR custom_fields LIKE ?)';
           countParams.push(searchTerm, searchTerm, `%${search.trim()}%`);
@@ -260,7 +268,7 @@ export async function onRequest(context) {
 
       // 상태만 업데이트하는 경우
       if (status && !name && !contact && !message && !custom_fields && notes === undefined) {
-        if (!['pending', 'contacted', 'completed'].includes(status)) {
+        if (!['pending', 'contacted', 'partner', 'completed'].includes(status)) {
           return new Response(JSON.stringify({ 
             error: 'Invalid status' 
           }), {

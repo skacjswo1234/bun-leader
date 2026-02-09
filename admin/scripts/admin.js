@@ -62,6 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
+            // 분양파트너 관리자페이지 버튼은 별도 처리
+            if (btn.id === 'bunPartnerAdminBtn') {
+                return;
+            }
+            
             document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentSite = btn.dataset.site;
@@ -74,12 +79,129 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.pagination').style.display = 'flex';
             document.querySelector('.content-header').style.display = 'flex';
             document.getElementById('passwordChangeSection').style.display = 'none';
+            document.getElementById('bunPartnerAdminSection').style.display = 'none';
             
             // 모바일에서 메뉴 항목 클릭 시 메뉴 닫기
             if (window.innerWidth <= 768) {
                 closeMenu();
             }
         });
+    });
+
+    // 분양파트너 관리자페이지 버튼 이벤트
+    const bunPartnerAdminBtn = document.getElementById('bunPartnerAdminBtn');
+    const bunPartnerAdminSection = document.getElementById('bunPartnerAdminSection');
+    const cancelBunPartnerAdminBtn = document.getElementById('cancelBunPartnerAdminBtn');
+
+    bunPartnerAdminBtn.addEventListener('click', () => {
+        // 다른 사이드바 항목 비활성화
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        bunPartnerAdminBtn.classList.add('active');
+        
+        // 문의 목록 숨기기, 분양파트너 관리자페이지 섹션 표시
+        document.querySelector('.inquiries-table-container').style.display = 'none';
+        document.querySelector('.pagination').style.display = 'none';
+        document.querySelector('.content-header').style.display = 'none';
+        document.getElementById('passwordChangeSection').style.display = 'none';
+        bunPartnerAdminSection.style.display = 'block';
+        
+        // 모바일에서 메뉴 닫기
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+
+    cancelBunPartnerAdminBtn.addEventListener('click', () => {
+        // 문의 목록 표시, 분양파트너 관리자페이지 섹션 숨기기
+        document.querySelector('.inquiries-table-container').style.display = 'block';
+        document.querySelector('.pagination').style.display = 'flex';
+        document.querySelector('.content-header').style.display = 'flex';
+        bunPartnerAdminSection.style.display = 'none';
+        
+        // 사이드바 항목 복원
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector('[data-site="bun-partner"]').classList.add('active');
+        currentSite = 'bun-partner';
+        loadInquiries();
+        
+        // 폼 리셋
+        document.getElementById('bunPartnerAdminForm').reset();
+    });
+
+    // 분양파트너 관리자페이지 폼 제출
+    document.getElementById('bunPartnerAdminForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const inquiryType = document.getElementById('adminInquiryType').value;
+        const name = document.getElementById('adminName').value;
+        const contact = document.getElementById('adminContact').value;
+        const rank = document.getElementById('adminRank').value;
+        const siteName = document.getElementById('adminSiteName').value;
+        const adAmount = document.getElementById('adminAdAmount').value;
+        const investAmount = document.getElementById('adminInvestAmount').value;
+        const referrer = document.getElementById('adminReferrer').value;
+        const referrerContact = document.getElementById('adminReferrerContact').value;
+        const message = document.getElementById('adminMessage').value;
+        const status = document.getElementById('adminStatus').value;
+
+        if (!inquiryType || !name || !contact) {
+            showNotification('warning', '입력 필요', '문의타입, 성명, 전화번호는 필수 입력 항목입니다.');
+            return;
+        }
+
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = '저장 중...';
+
+        // custom_fields 구성
+        const customFields = {
+            inquiry_type: inquiryType
+        };
+        if (rank) customFields.rank = rank;
+        if (siteName) customFields.site_name = siteName;
+        if (adAmount) customFields.ad_amount = adAmount;
+        if (investAmount) customFields.invest_amount = investAmount;
+        if (referrer) customFields.referrer = referrer;
+        if (referrerContact) customFields.referrer_contact = referrerContact;
+
+        try {
+            const response = await fetch('/api/inquiries', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    site_id: 'bun-partner',
+                    name,
+                    contact,
+                    message: message || null,
+                    custom_fields: customFields,
+                    status: status || 'pending'
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                showNotification('success', '저장 완료', '분양파트너 문의가 성공적으로 저장되었습니다.');
+                document.getElementById('bunPartnerAdminForm').reset();
+            } else {
+                showNotification('error', '저장 실패', result.error || '문의 저장에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Save inquiry error:', error);
+            showNotification('error', '오류 발생', '오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
     });
 
     document.getElementById('statusFilter').addEventListener('change', (e) => {
@@ -413,6 +535,7 @@ function displayInquiries(inquiries) {
                 <select class="filter-select status-select" data-inquiry-id="${inquiry.id}" onchange="updateStatusFromSelect(this)" title="상태 변경">
                     <option value="pending" ${inquiry.status === 'pending' ? 'selected' : ''}>대기 중</option>
                     <option value="contacted" ${inquiry.status === 'contacted' ? 'selected' : ''}>연락 완료</option>
+                    <option value="partner" ${inquiry.status === 'partner' ? 'selected' : ''}>파트너</option>
                     <option value="completed" ${inquiry.status === 'completed' ? 'selected' : ''}>처리 완료</option>
                 </select>
             </td>
@@ -609,13 +732,57 @@ async function openEditModal(id) {
                 if (key !== 'admin_notes') {
                     const formGroup = document.createElement('div');
                     formGroup.className = 'form-group';
+                    const fieldLabel = getKoreanFieldLabel(key);
                     formGroup.innerHTML = `
-                        <label>${key}</label>
+                        <label>${escapeHtml(fieldLabel)}</label>
                         <input type="text" class="form-input" data-field="${key}" value="${escapeHtml(String(customFields[key] || ''))}">
                     `;
                     customFieldsContainer.appendChild(formGroup);
                 }
             });
+            
+            // 분양파트너인 경우 추천인 필드가 없으면 추가
+            if (inquiry.site_id === 'bun-partner') {
+                const hasReferrer = customFields.referrer !== undefined;
+                const hasReferrerContact = customFields.referrer_contact !== undefined;
+                
+                if (!hasReferrer) {
+                    const formGroup = document.createElement('div');
+                    formGroup.className = 'form-group';
+                    formGroup.innerHTML = `
+                        <label>추천인</label>
+                        <input type="text" class="form-input" data-field="referrer" value="">
+                    `;
+                    customFieldsContainer.appendChild(formGroup);
+                }
+                
+                if (!hasReferrerContact) {
+                    const formGroup = document.createElement('div');
+                    formGroup.className = 'form-group';
+                    formGroup.innerHTML = `
+                        <label>추천인 전화번호</label>
+                        <input type="tel" class="form-input" data-field="referrer_contact" value="">
+                    `;
+                    customFieldsContainer.appendChild(formGroup);
+                }
+            }
+        } else if (inquiry.site_id === 'bun-partner') {
+            // custom_fields가 없어도 분양파트너인 경우 추천인 필드 추가
+            const referrerGroup = document.createElement('div');
+            referrerGroup.className = 'form-group';
+            referrerGroup.innerHTML = `
+                <label>추천인</label>
+                <input type="text" class="form-input" data-field="referrer" value="">
+            `;
+            customFieldsContainer.appendChild(referrerGroup);
+            
+            const referrerContactGroup = document.createElement('div');
+            referrerContactGroup.className = 'form-group';
+            referrerContactGroup.innerHTML = `
+                <label>추천인 전화번호</label>
+                <input type="tel" class="form-input" data-field="referrer_contact" value="">
+            `;
+            customFieldsContainer.appendChild(referrerContactGroup);
         }
 
         document.getElementById('editModalOverlay').style.display = 'flex';
@@ -954,6 +1121,7 @@ function getStatusText(status) {
     const statusMap = {
         'pending': '대기 중',
         'contacted': '연락 완료',
+        'partner': '파트너',
         'completed': '처리 완료'
     };
     return statusMap[status] || status;
@@ -1040,7 +1208,7 @@ function getKoreanFieldLabel(key) {
 // 엑셀 다운로드 함수
 async function downloadExcel() {
     try {
-        // 모든 문의 데이터 가져오기 (페이지네이션 없이)
+        // 모든 문의 데이터 가져오기 (페이지네이션 없이, 검색 조건 포함)
         const params = new URLSearchParams({
             limit: 10000, // 충분히 큰 수
             site_id: currentSite
@@ -1048,6 +1216,12 @@ async function downloadExcel() {
 
         if (currentStatus) {
             params.append('status', currentStatus);
+        }
+
+        // 검색 조건 추가
+        if (currentSearch) {
+            params.append('search', currentSearch);
+            params.append('search_field', currentSearchField);
         }
 
         const response = await fetch(`${API_BASE}/inquiries?${params}`);
