@@ -482,7 +482,7 @@ async function loadInquiries() {
         const result = await response.json();
 
         if (result.success) {
-            displayInquiries(result.data);
+            displayInquiries(result.data, result.pagination);
             displayPagination(result.pagination);
         } else {
             tbody.innerHTML = '<tr><td colspan="6" class="loading">데이터를 불러올 수 없습니다.</td></tr>';
@@ -494,7 +494,7 @@ async function loadInquiries() {
 }
 
 // 문의 목록 표시
-function displayInquiries(inquiries) {
+function displayInquiries(inquiries, pagination) {
     const tbody = document.getElementById('inquiriesTableBody');
     const thead = document.querySelector('.inquiries-table thead tr');
     
@@ -503,9 +503,13 @@ function displayInquiries(inquiries) {
         return;
     }
 
+    // 전체 개수와 현재 페이지 정보로 번호 계산
+    const total = pagination ? pagination.total : inquiries.length;
+    const offset = pagination ? (currentPage - 1) * limit : 0;
+
     // 모든 사이트에 대해 간소화된 리스트 표시
     thead.innerHTML = `
-        <th>ID</th>
+        <th>번호</th>
         <th>이름</th>
         <th>연락처</th>
         <th>상태</th>
@@ -513,7 +517,9 @@ function displayInquiries(inquiries) {
         <th>작업</th>
     `;
     
-    tbody.innerHTML = inquiries.map(inquiry => {
+    tbody.innerHTML = inquiries.map((inquiry, index) => {
+        // 번호 계산: 전체 개수에서 현재 인덱스를 빼서 최신이 1번이 되도록
+        const displayNumber = total - offset - index;
         // custom_fields 파싱
         let customFields = {};
         if (inquiry.custom_fields) {
@@ -528,7 +534,7 @@ function displayInquiries(inquiries) {
 
         return `
         <tr>
-            <td>${inquiry.id}</td>
+            <td>${displayNumber}</td>
             <td>${escapeHtml(inquiry.name)}</td>
             <td>${escapeHtml(inquiry.contact)}</td>
             <td>
