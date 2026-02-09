@@ -110,7 +110,13 @@ export async function onRequest(context) {
       const totalStats = await db.prepare(`
         SELECT 
           COUNT(*) as total,
-          SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending
+          SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+          SUM(CASE WHEN status = 'contacted' THEN 1 ELSE 0 END) as contacted,
+          SUM(CASE WHEN status = 'reviewing' THEN 1 ELSE 0 END) as reviewing,
+          SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
+          SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
+          SUM(CASE WHEN status = 'advertising' THEN 1 ELSE 0 END) as advertising,
+          SUM(CASE WHEN status = 'partner' THEN 1 ELSE 0 END) as partner
         FROM inquiries
       `).first();
 
@@ -282,7 +288,7 @@ export async function onRequest(context) {
 
       // 상태만 업데이트하는 경우
       if (status && !name && !contact && !message && !custom_fields && notes === undefined) {
-        if (!['pending', 'contacted', 'reviewing', 'completed', 'partner'].includes(status)) {
+        if (!['pending', 'contacted', 'reviewing', 'rejected', 'completed', 'advertising', 'partner'].includes(status)) {
           return new Response(JSON.stringify({ 
             error: 'Invalid status' 
           }), {

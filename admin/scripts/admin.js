@@ -449,8 +449,15 @@ async function loadStats() {
         const result = await response.json();
         
         if (result.success) {
-            document.getElementById('totalInquiries').textContent = result.data.total.total || 0;
-            document.getElementById('pendingInquiries').textContent = result.data.total.pending || 0;
+            const stats = result.data.total;
+            document.getElementById('totalInquiries').textContent = stats.total || 0;
+            document.getElementById('pendingInquiries').textContent = stats.pending || 0;
+            document.getElementById('contactedInquiries').textContent = stats.contacted || 0;
+            document.getElementById('reviewingInquiries').textContent = stats.reviewing || 0;
+            document.getElementById('rejectedInquiries').textContent = stats.rejected || 0;
+            document.getElementById('completedInquiries').textContent = stats.completed || 0;
+            document.getElementById('advertisingInquiries').textContent = stats.advertising || 0;
+            document.getElementById('partnerInquiries').textContent = stats.partner || 0;
         }
     } catch (error) {
         console.error('Stats load error:', error);
@@ -543,7 +550,9 @@ function displayInquiries(inquiries, pagination) {
                     <option value="pending" ${inquiry.status === 'pending' ? 'selected' : ''}>대기 중</option>
                     <option value="contacted" ${inquiry.status === 'contacted' ? 'selected' : ''}>연락 완료</option>
                     <option value="reviewing" ${inquiry.status === 'reviewing' ? 'selected' : ''}>심사중</option>
+                    <option value="rejected" ${inquiry.status === 'rejected' ? 'selected' : ''}>심사탈락</option>
                     <option value="completed" ${inquiry.status === 'completed' ? 'selected' : ''}>처리 완료</option>
+                    <option value="advertising" ${inquiry.status === 'advertising' ? 'selected' : ''}>광고중</option>
                     <option value="partner" ${inquiry.status === 'partner' ? 'selected' : ''}>파트너</option>
                 </select>
             </td>
@@ -1130,7 +1139,9 @@ function getStatusText(status) {
         'pending': '대기 중',
         'contacted': '연락 완료',
         'reviewing': '심사중',
+        'rejected': '심사탈락',
         'completed': '처리 완료',
+        'advertising': '광고중',
         'partner': '파트너'
     };
     return statusMap[status] || status;
