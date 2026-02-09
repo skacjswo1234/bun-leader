@@ -161,14 +161,16 @@ export async function onRequest(context) {
           query += ' AND custom_fields LIKE ?';
           params.push(`%${search.trim()}%`);
         } else if (searchField === 'referrer') {
-          // 추천인 검색: custom_fields의 referrer 필드 검색 (JSON 형식 고려)
-          query += ' AND (custom_fields LIKE ? OR custom_fields LIKE ?)';
+          // 추천인 검색: custom_fields의 referrer 필드 검색
+          // JSON에서 referrer 필드 값 검색 (여러 패턴 시도)
+          query += ' AND (custom_fields LIKE ? OR custom_fields LIKE ? OR custom_fields LIKE ?)';
           const searchTerm = search.trim();
-          // JSON에서 referrer 필드 값 검색 (여러 패턴 지원)
-          // 패턴 1: "referrer":"값" (공백 없음)
-          // 패턴 2: "referrer": "값" (공백 있음)
+          // 패턴 1: "referrer":"검색어" (공백 없음)
+          // 패턴 2: "referrer": "검색어" (공백 있음)  
+          // 패턴 3: referrer 키와 검색어가 모두 포함된 경우 (더 유연)
           params.push(`%"referrer":"%${searchTerm}%"`);
           params.push(`%"referrer": "%${searchTerm}%"`);
+          params.push(`%"referrer"%${searchTerm}%`);
         } else {
           // all: 이름, 연락처, custom_fields(문의타입, 추천인 포함) 모두 검색
           query += ' AND (name LIKE ? OR contact LIKE ? OR custom_fields LIKE ?)';
@@ -210,14 +212,16 @@ export async function onRequest(context) {
           countQuery += ' AND custom_fields LIKE ?';
           countParams.push(`%${search.trim()}%`);
         } else if (searchField === 'referrer') {
-          // 추천인 검색: custom_fields의 referrer 필드 검색 (JSON 형식 고려)
-          countQuery += ' AND (custom_fields LIKE ? OR custom_fields LIKE ?)';
+          // 추천인 검색: custom_fields의 referrer 필드 검색
+          // JSON에서 referrer 필드 값 검색 (여러 패턴 시도)
+          countQuery += ' AND (custom_fields LIKE ? OR custom_fields LIKE ? OR custom_fields LIKE ?)';
           const searchTerm = search.trim();
-          // JSON에서 referrer 필드 값 검색 (여러 패턴 지원)
-          // 패턴 1: "referrer":"값" (공백 없음)
-          // 패턴 2: "referrer": "값" (공백 있음)
+          // 패턴 1: "referrer":"검색어" (공백 없음)
+          // 패턴 2: "referrer": "검색어" (공백 있음)
+          // 패턴 3: referrer 키와 검색어가 모두 포함된 경우 (더 유연)
           countParams.push(`%"referrer":"%${searchTerm}%"`);
           countParams.push(`%"referrer": "%${searchTerm}%"`);
+          countParams.push(`%"referrer"%${searchTerm}%`);
         } else {
           countQuery += ' AND (name LIKE ? OR contact LIKE ? OR custom_fields LIKE ?)';
           countParams.push(searchTerm, searchTerm, `%${search.trim()}%`);
