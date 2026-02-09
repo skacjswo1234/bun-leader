@@ -542,6 +542,7 @@ function displayInquiries(inquiries, pagination) {
                 <select class="filter-select status-select" data-inquiry-id="${inquiry.id}" onchange="updateStatusFromSelect(this)" title="상태 변경">
                     <option value="pending" ${inquiry.status === 'pending' ? 'selected' : ''}>대기 중</option>
                     <option value="contacted" ${inquiry.status === 'contacted' ? 'selected' : ''}>연락 완료</option>
+                    <option value="reviewing" ${inquiry.status === 'reviewing' ? 'selected' : ''}>심사중</option>
                     <option value="completed" ${inquiry.status === 'completed' ? 'selected' : ''}>처리 완료</option>
                     <option value="partner" ${inquiry.status === 'partner' ? 'selected' : ''}>파트너</option>
                 </select>
@@ -1128,8 +1129,9 @@ function getStatusText(status) {
     const statusMap = {
         'pending': '대기 중',
         'contacted': '연락 완료',
-        'partner': '파트너',
-        'completed': '처리 완료'
+        'reviewing': '심사중',
+        'completed': '처리 완료',
+        'partner': '파트너'
     };
     return statusMap[status] || status;
 }

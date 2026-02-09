@@ -282,7 +282,7 @@ export async function onRequest(context) {
 
       // 상태만 업데이트하는 경우
       if (status && !name && !contact && !message && !custom_fields && notes === undefined) {
-        if (!['pending', 'contacted', 'partner', 'completed'].includes(status)) {
+        if (!['pending', 'contacted', 'reviewing', 'completed', 'partner'].includes(status)) {
           return new Response(JSON.stringify({ 
             error: 'Invalid status' 
           }), {
