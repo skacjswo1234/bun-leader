@@ -1260,9 +1260,9 @@ async function downloadExcel() {
             const inquiryType = getInquiryType(inquiries[0], customFields);
 
             if (inquiryType === '파트너 지원 신청') {
-                headers = ['ID', '문의타입', '성명', '전화번호', '직급', '현장명', '광고지원금액', '추천인', '추천인 전화번호', '상태', '등록일시'];
+                headers = ['번호', '문의타입', '성명', '전화번호', '직급', '현장명', '광고지원금액', '추천인', '추천인 전화번호', '상태', '등록일시'];
                 
-                rows = inquiries.map(inquiry => {
+                rows = inquiries.map((inquiry, index) => {
                     let fields = {};
                     if (inquiry.custom_fields) {
                         try {
@@ -1276,7 +1276,7 @@ async function downloadExcel() {
                     const type = getInquiryType(inquiry, fields);
                     
                     return [
-                        inquiry.id,
+                        index + 1, // 최신이 1번이 되도록
                         type,
                         inquiry.name,
                         inquiry.contact,
@@ -1290,9 +1290,9 @@ async function downloadExcel() {
                     ];
                 });
             } else if (inquiryType === '투자자 지원 신청') {
-                headers = ['ID', '문의타입', '성명', '전화번호', '투자금', '상태', '등록일시'];
+                headers = ['번호', '문의타입', '성명', '전화번호', '투자금', '상태', '등록일시'];
                 
-                rows = inquiries.map(inquiry => {
+                rows = inquiries.map((inquiry, index) => {
                     let fields = {};
                     if (inquiry.custom_fields) {
                         try {
@@ -1306,7 +1306,7 @@ async function downloadExcel() {
                     const type = getInquiryType(inquiry, fields);
                     
                     return [
-                        inquiry.id,
+                        index + 1, // 최신이 1번이 되도록
                         type,
                         inquiry.name,
                         inquiry.contact,
@@ -1317,9 +1317,9 @@ async function downloadExcel() {
                 });
             } else {
                 // 기본 구조
-                headers = ['ID', '문의타입', '이름', '연락처', '상품유형', '상태', '등록일시'];
+                headers = ['번호', '문의타입', '이름', '연락처', '상품유형', '상태', '등록일시'];
                 
-                rows = inquiries.map(inquiry => {
+                rows = inquiries.map((inquiry, index) => {
                     let customFields = {};
                     if (inquiry.custom_fields) {
                         try {
@@ -1334,7 +1334,7 @@ async function downloadExcel() {
                     const productType = customFields.product_type || customFields.productType || '';
                     
                     return [
-                        inquiry.id,
+                        index + 1, // 최신이 1번이 되도록
                         inquiryType,
                         inquiry.name,
                         inquiry.contact,
@@ -1346,9 +1346,9 @@ async function downloadExcel() {
             }
         } else {
             // 다른 사이트는 기본 구조
-            headers = ['ID', '문의타입', '이름', '연락처', '상품유형', '상태', '등록일시'];
+            headers = ['번호', '문의타입', '이름', '연락처', '상품유형', '상태', '등록일시'];
             
-            rows = inquiries.map(inquiry => {
+            rows = inquiries.map((inquiry, index) => {
                 let customFields = {};
                 if (inquiry.custom_fields) {
                     try {
@@ -1363,7 +1363,7 @@ async function downloadExcel() {
                 const productType = customFields.product_type || customFields.productType || '';
                 
                 return [
-                    inquiry.id,
+                    index + 1, // 최신이 1번이 되도록
                     inquiryType,
                     inquiry.name,
                     inquiry.contact,
