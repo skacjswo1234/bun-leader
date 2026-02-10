@@ -848,6 +848,23 @@ async function openEditModal(id) {
                 console.error('Failed to parse custom_fields:', e);
             }
 
+            // 분양파트너 문의의 경우 필수적으로 보여줄 항목들 보장
+            if (inquiry.site_id === 'bun-partner') {
+                const requiredKeys = [
+                    'inquiry_type',     // 문의타입
+                    'rank',             // 직급
+                    'site_name',        // 현장명
+                    'ad_amount',        // 광고지원금액
+                    'referrer',         // 추천인
+                    'referrer_contact'  // 추천인 전화번호
+                ];
+                requiredKeys.forEach(key => {
+                    if (customFields[key] === undefined) {
+                        customFields[key] = '';
+                    }
+                });
+            }
+
             // admin_notes는 제외하고 표시
             let hasManageStatus = false;
 
@@ -868,9 +885,10 @@ async function openEditModal(id) {
                         </select>
                     `;
                 } else {
+                    const inputType = key === 'referrer_contact' ? 'tel' : 'text';
                     formGroup.innerHTML = `
                         <label>${escapeHtml(fieldLabel)}</label>
-                        <input type="text" class="form-input" data-field="${key}" value="${escapeHtml(String(customFields[key] || ''))}">
+                        <input type="${inputType}" class="form-input" data-field="${key}" value="${escapeHtml(String(customFields[key] || ''))}">
                     `;
                 }
                 customFieldsContainer.appendChild(formGroup);
@@ -888,50 +906,27 @@ async function openEditModal(id) {
                 `;
                 customFieldsContainer.appendChild(formGroup);
             }
-            
-            // 분양파트너인 경우 추천인 필드가 없으면 추가
-            if (inquiry.site_id === 'bun-partner') {
-                const hasReferrer = customFields.referrer !== undefined;
-                const hasReferrerContact = customFields.referrer_contact !== undefined;
-                
-                if (!hasReferrer) {
-                    const formGroup = document.createElement('div');
-                    formGroup.className = 'form-group';
-                    formGroup.innerHTML = `
-                        <label>추천인</label>
-                        <input type="text" class="form-input" data-field="referrer" value="">
-                    `;
-                    customFieldsContainer.appendChild(formGroup);
-                }
-                
-                if (!hasReferrerContact) {
-                    const formGroup = document.createElement('div');
-                    formGroup.className = 'form-group';
-                    formGroup.innerHTML = `
-                        <label>추천인 전화번호</label>
-                        <input type="tel" class="form-input" data-field="referrer_contact" value="">
-                    `;
-                    customFieldsContainer.appendChild(formGroup);
-                }
-            }
         } else if (inquiry.site_id === 'bun-partner') {
-            // custom_fields가 없어도 분양파트너인 경우 추천인 필드 추가
-            const referrerGroup = document.createElement('div');
-            referrerGroup.className = 'form-group';
-            referrerGroup.innerHTML = `
-                <label>추천인</label>
-                <input type="text" class="form-input" data-field="referrer" value="">
-            `;
-            customFieldsContainer.appendChild(referrerGroup);
-            
-            const referrerContactGroup = document.createElement('div');
-            referrerContactGroup.className = 'form-group';
-            referrerContactGroup.innerHTML = `
-                <label>추천인 전화번호</label>
-                <input type="tel" class="form-input" data-field="referrer_contact" value="">
-            `;
-            customFieldsContainer.appendChild(referrerContactGroup);
-            
+            // custom_fields가 없어도 분양파트너인 경우 필수 항목들을 모두 추가
+            const fieldsConfig = [
+                { key: 'inquiry_type', label: getKoreanFieldLabel('inquiry_type'), type: 'text' },
+                { key: 'rank', label: getKoreanFieldLabel('rank'), type: 'text' },
+                { key: 'site_name', label: getKoreanFieldLabel('site_name'), type: 'text' },
+                { key: 'ad_amount', label: getKoreanFieldLabel('ad_amount'), type: 'text' },
+                { key: 'referrer', label: getKoreanFieldLabel('referrer'), type: 'text' },
+                { key: 'referrer_contact', label: getKoreanFieldLabel('referrer_contact'), type: 'tel' }
+            ];
+
+            fieldsConfig.forEach(field => {
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+                formGroup.innerHTML = `
+                    <label>${escapeHtml(field.label)}</label>
+                    <input type="${field.type}" class="form-input" data-field="${field.key}" value="">
+                `;
+                customFieldsContainer.appendChild(formGroup);
+            });
+
             // 분양파트너이면서 custom_fields가 없는 경우에도 관리현황 필드 추가
             const manageStatusGroup = document.createElement('div');
             manageStatusGroup.className = 'form-group';
@@ -969,8 +964,8 @@ async function saveEditInquiry(e) {
     const contact = document.getElementById('editInquiryContact').value;
     const message = document.getElementById('editInquiryMessage').value;
 
-    // custom_fields 수집
-    const customFieldsInputs = document.querySelectorAll('#editCustomFieldsContainer input[data-field]');
+    // custom_fields 수집 (input + select)
+    const customFieldsInputs = document.querySelectorAll('#editCustomFieldsContainer input[data-field], #editCustomFieldsContainer select[data-field]');
     const customFields = {};
     customFieldsInputs.forEach(input => {
         customFields[input.dataset.field] = input.value;
