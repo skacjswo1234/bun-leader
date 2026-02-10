@@ -6,6 +6,7 @@ const API_BASE = '/api/admin';
 
 let currentSite = 'bun-partner';
 let currentStatus = '';
+let currentManageStatus = '';
 let currentPage = 1;
 let currentSearch = '';
 let currentSearchField = 'all';
@@ -171,6 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (referrer) customFields.referrer = referrer;
         if (referrerContact) customFields.referrer_contact = referrerContact;
 
+        const adminManageStatus = document.getElementById('adminManageStatus').value;
+        if (adminManageStatus) customFields.manage_status = adminManageStatus;
+
         try {
             const response = await fetch('/api/inquiries', {
                 method: 'POST',
@@ -210,6 +214,15 @@ document.addEventListener('DOMContentLoaded', () => {
         loadInquiries();
     });
 
+    const manageStatusFilter = document.getElementById('manageStatusFilter');
+    if (manageStatusFilter) {
+        manageStatusFilter.addEventListener('change', (e) => {
+            currentManageStatus = e.target.value;
+            currentPage = 1;
+            loadInquiries();
+        });
+    }
+
     // 검색 기능
     const searchInput = document.getElementById('searchInput');
     const searchFieldFilter = document.getElementById('searchFieldFilter');
@@ -235,6 +248,10 @@ document.addEventListener('DOMContentLoaded', () => {
         searchFieldFilter.value = 'all';
         currentStatus = '';
         document.getElementById('statusFilter').value = '';
+        currentManageStatus = '';
+        if (manageStatusFilter) {
+            manageStatusFilter.value = '';
+        }
         currentPage = 1;
         loadStats();
         loadInquiries();
@@ -467,7 +484,7 @@ async function loadStats() {
 // 문의 목록 로드
 async function loadInquiries() {
     const tbody = document.getElementById('inquiriesTableBody');
-    tbody.innerHTML = '<tr><td colspan="6" class="loading">로딩 중...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="loading">로딩 중...</td></tr>';
 
     try {
         const params = new URLSearchParams({
@@ -478,6 +495,10 @@ async function loadInquiries() {
 
         if (currentStatus) {
             params.append('status', currentStatus);
+        }
+
+        if (currentManageStatus) {
+            params.append('manage_status', currentManageStatus);
         }
 
         if (currentSearch) {
@@ -492,11 +513,11 @@ async function loadInquiries() {
             displayInquiries(result.data, result.pagination);
             displayPagination(result.pagination);
         } else {
-            tbody.innerHTML = '<tr><td colspan="6" class="loading">데이터를 불러올 수 없습니다.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="loading">데이터를 불러올 수 없습니다.</td></tr>';
         }
     } catch (error) {
         console.error('Inquiries load error:', error);
-        tbody.innerHTML = '<tr><td colspan="6" class="loading">오류가 발생했습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="loading">오류가 발생했습니다.</td></tr>';
     }
 }
 
@@ -506,7 +527,7 @@ function displayInquiries(inquiries, pagination) {
     const thead = document.querySelector('.inquiries-table thead tr');
     
     if (inquiries.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="loading">문의가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="loading">문의가 없습니다.</td></tr>`;
         return;
     }
 
@@ -520,6 +541,7 @@ function displayInquiries(inquiries, pagination) {
         <th>이름</th>
         <th>연락처</th>
         <th>상태</th>
+        <th>관리현황</th>
         <th>등록일시</th>
         <th>작업</th>
     `;
@@ -540,6 +562,8 @@ function displayInquiries(inquiries, pagination) {
             }
         }
 
+        const manageStatus = customFields.manage_status || '';
+
         return `
         <tr>
             <td>${displayNumber}</td>
@@ -554,6 +578,11 @@ function displayInquiries(inquiries, pagination) {
                     <option value="completed" ${inquiry.status === 'completed' ? 'selected' : ''}>처리 완료</option>
                     <option value="advertising" ${inquiry.status === 'advertising' ? 'selected' : ''}>광고중</option>
                     <option value="partner" ${inquiry.status === 'partner' ? 'selected' : ''}>파트너</option>
+                </select>
+            </td>
+            <td>
+                <select class="filter-select manage-status-select" data-inquiry-id="${inquiry.id}" onchange="updateManageStatusFromSelect(this)" title="관리현황 변경">
+                    ${renderManageStatusOptions(manageStatus)}
                 </select>
             </td>
             <td>${formatDate(inquiry.created_at)}</td>
@@ -688,6 +717,81 @@ async function doUpdateStatus(id, status) {
     }
 }
 
+const MANAGE_STATUS_OPTIONS = [
+    '',
+    '감도상',
+    '감도중',
+    '감도하',
+    '지속관리',
+    '현장소개',
+    '현장이동',
+    '블랙거절'
+];
+
+function renderManageStatusOptions(selectedValue) {
+    return MANAGE_STATUS_OPTIONS.map(value => {
+        const label = value === '' ? '선택' : value;
+        const selectedAttr = value === selectedValue ? 'selected' : '';
+        return `<option value="${value}" ${selectedAttr}>${label}</option>`;
+    }).join('');
+}
+
+async function updateManageStatusFromSelect(selectEl) {
+    const id = selectEl.dataset.inquiryId;
+    const manageStatus = selectEl.value;
+    if (!id) return;
+
+    try {
+        // 현재 문의의 custom_fields 가져오기
+        const response = await fetch(`${API_BASE}/inquiries/${id}`);
+        const result = await response.json();
+
+        if (!result.success || !result.data) {
+            showNotification('error', '불러오기 실패', '문의 정보를 불러올 수 없습니다.');
+            return;
+        }
+
+        let customFields = {};
+        if (result.data.custom_fields) {
+            try {
+                customFields = typeof result.data.custom_fields === 'string'
+                    ? JSON.parse(result.data.custom_fields)
+                    : result.data.custom_fields;
+            } catch (e) {
+                console.error('Failed to parse custom_fields:', e);
+            }
+        }
+
+        if (manageStatus) {
+            customFields.manage_status = manageStatus;
+        } else {
+            delete customFields.manage_status;
+        }
+
+        const updateResponse = await fetch(`${API_BASE}/inquiries/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                custom_fields: customFields
+            })
+        });
+
+        const updateResult = await updateResponse.json();
+
+        if (updateResult.success) {
+            showNotification('success', '변경 완료', '관리현황이 성공적으로 변경되었습니다.');
+            loadInquiries();
+        } else {
+            showNotification('error', '변경 실패', updateResult.error || '관리현황 변경에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('Manage status update error:', error);
+        showNotification('error', '오류 발생', '오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
+}
+
 // 문의 삭제
 async function deleteInquiry(id) {
     if (!confirm('정말 삭제하시겠습니까?')) return;
@@ -745,18 +849,45 @@ async function openEditModal(id) {
             }
 
             // admin_notes는 제외하고 표시
+            let hasManageStatus = false;
+
             Object.keys(customFields).forEach(key => {
-                if (key !== 'admin_notes') {
-                    const formGroup = document.createElement('div');
-                    formGroup.className = 'form-group';
-                    const fieldLabel = getKoreanFieldLabel(key);
+                if (key === 'admin_notes') {
+                    return;
+                }
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+                const fieldLabel = getKoreanFieldLabel(key);
+
+                if (key === 'manage_status') {
+                    hasManageStatus = true;
+                    formGroup.innerHTML = `
+                        <label>${escapeHtml(fieldLabel)}</label>
+                        <select class="form-input filter-select" data-field="manage_status">
+                            ${renderManageStatusOptions(String(customFields[key] || ''))}
+                        </select>
+                    `;
+                } else {
                     formGroup.innerHTML = `
                         <label>${escapeHtml(fieldLabel)}</label>
                         <input type="text" class="form-input" data-field="${key}" value="${escapeHtml(String(customFields[key] || ''))}">
                     `;
-                    customFieldsContainer.appendChild(formGroup);
                 }
+                customFieldsContainer.appendChild(formGroup);
             });
+
+            if (!hasManageStatus) {
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+                const fieldLabel = getKoreanFieldLabel('manage_status');
+                formGroup.innerHTML = `
+                    <label>${escapeHtml(fieldLabel)}</label>
+                    <select class="form-input filter-select" data-field="manage_status">
+                        ${renderManageStatusOptions('')}
+                    </select>
+                `;
+                customFieldsContainer.appendChild(formGroup);
+            }
             
             // 분양파트너인 경우 추천인 필드가 없으면 추가
             if (inquiry.site_id === 'bun-partner') {
@@ -800,6 +931,18 @@ async function openEditModal(id) {
                 <input type="tel" class="form-input" data-field="referrer_contact" value="">
             `;
             customFieldsContainer.appendChild(referrerContactGroup);
+            
+            // 분양파트너이면서 custom_fields가 없는 경우에도 관리현황 필드 추가
+            const manageStatusGroup = document.createElement('div');
+            manageStatusGroup.className = 'form-group';
+            const fieldLabel = getKoreanFieldLabel('manage_status');
+            manageStatusGroup.innerHTML = `
+                <label>${escapeHtml(fieldLabel)}</label>
+                <select class="form-input filter-select" data-field="manage_status">
+                    ${renderManageStatusOptions('')}
+                </select>
+            `;
+            customFieldsContainer.appendChild(manageStatusGroup);
         }
 
         document.getElementById('editModalOverlay').style.display = 'flex';
@@ -1218,7 +1361,8 @@ function getKoreanFieldLabel(key) {
         'tel': '전화번호',
         'mobile': '휴대폰',
         'mobile_number': '휴대폰번호',
-        'mobileNumber': '휴대폰번호'
+        'mobileNumber': '휴대폰번호',
+        'manage_status': '관리현황'
     };
     
     // 매핑된 한글 레이블이 있으면 반환, 없으면 원본 키 반환
@@ -1236,6 +1380,10 @@ async function downloadExcel() {
 
         if (currentStatus) {
             params.append('status', currentStatus);
+        }
+
+        if (currentManageStatus) {
+            params.append('manage_status', currentManageStatus);
         }
 
         // 검색 조건 추가
