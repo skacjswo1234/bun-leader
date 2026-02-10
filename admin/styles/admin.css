@@ -585,10 +585,40 @@ body {
     .content-header {
         flex-direction: column;
         align-items: flex-start;
+        width: 100%;
     }
 
     .content-title {
         font-size: 20px;
+    }
+
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .filters > * {
+        width: 100%;
+    }
+
+    .search-container {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #searchFieldFilter {
+        width: 100% !important;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .refresh-btn {
+        width: 100%;
+        text-align: center;
     }
 
     .inquiries-table-container {
