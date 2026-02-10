@@ -278,8 +278,9 @@ body {
     padding: 0.5rem;
 }
 
-/* 리스트 내 상태 변경 드롭다운 */
-.status-select {
+/* 리스트 내 상태/관리현황 드롭다운 */
+.status-select,
+.manage-status-select {
     min-width: 110px;
     max-width: 140px;
     padding: 0.4rem 0.6rem;

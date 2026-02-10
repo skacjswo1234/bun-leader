@@ -863,7 +863,7 @@ async function openEditModal(id) {
                     hasManageStatus = true;
                     formGroup.innerHTML = `
                         <label>${escapeHtml(fieldLabel)}</label>
-                        <select class="form-input filter-select" data-field="manage_status">
+                        <select class="form-input filter-select manage-status-select" data-field="manage_status">
                             ${renderManageStatusOptions(String(customFields[key] || ''))}
                         </select>
                     `;
@@ -882,7 +882,7 @@ async function openEditModal(id) {
                 const fieldLabel = getKoreanFieldLabel('manage_status');
                 formGroup.innerHTML = `
                     <label>${escapeHtml(fieldLabel)}</label>
-                    <select class="form-input filter-select" data-field="manage_status">
+                    <select class="form-input filter-select manage-status-select" data-field="manage_status">
                         ${renderManageStatusOptions('')}
                     </select>
                 `;
@@ -938,7 +938,7 @@ async function openEditModal(id) {
             const fieldLabel = getKoreanFieldLabel('manage_status');
             manageStatusGroup.innerHTML = `
                 <label>${escapeHtml(fieldLabel)}</label>
-                <select class="form-input filter-select" data-field="manage_status">
+                <select class="form-input filter-select manage-status-select" data-field="manage_status">
                     ${renderManageStatusOptions('')}
                 </select>
             `;
