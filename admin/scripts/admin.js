@@ -73,6 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('active');
             currentSite = btn.dataset.site;
             currentPage = 1;
+            currentPaymentStatus = '';
+            const paymentStatusFilterEl = document.getElementById('paymentStatusFilter');
+            if (paymentStatusFilterEl) {
+                paymentStatusFilterEl.value = '';
+                paymentStatusFilterEl.style.display = currentSite === 'bun-partner' ? '' : 'none';
+            }
             updateContentTitle();
             loadInquiries();
             
@@ -130,6 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         document.querySelector('[data-site="bun-partner"]').classList.add('active');
         currentSite = 'bun-partner';
+        const paymentStatusFilterEl = document.getElementById('paymentStatusFilter');
+        if (paymentStatusFilterEl) {
+            paymentStatusFilterEl.style.display = '';
+        }
         loadInquiries();
         
         // 폼 리셋
@@ -229,6 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const paymentStatusFilter = document.getElementById('paymentStatusFilter');
     if (paymentStatusFilter) {
+        paymentStatusFilter.style.display = currentSite === 'bun-partner' ? '' : 'none';
         paymentStatusFilter.addEventListener('change', (e) => {
             currentPaymentStatus = e.target.value;
             currentPage = 1;
@@ -501,7 +512,8 @@ async function loadStats() {
 // 문의 목록 로드
 async function loadInquiries() {
     const tbody = document.getElementById('inquiriesTableBody');
-    tbody.innerHTML = '<tr><td colspan="8" class="loading">로딩 중...</td></tr>';
+    const colCount = currentSite === 'bun-partner' ? 8 : 7;
+    tbody.innerHTML = `<tr><td colspan="${colCount}" class="loading">로딩 중...</td></tr>`;
 
     try {
         const params = new URLSearchParams({
@@ -518,7 +530,7 @@ async function loadInquiries() {
             params.append('manage_status', currentManageStatus);
         }
 
-        if (currentPaymentStatus) {
+        if (currentSite === 'bun-partner' && currentPaymentStatus) {
             params.append('payment_status', currentPaymentStatus);
         }
 
@@ -534,11 +546,11 @@ async function loadInquiries() {
             displayInquiries(result.data, result.pagination);
             displayPagination(result.pagination);
         } else {
-            tbody.innerHTML = '<tr><td colspan="8" class="loading">데이터를 불러올 수 없습니다.</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="${colCount}" class="loading">데이터를 불러올 수 없습니다.</td></tr>`;
         }
     } catch (error) {
         console.error('Inquiries load error:', error);
-        tbody.innerHTML = '<tr><td colspan="8" class="loading">오류가 발생했습니다.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="${colCount}" class="loading">오류가 발생했습니다.</td></tr>`;
     }
 }
 
@@ -546,9 +558,11 @@ async function loadInquiries() {
 function displayInquiries(inquiries, pagination) {
     const tbody = document.getElementById('inquiriesTableBody');
     const thead = document.querySelector('.inquiries-table thead tr');
-    
+    const isBunPartner = currentSite === 'bun-partner';
+    const colCount = isBunPartner ? 8 : 7;
+
     if (inquiries.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="loading">문의가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="${colCount}" class="loading">문의가 없습니다.</td></tr>`;
         return;
     }
 
@@ -556,8 +570,9 @@ function displayInquiries(inquiries, pagination) {
     const total = pagination ? pagination.total : inquiries.length;
     const offset = pagination ? (currentPage - 1) * limit : 0;
 
-    // 모든 사이트에 대해 간소화된 리스트 표시
-    thead.innerHTML = `
+    // 분양파트너: 관리현황 오른쪽에 입금현황 컬럼 포함 / 그 외 사이트: 입금현황 없음
+    thead.innerHTML = isBunPartner
+        ? `
         <th>번호</th>
         <th>이름</th>
         <th>연락처</th>
@@ -566,18 +581,24 @@ function displayInquiries(inquiries, pagination) {
         <th>입금현황</th>
         <th>등록일시</th>
         <th>작업</th>
+    `
+        : `
+        <th>번호</th>
+        <th>이름</th>
+        <th>연락처</th>
+        <th>상태</th>
+        <th>관리현황</th>
+        <th>등록일시</th>
+        <th>작업</th>
     `;
-    
+
     tbody.innerHTML = inquiries.map((inquiry, index) => {
-        // 번호 계산: 최신이 마지막 숫자가 되도록 (전체 개수에서 역순)
-        // 전체 100개, 1페이지: 100, 99, 98... / 2페이지: 50, 49, 48...
         const displayNumber = total - offset - index;
-        // custom_fields 파싱
         let customFields = {};
         if (inquiry.custom_fields) {
             try {
-                customFields = typeof inquiry.custom_fields === 'string' 
-                    ? JSON.parse(inquiry.custom_fields) 
+                customFields = typeof inquiry.custom_fields === 'string'
+                    ? JSON.parse(inquiry.custom_fields)
                     : inquiry.custom_fields;
             } catch (e) {
                 console.error('Failed to parse custom_fields:', e);
@@ -586,6 +607,16 @@ function displayInquiries(inquiries, pagination) {
 
         const manageStatus = customFields.manage_status || '';
         const paymentStatus = customFields.payment_status || '입금미완료';
+
+        const paymentCell = isBunPartner
+            ? `
+            <td>
+                <select class="filter-select manage-status-select" data-inquiry-id="${inquiry.id}" onchange="updatePaymentStatusFromSelect(this)" title="입금현황 변경">
+                    ${renderPaymentStatusOptions(paymentStatus)}
+                </select>
+            </td>
+            `
+            : '';
 
         return `
         <tr>
@@ -608,11 +639,7 @@ function displayInquiries(inquiries, pagination) {
                     ${renderManageStatusOptions(manageStatus)}
                 </select>
             </td>
-            <td>
-                <select class="filter-select manage-status-select" data-inquiry-id="${inquiry.id}" onchange="updatePaymentStatusFromSelect(this)" title="입금현황 변경">
-                    ${renderPaymentStatusOptions(paymentStatus)}
-                </select>
-            </td>
+            ${paymentCell}
             <td>${formatDate(inquiry.created_at)}</td>
             <td>
                 <div class="action-buttons">
@@ -960,6 +987,10 @@ async function openEditModal(id) {
 
             Object.keys(customFields).forEach(key => {
                 if (key === 'admin_notes') {
+                    return;
+                }
+                // 입금현황은 분양파트너 문의에만 표시
+                if (key === 'payment_status' && inquiry.site_id !== 'bun-partner') {
                     return;
                 }
                 const formGroup = document.createElement('div');
@@ -1490,7 +1521,7 @@ async function downloadExcel() {
             params.append('manage_status', currentManageStatus);
         }
 
-        if (currentPaymentStatus) {
+        if (currentSite === 'bun-partner' && currentPaymentStatus) {
             params.append('payment_status', currentPaymentStatus);
         }
 

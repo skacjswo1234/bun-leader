@@ -162,7 +162,7 @@ export async function onRequest(context) {
         params.push(`%"manage_status":"${manageStatus}"%`);
       }
 
-      if (paymentStatus) {
+      if (paymentStatus && site_id === 'bun-partner') {
         query += ' AND custom_fields LIKE ?';
         params.push(`%"payment_status":"${paymentStatus}"%`);
       }
@@ -223,7 +223,7 @@ export async function onRequest(context) {
         countParams.push(`%"manage_status":"${manageStatus}"%`);
       }
 
-      if (paymentStatus) {
+      if (paymentStatus && site_id === 'bun-partner') {
         countQuery += ' AND custom_fields LIKE ?';
         countParams.push(`%"payment_status":"${paymentStatus}"%`);
       }
