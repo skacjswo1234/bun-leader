@@ -163,8 +163,14 @@ export async function onRequest(context) {
       }
 
       if (paymentStatus && site_id === 'bun-partner') {
-        query += ' AND custom_fields LIKE ?';
-        params.push(`%"payment_status":"${paymentStatus}"%`);
+        // 입금미완료: 값이 '입금미완료'이거나, payment_status 키가 없으면 디폴트 입금미완료로 간주
+        if (paymentStatus === '입금미완료') {
+          query += ' AND (custom_fields IS NULL OR custom_fields NOT LIKE ? OR custom_fields LIKE ?)';
+          params.push('%"payment_status"%', `%"payment_status":"입금미완료"%`);
+        } else {
+          query += ' AND custom_fields LIKE ?';
+          params.push(`%"payment_status":"${paymentStatus}"%`);
+        }
       }
 
       // 검색 기능
@@ -224,8 +230,13 @@ export async function onRequest(context) {
       }
 
       if (paymentStatus && site_id === 'bun-partner') {
-        countQuery += ' AND custom_fields LIKE ?';
-        countParams.push(`%"payment_status":"${paymentStatus}"%`);
+        if (paymentStatus === '입금미완료') {
+          countQuery += ' AND (custom_fields IS NULL OR custom_fields NOT LIKE ? OR custom_fields LIKE ?)';
+          countParams.push('%"payment_status"%', `%"payment_status":"입금미완료"%`);
+        } else {
+          countQuery += ' AND custom_fields LIKE ?';
+          countParams.push(`%"payment_status":"${paymentStatus}"%`);
+        }
       }
 
       // 검색 조건도 동일하게 적용
