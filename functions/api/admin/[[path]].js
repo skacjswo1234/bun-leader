@@ -136,6 +136,7 @@ export async function onRequest(context) {
       const site_id = url.searchParams.get('site_id');
       const status = url.searchParams.get('status');
       const manageStatus = url.searchParams.get('manage_status');
+      const paymentStatus = url.searchParams.get('payment_status');
       const search = url.searchParams.get('search'); // 검색어
       const searchField = url.searchParams.get('search_field') || 'all'; // 검색 항목 (all, name, contact, type)
       const page = parseInt(url.searchParams.get('page') || '1');
@@ -159,6 +160,11 @@ export async function onRequest(context) {
         // custom_fields JSON 내 manage_status 값 필터
         query += ' AND custom_fields LIKE ?';
         params.push(`%"manage_status":"${manageStatus}"%`);
+      }
+
+      if (paymentStatus) {
+        query += ' AND custom_fields LIKE ?';
+        params.push(`%"payment_status":"${paymentStatus}"%`);
       }
 
       // 검색 기능
@@ -215,6 +221,11 @@ export async function onRequest(context) {
       if (manageStatus) {
         countQuery += ' AND custom_fields LIKE ?';
         countParams.push(`%"manage_status":"${manageStatus}"%`);
+      }
+
+      if (paymentStatus) {
+        countQuery += ' AND custom_fields LIKE ?';
+        countParams.push(`%"payment_status":"${paymentStatus}"%`);
       }
 
       // 검색 조건도 동일하게 적용
