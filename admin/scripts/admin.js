@@ -68,6 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (btn.id === 'bunPartnerAdminBtn') {
                 return;
             }
+
+            // 로그아웃 버튼은 별도 처리
+            if (btn.id === 'logoutBtn') {
+                return;
+            }
             
             document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -570,15 +575,15 @@ function displayInquiries(inquiries, pagination) {
     const total = pagination ? pagination.total : inquiries.length;
     const offset = pagination ? (currentPage - 1) * limit : 0;
 
-    // 분양파트너: 관리현황 오른쪽에 입금현황 컬럼 포함 / 그 외 사이트: 입금현황 없음
+    // 분양파트너: 관리현황 오른쪽에 지급현황 컬럼 포함 / 그 외 사이트: 지급현황 없음
     thead.innerHTML = isBunPartner
         ? `
         <th>번호</th>
         <th>이름</th>
         <th>연락처</th>
-        <th>상태</th>
+        <th>진행상태</th>
         <th>관리현황</th>
-        <th>입금현황</th>
+        <th>지급현황</th>
         <th>등록일시</th>
         <th>작업</th>
     `
@@ -586,7 +591,7 @@ function displayInquiries(inquiries, pagination) {
         <th>번호</th>
         <th>이름</th>
         <th>연락처</th>
-        <th>상태</th>
+        <th>진행상태</th>
         <th>관리현황</th>
         <th>등록일시</th>
         <th>작업</th>
@@ -611,7 +616,7 @@ function displayInquiries(inquiries, pagination) {
         const paymentCell = isBunPartner
             ? `
             <td>
-                <select class="filter-select manage-status-select" data-inquiry-id="${inquiry.id}" onchange="updatePaymentStatusFromSelect(this)" title="입금현황 변경">
+                <select class="filter-select manage-status-select" data-inquiry-id="${inquiry.id}" onchange="updatePaymentStatusFromSelect(this)" title="지급현황 변경">
                     ${renderPaymentStatusOptions(paymentStatus)}
                 </select>
             </td>
@@ -791,13 +796,16 @@ function renderManageStatusOptions(selectedValue) {
     }).join('');
 }
 
-const PAYMENT_STATUS_OPTIONS = ['입금미완료', '입금완료'];
+const PAYMENT_STATUS_OPTIONS = [
+    { value: '입금미완료', label: '지급대기' },
+    { value: '입금완료', label: '지급완료' }
+];
 
 function renderPaymentStatusOptions(selectedValue) {
     const def = selectedValue || '입금미완료';
-    return PAYMENT_STATUS_OPTIONS.map(value => {
-        const selectedAttr = value === def ? 'selected' : '';
-        return `<option value="${value}" ${selectedAttr}>${value}</option>`;
+    return PAYMENT_STATUS_OPTIONS.map(option => {
+        const selectedAttr = option.value === def ? 'selected' : '';
+        return `<option value="${option.value}" ${selectedAttr}>${option.label}</option>`;
     }).join('');
 }
 
@@ -841,10 +849,10 @@ async function updatePaymentStatusFromSelect(selectEl) {
         const updateResult = await updateResponse.json();
 
         if (updateResult.success) {
-            showNotification('success', '변경 완료', '입금현황이 성공적으로 변경되었습니다.');
+            showNotification('success', '변경 완료', '지급현황이 성공적으로 변경되었습니다.');
             loadInquiries();
         } else {
-            showNotification('error', '변경 실패', updateResult.error || '입금현황 변경에 실패했습니다.');
+            showNotification('error', '변경 실패', updateResult.error || '지급현황 변경에 실패했습니다.');
         }
     } catch (error) {
         console.error('Payment status update error:', error);
@@ -1497,7 +1505,7 @@ function getKoreanFieldLabel(key) {
         'mobile_number': '휴대폰번호',
         'mobileNumber': '휴대폰번호',
         'manage_status': '관리현황',
-        'payment_status': '입금현황'
+        'payment_status': '지급현황'
     };
     
     // 매핑된 한글 레이블이 있으면 반환, 없으면 원본 키 반환

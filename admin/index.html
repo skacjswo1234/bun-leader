@@ -85,6 +85,10 @@
                         <span class="sidebar-icon">🔒</span>
                         <span class="sidebar-text">비밀번호 변경</span>
                     </button>
+                    <button class="sidebar-item" id="logoutBtn">
+                        <span class="sidebar-icon">🚪</span>
+                        <span class="sidebar-text">로그아웃</span>
+                    </button>
                 </nav>
             </aside>
 
@@ -105,7 +109,7 @@
                             <button class="refresh-btn" id="searchBtn" style="margin-left: 8px;">검색</button>
                         </div>
                         <select id="statusFilter" class="filter-select">
-                            <option value="">전체 상태</option>
+                            <option value="">진행상태</option>
                             <option value="pending">대기 중</option>
                             <option value="contacted">연락 완료</option>
                             <option value="reviewing">심사중</option>
@@ -115,7 +119,7 @@
                             <option value="partner">파트너</option>
                         </select>
                         <select id="manageStatusFilter" class="filter-select">
-                            <option value="">전체 관리현황</option>
+                            <option value="">관리현황</option>
                             <option value="감도상">감도상</option>
                             <option value="감도중">감도중</option>
                             <option value="감도하">감도하</option>
@@ -125,13 +129,12 @@
                             <option value="블랙거절">블랙거절</option>
                         </select>
                         <select id="paymentStatusFilter" class="filter-select">
-                            <option value="">전체 입금현황</option>
-                            <option value="입금미완료">입금미완료</option>
-                            <option value="입금완료">입금완료</option>
+                            <option value="">지급현황</option>
+                            <option value="입금미완료">지급대기</option>
+                            <option value="입금완료">지급완료</option>
                         </select>
                         <button class="refresh-btn" id="refreshBtn">새로고침</button>
                         <button class="refresh-btn" id="excelDownloadBtn" style="background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.3); color: #86EFAC;">엑셀 다운로드</button>
-                        <button class="refresh-btn" id="logoutBtn" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.3); color: #FCA5A5;">로그아웃</button>
                     </div>
                 </div>
 
@@ -144,7 +147,7 @@
                                 <th>연락처</th>
                                 <th>상태</th>
                                 <th>관리현황</th>
-                                <th>입금현황</th>
+                                <th>지급현황</th>
                                 <th>등록일시</th>
                                 <th>작업</th>
                             </tr>
@@ -327,10 +330,10 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>입금현황</label>
+                                <label>지급현황</label>
                                 <select id="adminPaymentStatus" class="form-input filter-select manage-status-select">
-                                    <option value="입금미완료" selected>입금미완료</option>
-                                    <option value="입금완료">입금완료</option>
+                                    <option value="입금미완료" selected>지급대기</option>
+                                    <option value="입금완료">지급완료</option>
                                 </select>
                             </div>
                             <div class="form-actions">
