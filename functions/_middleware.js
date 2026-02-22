@@ -61,6 +61,8 @@ export async function onRequest(context) {
     'www.xn--h50bt0vxig27n8la.com': 'bun-partner',  // www.분양파트너.com (punycode)
     '분양파트너.com': 'bun-partner',  // 분양파트너 한글 도메인
     'www.분양파트너.com': 'bun-partner',  // www.분양파트너 한글 도메인
+    'xn--vk5b1xno.com': 'jo',  // JO 제이오 전용 도메인 (punycode)
+    'www.xn--vk5b1xno.com': 'jo',  // www.JO 도메인
   };
 
   // 메인 홈페이지 도메인 (루트 index.html 표시)
@@ -84,7 +86,6 @@ export async function onRequest(context) {
     // bun-partner 도메인은 301 리다이렉트 없이 내부적으로 파일 서빙 (SEO 최적화)
     if (siteId === 'bun-partner') {
       // 내부적으로 /sites/bun-partner/ 경로로 라우팅하되 리다이렉트 없이 서빙
-      // 새로운 URL로 Request 생성하여 내부 라우팅
       const internalUrl = new URL('/sites/bun-partner/', url.origin);
       const internalRequest = new Request(internalUrl.toString(), {
         method: request.method,
@@ -93,8 +94,18 @@ export async function onRequest(context) {
         cf: request.cf
       });
       const response = await next(internalRequest);
-      // 응답 후 meta 태그 교체 로직이 적용되도록 반환
       return response;
+    }
+    // JO 도메인(xn--vk5b1xno.com, www): 리다이렉트 없이 jo 폴더 index.html 서빙
+    if (siteId === 'jo') {
+      const internalUrl = new URL('/sites/jo/', url.origin);
+      const internalRequest = new Request(internalUrl.toString(), {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+        cf: request.cf
+      });
+      return next(internalRequest);
     }
     // marketing 도메인으로 접속한 경우 marketing 폴더의 index.html로 리다이렉트
     if (siteId === 'marketing') {
@@ -122,6 +133,18 @@ export async function onRequest(context) {
   // 예: band-program.com/program.html → /sites/band-program/program.html
   // 예: 분양리더애드.com/gdn.html → /sites/marketing/gdn.html
   if (siteId && !url.pathname.startsWith('/sites/') && !url.pathname.startsWith('/api/') && !url.pathname.startsWith('/admin/') && !url.pathname.startsWith('/shared/')) {
+    // JO 도메인: 리다이렉트 없이 내부적으로 /sites/jo/ 경로 서빙 (URL 유지)
+    if (siteId === 'jo') {
+      const joPath = url.pathname.startsWith('/') ? `/sites/jo${url.pathname}` : `/sites/jo/${url.pathname}`;
+      const internalUrl = new URL(joPath, url.origin);
+      const internalRequest = new Request(internalUrl.toString(), {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+        cf: request.cf
+      });
+      return next(internalRequest);
+    }
     // marketing 사이트의 경우, HTML 파일들도 처리
     if (siteId === 'marketing') {
       // marketing 폴더에 있는 파일들 (.html, 이미지 등)
