@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JO 제이오 | 구글 GDN</title>
+    <meta name="description" content="JO 제이오 구글 GDN - 관심사 기반 디스플레이, 전국 타겟, 브랜드 노출">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="page-gdn">
+    <header class="header">
+        <div class="header-inner">
+            <a href="index.html" class="logo" aria-label="JO 제이오 홈">
+                <img src="images/logo-white.png" alt="JO 제이오" class="logo-img logo-white">
+                <img src="images/logo-orange.png" alt="JO 제이오" class="logo-img logo-orange">
+            </a>
+            <nav class="nav-pc">
+                <a href="index.html">홈</a>
+                <a href="index.html#service">서비스</a>
+                <a href="index.html#inquiry" class="nav-cta">무료 상담</a>
+            </nav>
+            <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기"><span></span><span></span><span></span></button>
+        </div>
+        <nav class="nav-mobile" id="navMobile">
+            <button type="button" class="nav-mobile-close" id="navMobileClose" aria-label="메뉴 닫기"><span aria-hidden="true">&times;</span></button>
+            <a href="index.html">홈</a>
+            <a href="index.html#service">서비스</a>
+            <a href="index.html#inquiry" class="nav-cta">무료 상담</a>
+        </nav>
+    </header>
+    <div class="nav-overlay" id="navOverlay" aria-hidden="true"></div>
+
+    <main class="page-content">
+        <div class="page-videos" data-folder="gdn"></div>
+
+        <section class="section inquiry-section" id="inquiry">
+            <div class="container">
+                <h2 class="section-title">무료 광고진단 · 상담 신청</h2>
+                <form class="inquiry-form" id="inquiryForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">이름</label>
+                            <input type="text" id="name" name="name" required placeholder="이름을 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact">전화번호</label>
+                            <input type="tel" id="contact" name="contact" required placeholder="010-0000-0000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="productType">상품유형</label>
+                        <select id="productType" name="productType">
+                            <option value="">선택해주세요</option>
+                            <option value="메타광고">메타 광고</option>
+                            <option value="구글GDN" selected>구글 GDN</option>
+                            <option value="당근비즈니스">당근비즈니스</option>
+                            <option value="호갱노노">호갱노노</option>
+                            <option value="LMS문자광고">LMS 문자광고</option>
+                            <option value="네이버블로그">네이버 블로그</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block submit-btn">무료 진단 신청하기</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <a href="index.html" class="footer-logo"><img src="images/logo-orange.png" alt="JO 제이오" onerror="this.style.display='none'"></a>
+            <p class="footer-copy">© JO 제이오. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div class="fixed-cta">
+        <a href="tel:01041387559" class="fixed-btn fixed-phone" aria-label="전화 상담"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="currentColor"/></svg></a>
+        <a href="https://pf.kakao.com/_FPxoyn/chat" class="fixed-btn fixed-kakao" id="fixedKakao" aria-label="카카오톡 문의" target="_blank" rel="noopener noreferrer"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.54 1.82 4.78 4.54 6.13L6 21l3.95-2.17c1.04.28 2.13.44 3.05.44 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg></a>
+        <button type="button" class="fixed-btn fixed-top" id="topBtn" aria-label="맨 위로">TOP</button>
+    </div>
+
+    <script>window.SITE_ID = 'jo'; window.INQUIRY_TYPE = '구글GDN';</script>
+    <script src="page-videos.js"></script>
+    <script src="script.js"></script>
+    <script src="/shared/scripts/inquiry-form.js"></script>
+</body>
+</html>

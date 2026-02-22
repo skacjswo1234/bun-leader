@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: /sites/jo/sitemap.xml

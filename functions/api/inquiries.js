@@ -66,6 +66,8 @@ export async function onRequest(context) {
           siteName = '분양리더마케팅';
         } else if (site_id === 'bun-partner') {
           siteName = '분양파트너';
+        } else if (site_id === 'jo') {
+          siteName = 'JO';
         }
 
         // sites 테이블에 사이트 자동 생성
@@ -90,9 +92,9 @@ export async function onRequest(context) {
       .bind(site_id, name, contact, message || null, customFieldsJson)
       .run();
 
-      // 텔레그램 알림 전송 (band-program, marketing, bun-partner 사이트인 경우)
+      // 텔레그램 알림 전송 (band-program, marketing, bun-partner, jo 사이트인 경우)
       let telegramStatus = null;
-      if (site_id === 'band-program' || site_id === 'marketing' || site_id === 'bun-partner') {
+      if (site_id === 'band-program' || site_id === 'marketing' || site_id === 'bun-partner' || site_id === 'jo') {
         const telegramBotToken = env.TELEGRAM_BOT_TOKEN;
         const telegramChatId = env.TELEGRAM_CHAT_ID;
         
@@ -133,7 +135,7 @@ export async function onRequest(context) {
           telegramStatus = 'not_configured';
         }
       } else {
-        console.log('[Telegram] 알림 전송 건너뜀 - site_id:', site_id, '(band-program 또는 marketing이 아님)');
+        console.log('[Telegram] 알림 전송 건너뜀 - site_id:', site_id);
         telegramStatus = 'skipped';
       }
 

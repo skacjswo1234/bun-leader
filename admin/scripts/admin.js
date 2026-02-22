@@ -84,6 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 paymentStatusFilterEl.value = '';
                 paymentStatusFilterEl.style.display = currentSite === 'bun-partner' ? '' : 'none';
             }
+            const manageStatusFilterEl = document.getElementById('manageStatusFilter');
+            if (manageStatusFilterEl) {
+                manageStatusFilterEl.style.display = currentSite === 'jo' ? 'none' : '';
+                if (currentSite === 'jo') manageStatusFilterEl.value = '';
+            }
             updateContentTitle();
             loadInquiries();
             
@@ -517,7 +522,7 @@ async function loadStats() {
 // 문의 목록 로드
 async function loadInquiries() {
     const tbody = document.getElementById('inquiriesTableBody');
-    const colCount = currentSite === 'bun-partner' ? 8 : 7;
+    const colCount = currentSite === 'bun-partner' ? 8 : (currentSite === 'jo' ? 7 : 7);
     tbody.innerHTML = `<tr><td colspan="${colCount}" class="loading">로딩 중...</td></tr>`;
 
     try {
@@ -564,6 +569,7 @@ function displayInquiries(inquiries, pagination) {
     const tbody = document.getElementById('inquiriesTableBody');
     const thead = document.querySelector('.inquiries-table thead tr');
     const isBunPartner = currentSite === 'bun-partner';
+    const isJo = currentSite === 'jo';
     const colCount = isBunPartner ? 8 : 7;
 
     if (inquiries.length === 0) {
@@ -575,9 +581,19 @@ function displayInquiries(inquiries, pagination) {
     const total = pagination ? pagination.total : inquiries.length;
     const offset = pagination ? (currentPage - 1) * limit : 0;
 
-    // 분양파트너: 관리현황 오른쪽에 지급현황 컬럼 포함 / 그 외 사이트: 지급현황 없음
-    thead.innerHTML = isBunPartner
-        ? `
+    // JO: 순번, 이름, 전화번호, 상품, 상태, 등록일, 작업 / 분양파트너: 지급현황 포함 / 그 외: 관리현황 포함
+    if (isJo) {
+        thead.innerHTML = `
+            <th>순번</th>
+            <th>이름</th>
+            <th>전화번호</th>
+            <th>상품</th>
+            <th>상태</th>
+            <th>등록일</th>
+            <th>작업</th>
+        `;
+    } else if (isBunPartner) {
+        thead.innerHTML = `
         <th>번호</th>
         <th>이름</th>
         <th>연락처</th>
@@ -586,8 +602,9 @@ function displayInquiries(inquiries, pagination) {
         <th>지급현황</th>
         <th>등록일시</th>
         <th>작업</th>
-    `
-        : `
+    `;
+    } else {
+        thead.innerHTML = `
         <th>번호</th>
         <th>이름</th>
         <th>연락처</th>
@@ -596,6 +613,7 @@ function displayInquiries(inquiries, pagination) {
         <th>등록일시</th>
         <th>작업</th>
     `;
+    }
 
     tbody.innerHTML = inquiries.map((inquiry, index) => {
         const displayNumber = total - offset - index;
@@ -612,6 +630,7 @@ function displayInquiries(inquiries, pagination) {
 
         const manageStatus = customFields.manage_status || '';
         const paymentStatus = customFields.payment_status || '입금미완료';
+        const productType = customFields.product_type || customFields.productType || '-';
 
         const paymentCell = isBunPartner
             ? `
@@ -622,6 +641,49 @@ function displayInquiries(inquiries, pagination) {
             </td>
             `
             : '';
+
+        const manageStatusCell = isJo ? '' : `
+            <td>
+                <select class="filter-select manage-status-select" data-inquiry-id="${inquiry.id}" onchange="updateManageStatusFromSelect(this)" title="관리현황 변경">
+                    ${renderManageStatusOptions(manageStatus)}
+                </select>
+            </td>
+            `;
+
+        const productCell = isJo
+            ? `<td>${escapeHtml(productType)}</td>`
+            : '';
+
+        if (isJo) {
+            return `
+            <tr>
+                <td>${displayNumber}</td>
+                <td>${escapeHtml(inquiry.name)}</td>
+                <td>${escapeHtml(inquiry.contact)}</td>
+                <td>${escapeHtml(productType)}</td>
+                <td>
+                    <select class="filter-select status-select" data-inquiry-id="${inquiry.id}" onchange="updateStatusFromSelect(this)" title="상태 변경">
+                        <option value="pending" ${inquiry.status === 'pending' ? 'selected' : ''}>대기 중</option>
+                        <option value="contacted" ${inquiry.status === 'contacted' ? 'selected' : ''}>연락 완료</option>
+                        <option value="reviewing" ${inquiry.status === 'reviewing' ? 'selected' : ''}>심사중</option>
+                        <option value="rejected" ${inquiry.status === 'rejected' ? 'selected' : ''}>심사탈락</option>
+                        <option value="completed" ${inquiry.status === 'completed' ? 'selected' : ''}>처리 완료</option>
+                        <option value="advertising" ${inquiry.status === 'advertising' ? 'selected' : ''}>광고중</option>
+                        <option value="partner" ${inquiry.status === 'partner' ? 'selected' : ''}>파트너</option>
+                    </select>
+                </td>
+                <td>${formatDate(inquiry.created_at)}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="openDetailModal(${inquiry.id})" style="background: rgba(139, 92, 246, 0.2); color: #A78BFA; border: 1px solid rgba(139, 92, 246, 0.3);">상세</button>
+                        <button class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
+                        <button class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
+                        <button class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
+                    </div>
+                </td>
+            </tr>
+            `;
+        }
 
         return `
         <tr>
@@ -639,11 +701,7 @@ function displayInquiries(inquiries, pagination) {
                     <option value="partner" ${inquiry.status === 'partner' ? 'selected' : ''}>파트너</option>
                 </select>
             </td>
-            <td>
-                <select class="filter-select manage-status-select" data-inquiry-id="${inquiry.id}" onchange="updateManageStatusFromSelect(this)" title="관리현황 변경">
-                    ${renderManageStatusOptions(manageStatus)}
-                </select>
-            </td>
+            ${manageStatusCell}
             ${paymentCell}
             <td>${formatDate(inquiry.created_at)}</td>
             <td>
@@ -662,6 +720,10 @@ function displayInquiries(inquiries, pagination) {
 // 문의 타입 추출 함수
 function getInquiryType(inquiry, customFields) {
     // site_id로 먼저 판단
+    if (inquiry.site_id === 'jo') {
+        const productType = customFields.product_type || customFields.productType;
+        return productType || 'JO';
+    }
     if (inquiry.site_id === 'marketing') {
         // marketing 사이트의 경우 product_type을 문의 타입으로 사용
         const productType = customFields.product_type || customFields.productType;
@@ -1709,7 +1771,8 @@ async function downloadExcel() {
         // 파일명 생성
         const siteName = currentSite === 'band-program' ? '밴드홍보대행' :
                         currentSite === 'marketing' ? '분양리더마케팅' :
-                        currentSite === 'bun-partner' ? '분양파트너' : '문의';
+                        currentSite === 'bun-partner' ? '분양파트너' :
+                        currentSite === 'jo' ? 'JO' : '문의';
         const statusText = currentStatus ? `_${getStatusText(currentStatus)}` : '';
         const fileName = `${siteName}_문의목록${statusText}_${new Date().toISOString().split('T')[0]}.xlsx`;
         

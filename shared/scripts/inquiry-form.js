@@ -200,6 +200,7 @@ function createModal() {
     const confirmBtn = modal.querySelector('.inquiry-modal-button');
 
     const closeModal = () => {
+        modal.classList.remove('inquiry-modal-jo');
         modal.style.display = 'none';
     };
 
@@ -236,6 +237,11 @@ function showModal(title, message, isError = false) {
 
     titleEl.textContent = title;
     messageEl.textContent = message;
+    if (SITE_ID === 'jo' && !isError) {
+        modal.classList.add('inquiry-modal-jo');
+    } else {
+        modal.classList.remove('inquiry-modal-jo');
+    }
     modal.style.display = 'flex';
 }
 
