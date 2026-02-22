@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: /sites/jo/sitemap.xml
+Sitemap: https://xn--vk5b1xno.com/sitemap.xml
