@@ -1064,10 +1064,13 @@ textarea.form-input {
     margin-bottom: 1rem;
     flex-wrap: wrap;
 }
+.calendar-toolbar .refresh-btn {
+    color: #fff;
+}
 .calendar-month-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #A78BFA;
+    color: #fff;
     min-width: 140px;
     text-align: center;
 }
@@ -1083,7 +1086,7 @@ textarea.form-input {
     background: rgba(139, 92, 246, 0.15);
     font-weight: 600;
     font-size: 13px;
-    color: #A78BFA;
+    color: #fff;
 }
 .calendar-weekday {
     padding: 0.6rem;
@@ -1100,6 +1103,7 @@ textarea.form-input {
     background: rgba(0, 0, 0, 0.2);
     cursor: pointer;
     transition: background 0.2s;
+    color: #fff;
 }
 .calendar-day:hover {
     background: rgba(139, 92, 246, 0.15);
@@ -1113,7 +1117,7 @@ textarea.form-input {
 .calendar-day-num {
     display: block;
     font-size: 13px;
-    color: #ccc;
+    color: #fff;
     margin-bottom: 4px;
 }
 .calendar-day-events {
@@ -1129,13 +1133,15 @@ textarea.form-input {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #fff;
 }
 .calendar-day-event:hover {
     background: rgba(139, 92, 246, 0.6);
+    color: #fff;
 }
 .calendar-day-event-more {
     font-size: 10px;
-    color: #A78BFA;
+    color: #fff;
     padding: 2px 4px;
 }
 
