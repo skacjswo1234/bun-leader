@@ -31,7 +31,7 @@ export async function onRequest(context) {
     if (method === 'POST') {
       // 문의 생성
       const body = await request.json();
-      const { site_id, name, contact, message, custom_fields } = body;
+      const { site_id, name, contact, message, custom_fields, status: bodyStatus } = body;
 
       if (!site_id || !name || !contact) {
         return new Response(JSON.stringify({ 
@@ -85,11 +85,15 @@ export async function onRequest(context) {
         }
       }
 
+      // 관리자 등록 시 전달된 status 사용, 없거나 유효하지 않으면 'pending'
+      const validStatuses = ['pending', 'contacted', 'reviewing', 'rejected', 'completed', 'advertising', 'partner'];
+      const status = (bodyStatus && validStatuses.includes(bodyStatus)) ? bodyStatus : 'pending';
+
       const result = await db.prepare(
         `INSERT INTO inquiries (site_id, name, contact, message, custom_fields, status)
-         VALUES (?, ?, ?, ?, ?, 'pending')`
+         VALUES (?, ?, ?, ?, ?, ?)`
       )
-      .bind(site_id, name, contact, message || null, customFieldsJson)
+      .bind(site_id, name, contact, message || null, customFieldsJson, status)
       .run();
 
       // 텔레그램 알림 전송 (band-program, marketing, bun-partner, jo 사이트인 경우)
