@@ -43,10 +43,34 @@ CREATE TABLE IF NOT EXISTS admins (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS bun_partner_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    event_date TEXT NOT NULL,
+    start_time TEXT,
+    end_time TEXT,
+    description TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS bun_partner_sites (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    site_name TEXT NOT NULL,
+    product_type TEXT,
+    region TEXT,
+    support_condition TEXT,
+    details TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_inquiries_site_id ON inquiries(site_id);
 CREATE INDEX IF NOT EXISTS idx_inquiries_status ON inquiries(status);
 CREATE INDEX IF NOT EXISTS idx_inquiries_created_at ON inquiries(created_at);
 CREATE INDEX IF NOT EXISTS idx_site_fields_site_id ON site_fields(site_id);
+CREATE INDEX IF NOT EXISTS idx_bun_partner_events_date ON bun_partner_events(event_date);
+CREATE INDEX IF NOT EXISTS idx_bun_partner_sites_created ON bun_partner_sites(created_at);
 
 INSERT OR IGNORE INTO sites (id, name, domain) VALUES
     ('band-program', '분양리더 - 밴드홍보대행', NULL),

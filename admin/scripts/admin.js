@@ -64,8 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            // 분양파트너 관리자페이지 버튼은 별도 처리
-            if (btn.id === 'bunPartnerAdminBtn') {
+            // 분양파트너 관리자페이지/일정/현장리스트 버튼은 별도 처리
+            if (btn.id === 'bunPartnerAdminBtn' || btn.id === 'bunPartnerScheduleBtn' || btn.id === 'bunPartnerSiteListBtn') {
                 return;
             }
 
@@ -98,6 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.content-header').style.display = 'flex';
             document.getElementById('passwordChangeSection').style.display = 'none';
             document.getElementById('bunPartnerAdminSection').style.display = 'none';
+            const scheduleSec = document.getElementById('bunPartnerScheduleSection');
+            const siteListSec = document.getElementById('bunPartnerSiteListSection');
+            if (scheduleSec) scheduleSec.style.display = 'none';
+            if (siteListSec) siteListSec.style.display = 'none';
             
             // 모바일에서 메뉴 항목 클릭 시 메뉴 닫기
             if (window.innerWidth <= 768) {
@@ -123,6 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.pagination').style.display = 'none';
         document.querySelector('.content-header').style.display = 'none';
         document.getElementById('passwordChangeSection').style.display = 'none';
+        if (document.getElementById('bunPartnerScheduleSection')) document.getElementById('bunPartnerScheduleSection').style.display = 'none';
+        if (document.getElementById('bunPartnerSiteListSection')) document.getElementById('bunPartnerSiteListSection').style.display = 'none';
         bunPartnerAdminSection.style.display = 'block';
         
         // 모바일에서 메뉴 닫기
@@ -155,6 +161,44 @@ document.addEventListener('DOMContentLoaded', () => {
         // 폼 리셋
         document.getElementById('bunPartnerAdminForm').reset();
     });
+
+    // 분양파트너 일정 버튼
+    const bunPartnerScheduleBtn = document.getElementById('bunPartnerScheduleBtn');
+    const bunPartnerScheduleSection = document.getElementById('bunPartnerScheduleSection');
+    if (bunPartnerScheduleBtn && bunPartnerScheduleSection) {
+        bunPartnerScheduleBtn.addEventListener('click', () => {
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            bunPartnerScheduleBtn.classList.add('active');
+            document.querySelector('.inquiries-table-container').style.display = 'none';
+            document.querySelector('.pagination').style.display = 'none';
+            document.querySelector('.content-header').style.display = 'none';
+            document.getElementById('passwordChangeSection').style.display = 'none';
+            document.getElementById('bunPartnerAdminSection').style.display = 'none';
+            document.getElementById('bunPartnerSiteListSection').style.display = 'none';
+            bunPartnerScheduleSection.style.display = 'block';
+            if (window.innerWidth <= 768) { closeMenu(); }
+            initCalendar();
+        });
+    }
+
+    // 분양파트너 현장리스트 버튼
+    const bunPartnerSiteListBtn = document.getElementById('bunPartnerSiteListBtn');
+    const bunPartnerSiteListSection = document.getElementById('bunPartnerSiteListSection');
+    if (bunPartnerSiteListBtn && bunPartnerSiteListSection) {
+        bunPartnerSiteListBtn.addEventListener('click', () => {
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            bunPartnerSiteListBtn.classList.add('active');
+            document.querySelector('.inquiries-table-container').style.display = 'none';
+            document.querySelector('.pagination').style.display = 'none';
+            document.querySelector('.content-header').style.display = 'none';
+            document.getElementById('passwordChangeSection').style.display = 'none';
+            document.getElementById('bunPartnerAdminSection').style.display = 'none';
+            document.getElementById('bunPartnerScheduleSection').style.display = 'none';
+            bunPartnerSiteListSection.style.display = 'block';
+            if (window.innerWidth <= 768) { closeMenu(); }
+            loadSiteList();
+        });
+    }
 
     // 분양파트너 관리자페이지 폼 제출
     document.getElementById('bunPartnerAdminForm').addEventListener('submit', async (e) => {
@@ -1782,6 +1826,304 @@ async function downloadExcel() {
     } catch (error) {
         console.error('Excel download error:', error);
         showNotification('error', '다운로드 실패', '엑셀 다운로드 중 오류가 발생했습니다.');
+    }
+}
+
+// ----- 분양파트너 일정 (캘린더) -----
+let calendarYear = new Date().getFullYear();
+let calendarMonth = new Date().getMonth();
+let calendarEvents = [];
+
+function getAuthHeaders() {
+    const token = sessionStorage.getItem('admin_token') || localStorage.getItem('admin_token');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
+async function loadCalendarEvents() {
+    const firstDay = new Date(calendarYear, calendarMonth, 1);
+    const lastDay = new Date(calendarYear, calendarMonth + 1, 0);
+    const from = firstDay.toISOString().slice(0, 10);
+    const to = lastDay.toISOString().slice(0, 10);
+    try {
+        const res = await fetch(`${API_BASE}/bun-partner/events?from=${from}&to=${to}`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        calendarEvents = (data.success && data.data) ? data.data : [];
+    } catch (e) {
+        calendarEvents = [];
+    }
+    renderCalendar();
+}
+
+function renderCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    const titleEl = document.getElementById('calendarMonthTitle');
+    if (!grid || !titleEl) return;
+
+    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+    const first = new Date(calendarYear, calendarMonth, 1);
+    const last = new Date(calendarYear, calendarMonth + 1, 0);
+    const startPad = first.getDay();
+    const daysInMonth = last.getDate();
+    const totalCells = Math.ceil((startPad + daysInMonth) / 7) * 7;
+
+    titleEl.textContent = `${calendarYear}년 ${calendarMonth + 1}월`;
+
+    let html = '<div class="calendar-weekdays">' + weekdays.map(d => `<span class="calendar-weekday">${d}</span>`).join('') + '</div><div class="calendar-days">';
+    for (let i = 0; i < totalCells; i++) {
+        const dayNum = i - startPad + 1;
+        const isCurrentMonth = dayNum >= 1 && dayNum <= daysInMonth;
+        const dateStr = isCurrentMonth ? `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}` : '';
+        const dayEvents = calendarEvents.filter(e => e.event_date === dateStr);
+        const hasEvents = dayEvents.length > 0;
+        html += `<div class="calendar-day ${isCurrentMonth ? '' : 'other-month'} ${hasEvents ? 'has-events' : ''}" data-date="${dateStr}">`;
+        html += `<span class="calendar-day-num">${isCurrentMonth ? dayNum : ''}</span>`;
+        if (hasEvents) {
+            html += '<div class="calendar-day-events">';
+            dayEvents.slice(0, 3).forEach(ev => {
+                html += `<div class="calendar-day-event" data-id="${ev.id}" title="${escapeHtml(ev.title)}">${escapeHtml(ev.title)}</div>`;
+            });
+            if (dayEvents.length > 3) html += `<div class="calendar-day-event-more">+${dayEvents.length - 3}</div>`;
+            html += '</div>';
+        }
+        html += '</div>';
+    }
+    html += '</div>';
+    grid.innerHTML = html;
+
+    grid.querySelectorAll('.calendar-day[data-date]').forEach(cell => {
+        const date = cell.getAttribute('data-date');
+        if (!date) return;
+        cell.addEventListener('click', (e) => {
+            if (e.target.closest('.calendar-day-event')) {
+                const id = e.target.closest('.calendar-day-event').getAttribute('data-id');
+                openEventModal(date, parseInt(id, 10));
+            } else {
+                openEventModal(date, null);
+            }
+        });
+    });
+}
+
+function initCalendar() {
+    calendarYear = new Date().getFullYear();
+    calendarMonth = new Date().getMonth();
+    const prevBtn = document.getElementById('calendarPrevMonth');
+    const nextBtn = document.getElementById('calendarNextMonth');
+    const addBtn = document.getElementById('calendarAddEvent');
+    if (prevBtn) prevBtn.onclick = () => { calendarMonth--; if (calendarMonth < 0) { calendarYear--; calendarMonth = 11; } loadCalendarEvents(); };
+    if (nextBtn) nextBtn.onclick = () => { calendarMonth++; if (calendarMonth > 11) { calendarYear++; calendarMonth = 0; } loadCalendarEvents(); };
+    if (addBtn) addBtn.onclick = () => openEventModal(null, null);
+    loadCalendarEvents();
+
+    const eventForm = document.getElementById('eventForm');
+    const modalClose = document.getElementById('eventModalClose');
+    const modalOverlay = document.getElementById('eventModalOverlay');
+    const modalDelete = document.getElementById('eventModalDelete');
+    if (eventForm) eventForm.onsubmit = (e) => { e.preventDefault(); saveEvent(); };
+    if (modalClose) modalClose.onclick = closeEventModal;
+    if (modalOverlay) modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeEventModal(); };
+    if (modalDelete) modalDelete.onclick = () => { if (confirm('이 일정을 삭제할까요?')) deleteEvent(); };
+}
+
+function openEventModal(dateStr, eventId) {
+    const overlay = document.getElementById('eventModalOverlay');
+    const titleEl = document.getElementById('eventModalTitle');
+    const idInput = document.getElementById('eventId');
+    const form = document.getElementById('eventForm');
+    const deleteBtn = document.getElementById('eventModalDelete');
+    if (!overlay) return;
+
+    idInput.value = eventId || '';
+    document.getElementById('eventTitle').value = '';
+    document.getElementById('eventDate').value = dateStr || '';
+    document.getElementById('eventStartTime').value = '';
+    document.getElementById('eventEndTime').value = '';
+    document.getElementById('eventDescription').value = '';
+
+    if (eventId) {
+        titleEl.textContent = '일정 수정';
+        deleteBtn.style.display = 'block';
+        const ev = calendarEvents.find(e => e.id === eventId);
+        if (ev) {
+            document.getElementById('eventTitle').value = ev.title || '';
+            document.getElementById('eventDate').value = ev.event_date || '';
+            document.getElementById('eventStartTime').value = ev.start_time || '';
+            document.getElementById('eventEndTime').value = ev.end_time || '';
+            document.getElementById('eventDescription').value = ev.description || '';
+        }
+    } else {
+        titleEl.textContent = '일정 추가';
+        deleteBtn.style.display = 'none';
+    }
+    overlay.style.display = 'flex';
+}
+
+function closeEventModal() {
+    const overlay = document.getElementById('eventModalOverlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+async function saveEvent() {
+    const id = document.getElementById('eventId').value;
+    const title = document.getElementById('eventTitle').value.trim();
+    const event_date = document.getElementById('eventDate').value;
+    const start_time = document.getElementById('eventStartTime').value || null;
+    const end_time = document.getElementById('eventEndTime').value || null;
+    const description = document.getElementById('eventDescription').value.trim() || null;
+    if (!title || !event_date) {
+        showNotification('warning', '입력 필요', '제목과 날짜를 입력해주세요.');
+        return;
+    }
+    const url = id ? `${API_BASE}/bun-partner/events/${id}` : `${API_BASE}/bun-partner/events`;
+    const method = id ? 'PUT' : 'POST';
+    const body = JSON.stringify({ title, event_date, start_time, end_time, description });
+    try {
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, body });
+        const data = await res.json();
+        if (data.success) {
+            showNotification('success', '저장 완료', '일정이 저장되었습니다.');
+            closeEventModal();
+            loadCalendarEvents();
+        } else {
+            showNotification('error', '저장 실패', data.error || '저장에 실패했습니다.');
+        }
+    } catch (e) {
+        showNotification('error', '오류', '일정 저장 중 오류가 발생했습니다.');
+    }
+}
+
+async function deleteEvent() {
+    const id = document.getElementById('eventId').value;
+    if (!id) return;
+    try {
+        const res = await fetch(`${API_BASE}/bun-partner/events/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+        const data = await res.json();
+        if (data.success) {
+            showNotification('success', '삭제 완료', '일정이 삭제되었습니다.');
+            closeEventModal();
+            loadCalendarEvents();
+        } else {
+            showNotification('error', '삭제 실패', data.error || '삭제에 실패했습니다.');
+        }
+    } catch (e) {
+        showNotification('error', '오류', '일정 삭제 중 오류가 발생했습니다.');
+    }
+}
+
+// ----- 분양파트너 현장리스트 -----
+let siteListEditingId = null;
+let siteListData = [];
+
+async function loadSiteList() {
+    const tbody = document.getElementById('siteListTableBody');
+    if (!tbody) return;
+    try {
+        const res = await fetch(`${API_BASE}/bun-partner/sites`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        siteListData = (data.success && data.data) ? data.data : [];
+        const supportLabels = { '무지원': '무지원', '지원예정': '지원예정', '선지원': '선지원', '직원입금': '직원입금', '후지원': '후지원' };
+        tbody.innerHTML = siteListData.map(row => `
+            <tr>
+                <td>${escapeHtml(row.site_name || '')}</td>
+                <td>${escapeHtml(row.product_type || '')}</td>
+                <td>${escapeHtml(row.region || '')}</td>
+                <td>${supportLabels[row.support_condition] || row.support_condition || ''}</td>
+                <td class="site-list-details">${escapeHtml((row.details || '').slice(0, 50))}${(row.details || '').length > 50 ? '…' : ''}</td>
+                <td><button type="button" class="refresh-btn btn-small" data-edit-id="${row.id}">수정</button></td>
+                <td><button type="button" class="refresh-btn btn-small btn-danger" data-delete-id="${row.id}">삭제</button></td>
+            </tr>
+        `).join('') || '<tr><td colspan="7">등록된 현장이 없습니다.</td></tr>';
+
+        tbody.querySelectorAll('[data-edit-id]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.getAttribute('data-edit-id'), 10);
+                openSiteEdit(id);
+            });
+        });
+        tbody.querySelectorAll('[data-delete-id]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.getAttribute('data-delete-id'), 10);
+                if (confirm('이 현장을 삭제할까요?')) deleteSite(id);
+            });
+        });
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="7">목록을 불러오는 중 오류가 발생했습니다.</td></tr>';
+    }
+}
+
+function openSiteEdit(id) {
+    const row = siteListData.find(r => r.id === id);
+    if (!row) return;
+    siteListEditingId = id;
+    document.getElementById('siteListSiteName').value = row.site_name || '';
+    document.getElementById('siteListProductType').value = row.product_type || '';
+    document.getElementById('siteListRegion').value = row.region || '';
+    document.getElementById('siteListSupportCondition').value = row.support_condition || '';
+    document.getElementById('siteListDetails').value = row.details || '';
+    document.getElementById('siteListSubmitBtn').textContent = '수정';
+    const cancelBtn = document.getElementById('siteListCancelEdit');
+    if (cancelBtn) cancelBtn.style.display = 'inline-block';
+}
+
+function cancelSiteEdit() {
+    siteListEditingId = null;
+    document.getElementById('siteListForm').reset();
+    document.getElementById('siteListSubmitBtn').textContent = '추가';
+    const cancelBtn = document.getElementById('siteListCancelEdit');
+    if (cancelBtn) cancelBtn.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const siteListForm = document.getElementById('siteListForm');
+    const siteListCancelEdit = document.getElementById('siteListCancelEdit');
+    if (siteListForm) {
+        siteListForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const site_name = document.getElementById('siteListSiteName').value.trim();
+            const product_type = document.getElementById('siteListProductType').value.trim() || null;
+            const region = document.getElementById('siteListRegion').value.trim() || null;
+            const support_condition = document.getElementById('siteListSupportCondition').value || null;
+            const details = document.getElementById('siteListDetails').value.trim() || null;
+            if (!site_name) {
+                showNotification('warning', '입력 필요', '현장명을 입력해주세요.');
+                return;
+            }
+            const url = siteListEditingId ? `${API_BASE}/bun-partner/sites/${siteListEditingId}` : `${API_BASE}/bun-partner/sites`;
+            const method = siteListEditingId ? 'PUT' : 'POST';
+            const body = JSON.stringify({ site_name, product_type, region, support_condition, details });
+            try {
+                const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, body });
+                const data = await res.json();
+                if (data.success) {
+                    showNotification('success', '저장 완료', siteListEditingId ? '현장이 수정되었습니다.' : '현장이 추가되었습니다.');
+                    cancelSiteEdit();
+                    loadSiteList();
+                } else {
+                    showNotification('error', '저장 실패', data.error || '저장에 실패했습니다.');
+                }
+            } catch (err) {
+                showNotification('error', '오류', '저장 중 오류가 발생했습니다.');
+            }
+        });
+    }
+    if (siteListCancelEdit) {
+        siteListCancelEdit.addEventListener('click', () => { cancelSiteEdit(); });
+    }
+});
+
+async function deleteSite(id) {
+    try {
+        const res = await fetch(`${API_BASE}/bun-partner/sites/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+        const data = await res.json();
+        if (data.success) {
+            showNotification('success', '삭제 완료', '현장이 삭제되었습니다.');
+            if (siteListEditingId === id) cancelSiteEdit();
+            loadSiteList();
+        } else {
+            showNotification('error', '삭제 실패', data.error || '삭제에 실패했습니다.');
+        }
+    } catch (e) {
+        showNotification('error', '오류', '삭제 중 오류가 발생했습니다.');
     }
 }
 

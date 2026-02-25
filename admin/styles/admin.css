@@ -1056,6 +1056,154 @@ textarea.form-input {
     border: 1px solid rgba(139, 92, 246, 0.1);
 }
 
+/* 분양파트너 일정 캘린더 */
+.calendar-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+.calendar-month-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #A78BFA;
+    min-width: 140px;
+    text-align: center;
+}
+.calendar-grid {
+    background: rgba(139, 92, 246, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: rgba(139, 92, 246, 0.15);
+    font-weight: 600;
+    font-size: 13px;
+    color: #A78BFA;
+}
+.calendar-weekday {
+    padding: 0.6rem;
+    text-align: center;
+}
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+.calendar-day {
+    min-height: 90px;
+    padding: 0.5rem;
+    border: 1px solid rgba(139, 92, 246, 0.08);
+    background: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.calendar-day:hover {
+    background: rgba(139, 92, 246, 0.15);
+}
+.calendar-day.other-month {
+    opacity: 0.4;
+}
+.calendar-day.other-month:hover {
+    opacity: 0.7;
+}
+.calendar-day-num {
+    display: block;
+    font-size: 13px;
+    color: #ccc;
+    margin-bottom: 4px;
+}
+.calendar-day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.calendar-day-event {
+    font-size: 11px;
+    padding: 2px 6px;
+    background: rgba(139, 92, 246, 0.4);
+    border-radius: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.calendar-day-event:hover {
+    background: rgba(139, 92, 246, 0.6);
+}
+.calendar-day-event-more {
+    font-size: 10px;
+    color: #A78BFA;
+    padding: 2px 4px;
+}
+
+/* 일정 모달 */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+.modal-overlay .modal-content {
+    background: linear-gradient(135deg, #1a0a1a 0%, #0a0a0a 100%);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    max-width: 420px;
+    width: 100%;
+}
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+.form-row-wrap {
+    flex-wrap: wrap;
+}
+.form-row .form-group {
+    flex: 1;
+    min-width: 120px;
+}
+.btn-cancel {
+    background: rgba(100, 100, 100, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+.btn-cancel:hover {
+    background: rgba(120, 120, 120, 0.5) !important;
+}
+.btn-danger {
+    background: linear-gradient(135deg, #B91C1C 0%, #991B1B 100%) !important;
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3) !important;
+}
+.btn-danger:hover {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%) !important;
+}
+.btn-small {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 13px !important;
+}
+
+/* 분양파트너 현장리스트 테이블 */
+.site-list-table-wrap {
+    overflow-x: auto;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 8px;
+    background: rgba(139, 92, 246, 0.03);
+}
+.site-list-table-wrap .inquiries-table th,
+.site-list-table-wrap .inquiries-table td {
+    white-space: nowrap;
+}
+.site-list-table-wrap .inquiries-table td.site-list-details {
+    white-space: normal;
+    max-width: 200px;
+}
+
 @media (max-width: 768px) {
     .modal-content {
         max-width: 100%;

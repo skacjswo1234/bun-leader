@@ -435,6 +435,129 @@ export async function onRequest(context) {
       });
     }
 
+    // ----- 분양파트너 일정 (bun_partner_events) -----
+    if (path === 'bun-partner/events' && method === 'GET') {
+      const from = url.searchParams.get('from');
+      const to = url.searchParams.get('to');
+      let query = 'SELECT * FROM bun_partner_events';
+      const params = [];
+      if (from && to) {
+        query += ' WHERE event_date >= ? AND event_date <= ?';
+        params.push(from, to);
+      }
+      query += ' ORDER BY event_date ASC, start_time ASC';
+      const result = await db.prepare(query).bind(...params).all();
+      return new Response(JSON.stringify({ success: true, data: result.results }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    if (path === 'bun-partner/events' && method === 'POST') {
+      const body = await request.json();
+      const { title, event_date, start_time, end_time, description } = body;
+      if (!title || !event_date) {
+        return new Response(JSON.stringify({ error: 'title and event_date are required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      await db.prepare(
+        `INSERT INTO bun_partner_events (title, event_date, start_time, end_time, description)
+         VALUES (?, ?, ?, ?, ?)`
+      ).bind(title, event_date, start_time || null, end_time || null, description || null).run();
+      const row = await db.prepare('SELECT * FROM bun_partner_events ORDER BY id DESC LIMIT 1').first();
+      return new Response(JSON.stringify({ success: true, data: row }), {
+        status: 201,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    const eventIdMatch = path.match(/^bun-partner\/events\/(\d+)$/);
+    if (eventIdMatch) {
+      const id = eventIdMatch[1];
+      if (method === 'GET') {
+        const row = await db.prepare('SELECT * FROM bun_partner_events WHERE id = ?').bind(id).first();
+        if (!row) {
+          return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({ success: true, data: row }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      if (method === 'PUT') {
+        const body = await request.json();
+        const { title, event_date, start_time, end_time, description } = body;
+        await db.prepare(
+          `UPDATE bun_partner_events SET title = ?, event_date = ?, start_time = ?, end_time = ?, description = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
+        ).bind(title ?? '', event_date ?? '', start_time || null, end_time || null, description || null, id).run();
+        const row = await db.prepare('SELECT * FROM bun_partner_events WHERE id = ?').bind(id).first();
+        return new Response(JSON.stringify({ success: true, data: row }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      if (method === 'DELETE') {
+        await db.prepare('DELETE FROM bun_partner_events WHERE id = ?').bind(id).run();
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
+    // ----- 분양파트너 현장리스트 (bun_partner_sites) -----
+    if (path === 'bun-partner/sites' && method === 'GET') {
+      const result = await db.prepare('SELECT * FROM bun_partner_sites ORDER BY created_at DESC').all();
+      return new Response(JSON.stringify({ success: true, data: result.results }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    if (path === 'bun-partner/sites' && method === 'POST') {
+      const body = await request.json();
+      const { site_name, product_type, region, support_condition, details } = body;
+      if (!site_name || !site_name.trim()) {
+        return new Response(JSON.stringify({ error: 'site_name is required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      await db.prepare(
+        `INSERT INTO bun_partner_sites (site_name, product_type, region, support_condition, details)
+         VALUES (?, ?, ?, ?, ?)`
+      ).bind((site_name || '').trim(), product_type || null, region || null, support_condition || null, details || null).run();
+      const row = await db.prepare('SELECT * FROM bun_partner_sites ORDER BY id DESC LIMIT 1').first();
+      return new Response(JSON.stringify({ success: true, data: row }), {
+        status: 201,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    const siteListIdMatch = path.match(/^bun-partner\/sites\/(\d+)$/);
+    if (siteListIdMatch) {
+      const id = siteListIdMatch[1];
+      if (method === 'GET') {
+        const row = await db.prepare('SELECT * FROM bun_partner_sites WHERE id = ?').bind(id).first();
+        if (!row) {
+          return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({ success: true, data: row }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      if (method === 'PUT') {
+        const body = await request.json();
+        const { site_name, product_type, region, support_condition, details } = body;
+        await db.prepare(
+          `UPDATE bun_partner_sites SET site_name = ?, product_type = ?, region = ?, support_condition = ?, details = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
+        ).bind(site_name ?? '', product_type || null, region || null, support_condition || null, details || null, id).run();
+        const row = await db.prepare('SELECT * FROM bun_partner_sites WHERE id = ?').bind(id).first();
+        return new Response(JSON.stringify({ success: true, data: row }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      if (method === 'DELETE') {
+        await db.prepare('DELETE FROM bun_partner_sites WHERE id = ?').bind(id).run();
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
     // 관리자 비밀번호 변경: /api/admin/password
     if (path === 'password' && method === 'PUT') {
       const body = await request.json();

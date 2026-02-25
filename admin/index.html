@@ -73,6 +73,14 @@
                         <span class="sidebar-icon">⚙️</span>
                         <span class="sidebar-text">분양파트너 관리자페이지</span>
                     </button>
+                    <button class="sidebar-item" id="bunPartnerScheduleBtn">
+                        <span class="sidebar-icon">📅</span>
+                        <span class="sidebar-text">분양파트너 일정</span>
+                    </button>
+                    <button class="sidebar-item" id="bunPartnerSiteListBtn">
+                        <span class="sidebar-icon">📋</span>
+                        <span class="sidebar-text">분양파트너 현장리스트</span>
+                    </button>
                     <button class="sidebar-item" data-site="band-program">
                         <span class="sidebar-icon">🎵</span>
                         <span class="sidebar-text">밴드홍보대행/프로그램판매</span>
@@ -345,6 +353,117 @@
                                 <button type="button" class="refresh-btn" id="cancelBunPartnerAdminBtn" style="background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(100, 100, 100, 0.5);">취소</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <!-- 분양파트너 일정 섹션 -->
+                <div class="password-change-section" id="bunPartnerScheduleSection" style="display: none;">
+                    <div class="password-change-container" style="max-width: 900px;">
+                        <h2 class="content-title">분양파트너 일정</h2>
+                        <p style="color: #aaa; margin-bottom: 1rem;">일정을 등록·수정·삭제할 수 있습니다.</p>
+                        <div class="calendar-toolbar">
+                            <button type="button" class="refresh-btn" id="calendarPrevMonth">◀ 이전</button>
+                            <span class="calendar-month-title" id="calendarMonthTitle">2025년 1월</span>
+                            <button type="button" class="refresh-btn" id="calendarNextMonth">다음 ▶</button>
+                            <button type="button" class="refresh-btn" id="calendarAddEvent" style="margin-left: auto;">+ 일정 추가</button>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid"></div>
+                        <div class="calendar-legend" id="calendarLegend"></div>
+                    </div>
+                </div>
+                <!-- 일정 추가/수정 모달 -->
+                <div class="modal-overlay" id="eventModalOverlay" style="display: none;">
+                    <div class="modal-content" id="eventModal">
+                        <h3 class="content-title" id="eventModalTitle">일정 추가</h3>
+                        <form id="eventForm">
+                            <input type="hidden" id="eventId" value="">
+                            <div class="form-group">
+                                <label>제목</label>
+                                <input type="text" id="eventTitle" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>날짜</label>
+                                <input type="date" id="eventDate" class="form-input" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>시작 시간</label>
+                                    <input type="time" id="eventStartTime" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>종료 시간</label>
+                                    <input type="time" id="eventEndTime" class="form-input">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>메모</label>
+                                <textarea id="eventDescription" class="form-input" rows="3"></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="refresh-btn">저장</button>
+                                <button type="button" class="refresh-btn btn-cancel" id="eventModalClose">취소</button>
+                                <button type="button" class="refresh-btn btn-danger" id="eventModalDelete" style="margin-left: auto;">삭제</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 분양파트너 현장리스트 섹션 -->
+                <div class="password-change-section" id="bunPartnerSiteListSection" style="display: none;">
+                    <div class="password-change-container" style="max-width: 100%;">
+                        <h2 class="content-title">분양파트너 현장리스트</h2>
+                        <p style="color: #aaa; margin-bottom: 1rem;">현장을 등록·수정·삭제할 수 있습니다.</p>
+                        <form class="password-change-form" id="siteListForm" style="margin-bottom: 1.5rem;">
+                            <div class="form-row form-row-wrap">
+                                <div class="form-group">
+                                    <label>현장명</label>
+                                    <input type="text" id="siteListSiteName" class="form-input" required placeholder="직접 작성">
+                                </div>
+                                <div class="form-group">
+                                    <label>상품종류</label>
+                                    <input type="text" id="siteListProductType" class="form-input" placeholder="직접 작성">
+                                </div>
+                                <div class="form-group">
+                                    <label>지역</label>
+                                    <input type="text" id="siteListRegion" class="form-input" placeholder="직접 작성">
+                                </div>
+                                <div class="form-group">
+                                    <label>지원조건</label>
+                                    <select id="siteListSupportCondition" class="form-input filter-select">
+                                        <option value="">선택</option>
+                                        <option value="무지원">무지원</option>
+                                        <option value="지원예정">지원예정</option>
+                                        <option value="선지원">선지원</option>
+                                        <option value="직원입금">직원입금</option>
+                                        <option value="후지원">후지원</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>상세내역</label>
+                                <textarea id="siteListDetails" class="form-input" rows="2" placeholder="직접 작성"></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="refresh-btn" id="siteListSubmitBtn">추가</button>
+                                <button type="button" class="refresh-btn btn-cancel" id="siteListCancelEdit" style="display: none;">취소</button>
+                            </div>
+                        </form>
+                        <div class="site-list-table-wrap">
+                            <table class="inquiries-table" id="siteListTable">
+                                <thead>
+                                    <tr>
+                                        <th>현장명</th>
+                                        <th>상품종류</th>
+                                        <th>지역</th>
+                                        <th>지원조건</th>
+                                        <th>상세내역</th>
+                                        <th>수정</th>
+                                        <th>삭제</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="siteListTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
