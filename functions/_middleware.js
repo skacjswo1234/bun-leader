@@ -14,23 +14,24 @@ export async function onRequest(context) {
     return next();
   }
 
-  // 관리자 화면 처리
-  if (url.pathname.startsWith('/admin/')) {
+  // 관리자 화면 처리 (/admin 또는 /admin/...)
+  if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+    // /admin (끝 슬래시 없음) → /admin/ 으로 리다이렉트 (관리자 진입 보장)
+    if (url.pathname === '/admin') {
+      return Response.redirect(`${url.origin}/admin/`, 302);
+    }
     // 정적 리소스(styles, scripts)는 인증 체크 없이 통과
-    if (url.pathname.startsWith('/admin/styles/') || 
+    if (url.pathname.startsWith('/admin/styles/') ||
         url.pathname.startsWith('/admin/scripts/') ||
         url.pathname.startsWith('/admin/images/')) {
       return next();
     }
-    
     // 로그인 페이지는 인증 체크 없이 통과
     if (url.pathname === '/admin/login.html' || url.pathname === '/admin/login') {
       return next();
     }
-    
     // 다른 관리자 페이지는 인증 체크
     if (!checkAuth(request)) {
-      // 미인증 시 로그인 페이지로 리다이렉트
       return new Response(null, {
         status: 302,
         headers: {
@@ -38,7 +39,6 @@ export async function onRequest(context) {
         }
       });
     }
-    
     return next();
   }
 
