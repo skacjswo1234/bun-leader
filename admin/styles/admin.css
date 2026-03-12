@@ -1209,6 +1209,10 @@ textarea.form-input {
     white-space: normal;
     max-width: 200px;
 }
+.site-list-table-wrap .inquiries-table td.site-list-memo {
+    white-space: normal;
+    max-width: 160px;
+}
 
 @media (max-width: 768px) {
     .modal-content {

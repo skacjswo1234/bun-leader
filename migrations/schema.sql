@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS bun_partner_sites (
     region TEXT,
     support_condition TEXT,
     details TEXT,
+    memo TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

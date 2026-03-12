@@ -2013,6 +2013,53 @@ async function deleteEvent() {
 // ----- 분양파트너 현장리스트 -----
 let siteListEditingId = null;
 let siteListData = [];
+let siteListSearchQuery = '';
+
+function getFilteredSiteList() {
+    if (!siteListSearchQuery.trim()) return siteListData;
+    const q = siteListSearchQuery.trim().toLowerCase();
+    const supportLabels = { '무지원': '무지원', '지원예정': '지원예정', '선지원': '선지원', '직원입금': '직원입금', '후지원': '후지원' };
+    return siteListData.filter(row => {
+        const siteName = (row.site_name || '').toLowerCase();
+        const productType = (row.product_type || '').toLowerCase();
+        const region = (row.region || '').toLowerCase();
+        const support = (supportLabels[row.support_condition] || row.support_condition || '').toLowerCase();
+        const details = (row.details || '').toLowerCase();
+        const memo = (row.memo || '').toLowerCase();
+        return siteName.includes(q) || productType.includes(q) || region.includes(q) || support.includes(q) || details.includes(q) || memo.includes(q);
+    });
+}
+
+function renderSiteListTable(rows) {
+    const tbody = document.getElementById('siteListTableBody');
+    if (!tbody) return;
+    const supportLabels = { '무지원': '무지원', '지원예정': '지원예정', '선지원': '선지원', '직원입금': '직원입금', '후지원': '후지원' };
+    tbody.innerHTML = (rows && rows.length) ? rows.map(row => `
+        <tr>
+            <td>${escapeHtml(row.site_name || '')}</td>
+            <td>${escapeHtml(row.product_type || '')}</td>
+            <td>${escapeHtml(row.region || '')}</td>
+            <td>${supportLabels[row.support_condition] || row.support_condition || ''}</td>
+            <td class="site-list-details">${escapeHtml((row.details || '').slice(0, 50))}${(row.details || '').length > 50 ? '…' : ''}</td>
+            <td class="site-list-memo">${escapeHtml((row.memo || '').slice(0, 30))}${(row.memo || '').length > 30 ? '…' : ''}</td>
+            <td><button type="button" class="refresh-btn btn-small" data-edit-id="${row.id}">수정</button></td>
+            <td><button type="button" class="refresh-btn btn-small btn-danger" data-delete-id="${row.id}">삭제</button></td>
+        </tr>
+    `).join('') : '<tr><td colspan="8">등록된 현장이 없습니다.</td></tr>';
+
+    tbody.querySelectorAll('[data-edit-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = parseInt(btn.getAttribute('data-edit-id'), 10);
+            openSiteEdit(id);
+        });
+    });
+    tbody.querySelectorAll('[data-delete-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = parseInt(btn.getAttribute('data-delete-id'), 10);
+            if (confirm('이 현장을 삭제할까요?')) deleteSite(id);
+        });
+    });
+}
 
 async function loadSiteList() {
     const tbody = document.getElementById('siteListTableBody');
@@ -2021,33 +2068,10 @@ async function loadSiteList() {
         const res = await fetch(`${API_BASE}/bun-partner/sites`, { headers: getAuthHeaders() });
         const data = await res.json();
         siteListData = (data.success && data.data) ? data.data : [];
-        const supportLabels = { '무지원': '무지원', '지원예정': '지원예정', '선지원': '선지원', '직원입금': '직원입금', '후지원': '후지원' };
-        tbody.innerHTML = siteListData.map(row => `
-            <tr>
-                <td>${escapeHtml(row.site_name || '')}</td>
-                <td>${escapeHtml(row.product_type || '')}</td>
-                <td>${escapeHtml(row.region || '')}</td>
-                <td>${supportLabels[row.support_condition] || row.support_condition || ''}</td>
-                <td class="site-list-details">${escapeHtml((row.details || '').slice(0, 50))}${(row.details || '').length > 50 ? '…' : ''}</td>
-                <td><button type="button" class="refresh-btn btn-small" data-edit-id="${row.id}">수정</button></td>
-                <td><button type="button" class="refresh-btn btn-small btn-danger" data-delete-id="${row.id}">삭제</button></td>
-            </tr>
-        `).join('') || '<tr><td colspan="7">등록된 현장이 없습니다.</td></tr>';
-
-        tbody.querySelectorAll('[data-edit-id]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = parseInt(btn.getAttribute('data-edit-id'), 10);
-                openSiteEdit(id);
-            });
-        });
-        tbody.querySelectorAll('[data-delete-id]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = parseInt(btn.getAttribute('data-delete-id'), 10);
-                if (confirm('이 현장을 삭제할까요?')) deleteSite(id);
-            });
-        });
+        const filtered = getFilteredSiteList();
+        renderSiteListTable(filtered);
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="7">목록을 불러오는 중 오류가 발생했습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8">목록을 불러오는 중 오류가 발생했습니다.</td></tr>';
     }
 }
 
@@ -2060,6 +2084,8 @@ function openSiteEdit(id) {
     document.getElementById('siteListRegion').value = row.region || '';
     document.getElementById('siteListSupportCondition').value = row.support_condition || '';
     document.getElementById('siteListDetails').value = row.details || '';
+    const memoEl = document.getElementById('siteListMemo');
+    if (memoEl) memoEl.value = row.memo || '';
     document.getElementById('siteListSubmitBtn').textContent = '수정';
     const cancelBtn = document.getElementById('siteListCancelEdit');
     if (cancelBtn) cancelBtn.style.display = 'inline-block';
@@ -2084,13 +2110,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const region = document.getElementById('siteListRegion').value.trim() || null;
             const support_condition = document.getElementById('siteListSupportCondition').value || null;
             const details = document.getElementById('siteListDetails').value.trim() || null;
+            const memoEl = document.getElementById('siteListMemo');
+            const memo = memoEl ? memoEl.value.trim() || null : null;
             if (!site_name) {
                 showNotification('warning', '입력 필요', '현장명을 입력해주세요.');
                 return;
             }
             const url = siteListEditingId ? `${API_BASE}/bun-partner/sites/${siteListEditingId}` : `${API_BASE}/bun-partner/sites`;
             const method = siteListEditingId ? 'PUT' : 'POST';
-            const body = JSON.stringify({ site_name, product_type, region, support_condition, details });
+            const body = JSON.stringify({ site_name, product_type, region, support_condition, details, memo });
             try {
                 const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, body });
                 const data = await res.json();
@@ -2108,6 +2136,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (siteListCancelEdit) {
         siteListCancelEdit.addEventListener('click', () => { cancelSiteEdit(); });
+    }
+
+    // 현장리스트 검색
+    const siteListSearchInput = document.getElementById('siteListSearchInput');
+    const siteListSearchBtn = document.getElementById('siteListSearchBtn');
+    if (siteListSearchBtn && siteListSearchInput) {
+        const applySiteListSearch = () => {
+            siteListSearchQuery = siteListSearchInput.value.trim();
+            renderSiteListTable(getFilteredSiteList());
+        };
+        siteListSearchBtn.addEventListener('click', applySiteListSearch);
+        siteListSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applySiteListSearch(); } });
+    }
+
+    // 현장리스트 엑셀 다운로드
+    const siteListExcelBtn = document.getElementById('siteListExcelBtn');
+    if (siteListExcelBtn) {
+        siteListExcelBtn.addEventListener('click', () => {
+            const list = getFilteredSiteList();
+            if (!list.length) {
+                showNotification('warning', '데이터 없음', '다운로드할 현장이 없습니다.');
+                return;
+            }
+            try {
+                const supportLabels = { '무지원': '무지원', '지원예정': '지원예정', '선지원': '선지원', '직원입금': '직원입금', '후지원': '후지원' };
+                const headers = ['현장명', '상품종류', '지역', '지원조건', '상세내역', '메모'];
+                const rows = list.map(row => [
+                    row.site_name || '',
+                    row.product_type || '',
+                    row.region || '',
+                    supportLabels[row.support_condition] || row.support_condition || '',
+                    row.details || '',
+                    row.memo || ''
+                ]);
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                const colWidths = headers.map((_, i) => ({ wch: Math.min(Math.max(...rows.map(r => String(r[i] || '').length), headers[i].length) + 2, 50) }));
+                ws['!cols'] = colWidths;
+                XLSX.utils.book_append_sheet(wb, ws, '현장리스트');
+                const fileName = `분양파트너_현장리스트_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                showNotification('success', '다운로드 완료', fileName);
+            } catch (err) {
+                console.error('Site list Excel error:', err);
+                showNotification('error', '다운로드 실패', '엑셀 다운로드 중 오류가 발생했습니다.');
+            }
+        });
     }
 });
 

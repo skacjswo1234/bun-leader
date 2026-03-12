@@ -510,7 +510,7 @@ export async function onRequest(context) {
     }
     if (path === 'bun-partner/sites' && method === 'POST') {
       const body = await request.json();
-      const { site_name, product_type, region, support_condition, details } = body;
+      const { site_name, product_type, region, support_condition, details, memo } = body;
       if (!site_name || !site_name.trim()) {
         return new Response(JSON.stringify({ error: 'site_name is required' }), {
           status: 400,
@@ -518,9 +518,9 @@ export async function onRequest(context) {
         });
       }
       await db.prepare(
-        `INSERT INTO bun_partner_sites (site_name, product_type, region, support_condition, details)
-         VALUES (?, ?, ?, ?, ?)`
-      ).bind((site_name || '').trim(), product_type || null, region || null, support_condition || null, details || null).run();
+        `INSERT INTO bun_partner_sites (site_name, product_type, region, support_condition, details, memo)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      ).bind((site_name || '').trim(), product_type || null, region || null, support_condition || null, details || null, memo || null).run();
       const row = await db.prepare('SELECT * FROM bun_partner_sites ORDER BY id DESC LIMIT 1').first();
       return new Response(JSON.stringify({ success: true, data: row }), {
         status: 201,
@@ -541,10 +541,10 @@ export async function onRequest(context) {
       }
       if (method === 'PUT') {
         const body = await request.json();
-        const { site_name, product_type, region, support_condition, details } = body;
+        const { site_name, product_type, region, support_condition, details, memo } = body;
         await db.prepare(
-          `UPDATE bun_partner_sites SET site_name = ?, product_type = ?, region = ?, support_condition = ?, details = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
-        ).bind(site_name ?? '', product_type || null, region || null, support_condition || null, details || null, id).run();
+          `UPDATE bun_partner_sites SET site_name = ?, product_type = ?, region = ?, support_condition = ?, details = ?, memo = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
+        ).bind(site_name ?? '', product_type || null, region || null, support_condition || null, details || null, memo ?? null, id).run();
         const row = await db.prepare('SELECT * FROM bun_partner_sites WHERE id = ?').bind(id).first();
         return new Response(JSON.stringify({ success: true, data: row }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
