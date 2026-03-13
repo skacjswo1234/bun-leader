@@ -319,7 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('refreshBtn').addEventListener('click', () => {
+    // 검색 조건 초기화 버튼
+    document.getElementById('resetFiltersBtn').addEventListener('click', () => {
         currentSearch = '';
         searchInput.value = '';
         currentSearchField = 'all';
@@ -334,6 +335,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (paymentStatusFilter) {
             paymentStatusFilter.value = '';
         }
+        currentPage = 1;
+        loadInquiries();
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', () => {
         currentPage = 1;
         loadStats();
         loadInquiries();
@@ -2025,8 +2031,7 @@ function getFilteredSiteList() {
         const region = (row.region || '').toLowerCase();
         const support = (supportLabels[row.support_condition] || row.support_condition || '').toLowerCase();
         const details = (row.details || '').toLowerCase();
-        const memo = (row.memo || '').toLowerCase();
-        return siteName.includes(q) || productType.includes(q) || region.includes(q) || support.includes(q) || details.includes(q) || memo.includes(q);
+        return siteName.includes(q) || productType.includes(q) || region.includes(q) || support.includes(q) || details.includes(q);
     });
 }
 
@@ -2041,11 +2046,10 @@ function renderSiteListTable(rows) {
             <td>${escapeHtml(row.region || '')}</td>
             <td>${supportLabels[row.support_condition] || row.support_condition || ''}</td>
             <td class="site-list-details">${escapeHtml((row.details || '').slice(0, 50))}${(row.details || '').length > 50 ? '…' : ''}</td>
-            <td class="site-list-memo">${escapeHtml((row.memo || '').slice(0, 30))}${(row.memo || '').length > 30 ? '…' : ''}</td>
             <td><button type="button" class="refresh-btn btn-small" data-edit-id="${row.id}">수정</button></td>
             <td><button type="button" class="refresh-btn btn-small btn-danger" data-delete-id="${row.id}">삭제</button></td>
         </tr>
-    `).join('') : '<tr><td colspan="8">등록된 현장이 없습니다.</td></tr>';
+    `).join('') : '<tr><td colspan="7">등록된 현장이 없습니다.</td></tr>';
 
     tbody.querySelectorAll('[data-edit-id]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -2084,8 +2088,6 @@ function openSiteEdit(id) {
     document.getElementById('siteListRegion').value = row.region || '';
     document.getElementById('siteListSupportCondition').value = row.support_condition || '';
     document.getElementById('siteListDetails').value = row.details || '';
-    const memoEl = document.getElementById('siteListMemo');
-    if (memoEl) memoEl.value = row.memo || '';
     document.getElementById('siteListSubmitBtn').textContent = '수정';
     const cancelBtn = document.getElementById('siteListCancelEdit');
     if (cancelBtn) cancelBtn.style.display = 'inline-block';
@@ -2110,15 +2112,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const region = document.getElementById('siteListRegion').value.trim() || null;
             const support_condition = document.getElementById('siteListSupportCondition').value || null;
             const details = document.getElementById('siteListDetails').value.trim() || null;
-            const memoEl = document.getElementById('siteListMemo');
-            const memo = memoEl ? memoEl.value.trim() || null : null;
             if (!site_name) {
                 showNotification('warning', '입력 필요', '현장명을 입력해주세요.');
                 return;
             }
             const url = siteListEditingId ? `${API_BASE}/bun-partner/sites/${siteListEditingId}` : `${API_BASE}/bun-partner/sites`;
             const method = siteListEditingId ? 'PUT' : 'POST';
-            const body = JSON.stringify({ site_name, product_type, region, support_condition, details, memo });
+            const body = JSON.stringify({ site_name, product_type, region, support_condition, details });
             try {
                 const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, body });
                 const data = await res.json();
@@ -2150,6 +2150,16 @@ document.addEventListener('DOMContentLoaded', () => {
         siteListSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applySiteListSearch(); } });
     }
 
+    // 현장리스트 검색 초기화
+    const siteListResetBtn = document.getElementById('siteListResetBtn');
+    if (siteListResetBtn && siteListSearchInput) {
+        siteListResetBtn.addEventListener('click', () => {
+            siteListSearchInput.value = '';
+            siteListSearchQuery = '';
+            renderSiteListTable(getFilteredSiteList());
+        });
+    }
+
     // 현장리스트 엑셀 다운로드
     const siteListExcelBtn = document.getElementById('siteListExcelBtn');
     if (siteListExcelBtn) {
@@ -2161,14 +2171,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             try {
                 const supportLabels = { '무지원': '무지원', '지원예정': '지원예정', '선지원': '선지원', '직원입금': '직원입금', '후지원': '후지원' };
-                const headers = ['현장명', '상품종류', '지역', '지원조건', '상세내역', '메모'];
+                const headers = ['현장명', '상품종류', '지역', '지원조건', '상세내역'];
                 const rows = list.map(row => [
                     row.site_name || '',
                     row.product_type || '',
                     row.region || '',
                     supportLabels[row.support_condition] || row.support_condition || '',
-                    row.details || '',
-                    row.memo || ''
+                    row.details || ''
                 ]);
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
