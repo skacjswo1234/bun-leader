@@ -588,16 +588,22 @@ export async function onRequest(context) {
 
     // 분양파트너 일괄 문자(MMS/LMS): /api/admin/sms/bulk-send (multipart)
     if (path === 'sms/bulk-send' && method === 'POST') {
-      const apiKey = env.SOLAPI_API_KEY;
-      const apiSecret = env.SOLAPI_API_SECRET;
-      const from = env.SOLAPI_FROM;
+      const apiKey = String(env.SOLAPI_API_KEY ?? '').trim();
+      const apiSecret = String(env.SOLAPI_API_SECRET ?? '').trim();
+      const from = String(env.SOLAPI_FROM ?? '').trim();
 
       if (!apiKey || !apiSecret || !from) {
+        const missing = [];
+        if (!apiKey) missing.push('SOLAPI_API_KEY');
+        if (!apiSecret) missing.push('SOLAPI_API_SECRET');
+        if (!from) missing.push('SOLAPI_FROM');
         return new Response(
           JSON.stringify({
             success: false,
-            error:
-              '솔라피 환경변수가 설정되지 않았습니다. SOLAPI_API_KEY, SOLAPI_API_SECRET, SOLAPI_FROM(발신번호)를 Pages/Workers 환경에 등록하세요.',
+            error: `솔라피 설정이 Functions에 보이지 않습니다. 누락: ${missing.join(', ')}`,
+            missing,
+            hint:
+              '이 저장소에 wrangler.toml이 있으면 Cloudflare Pages는 대시보드의 **일반(비암호) 환경변수**를 Functions에 넣지 않는 경우가 많습니다. SOLAPI_API_KEY·SOLAPI_API_SECRET·SOLAPI_FROM은 **Variables and Secrets에서 Encrypt(Secret)**로 추가하거나, 터미널에서 `npx wrangler pages secret put SOLAPI_API_KEY` 등으로 등록하세요. SOLAPI_FROM은 wrangler.toml의 [vars]에 넣어도 됩니다. 저장 후 **재배포**가 필요합니다.',
           }),
           {
             status: 503,

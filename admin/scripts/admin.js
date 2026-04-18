@@ -397,7 +397,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sa = document.getElementById('smsSelectAll');
                 if (sa) sa.checked = false;
             } else {
-                showNotification('error', '발송 실패', json.error || '발송에 실패했습니다.');
+                const msg = [json.error || '발송에 실패했습니다.', json.hint].filter(Boolean).join('\n\n');
+                showNotification('error', '발송 실패', msg);
             }
         } catch (err) {
             console.error(err);
