@@ -588,22 +588,23 @@ export async function onRequest(context) {
 
     // 분양파트너 일괄 문자(MMS/LMS): /api/admin/sms/bulk-send (multipart)
     if (path === 'sms/bulk-send' && method === 'POST') {
-      const apiKey = String(env.SOLAPI_API_KEY ?? '').trim();
-      const apiSecret = String(env.SOLAPI_API_SECRET ?? '').trim();
-      const from = String(env.SOLAPI_FROM ?? '').trim();
+      // Cloudflare Secret 이름은 대소문자·철자가 정확해야 함. 흔한 오타용 별칭 + 발신번호 기본값.
+      const apiKey = String(env.SOLAPI_API_KEY ?? env.SOLAPI_KEY ?? '').trim();
+      const apiSecret = String(env.SOLAPI_API_SECRET ?? env.SOLAPI_SECRET ?? '').trim();
+      const fromEnv = String(env.SOLAPI_FROM ?? env.SMS_FROM ?? '').trim().replace(/\D/g, '');
+      const from = fromEnv || '01029312966';
 
-      if (!apiKey || !apiSecret || !from) {
+      if (!apiKey || !apiSecret) {
         const missing = [];
         if (!apiKey) missing.push('SOLAPI_API_KEY');
-        if (!apiSecret) missing.push('SOLAPI_API_SECRET');
-        if (!from) missing.push('SOLAPI_FROM');
+        if (!apiSecret) missing.push('SOLAPI_API_SECRET (또는 SOLAPI_SECRET)');
         return new Response(
           JSON.stringify({
             success: false,
-            error: `솔라피 설정이 Functions에 보이지 않습니다. 누락: ${missing.join(', ')}`,
+            error: `솔라피 API 키가 Functions에 보이지 않습니다. 누락: ${missing.join(', ')}`,
             missing,
             hint:
-              '이 저장소에 wrangler.toml이 있으면 Cloudflare Pages는 대시보드의 **일반(비암호) 환경변수**를 Functions에 넣지 않는 경우가 많습니다. SOLAPI_API_KEY·SOLAPI_API_SECRET·SOLAPI_FROM은 **Variables and Secrets에서 Encrypt(Secret)**로 추가하거나, 터미널에서 `npx wrangler pages secret put SOLAPI_API_KEY` 등으로 등록하세요. SOLAPI_FROM은 wrangler.toml의 [vars]에 넣어도 됩니다. 저장 후 **재배포**가 필요합니다.',
+              '대시보드 Secret 이름이 `SOLAPI_API_SECRET` 인지 확인하세요. `SOLAPI_SECRET` 만 넣었다면 코드에서 읽습니다. 등록 후 **재배포**하세요. `wrangler pages secret put SOLAPI_API_SECRET --project-name=bun-leader` 로도 설정 가능합니다. 발신번호는 env에 없으면 01029312966을 씁니다.',
           }),
           {
             status: 503,
