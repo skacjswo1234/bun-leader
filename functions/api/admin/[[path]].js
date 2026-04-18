@@ -4,6 +4,21 @@
  */
 import { corsHeaders } from '../../_utils/cors.js';
 import { checkAuth, authErrorResponse } from '../../_utils/auth.js';
+import {
+  solapiUploadMmsFile,
+  solapiSendManyDetail,
+  normalizeKoreanPhone,
+} from '../../_utils/solapi.js';
+
+function arrayBufferToBase64(buf) {
+  const bytes = new Uint8Array(buf);
+  const chunk = 0x8000;
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
 
 export async function onRequest(context) {
   const { request, env, params } = context;
@@ -568,6 +583,169 @@ export async function onRequest(context) {
         return new Response(JSON.stringify({ success: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
+      }
+    }
+
+    // 분양파트너 일괄 문자(MMS/LMS): /api/admin/sms/bulk-send (multipart)
+    if (path === 'sms/bulk-send' && method === 'POST') {
+      const apiKey = env.SOLAPI_API_KEY;
+      const apiSecret = env.SOLAPI_API_SECRET;
+      const from = env.SOLAPI_FROM;
+
+      if (!apiKey || !apiSecret || !from) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error:
+              '솔라피 환경변수가 설정되지 않았습니다. SOLAPI_API_KEY, SOLAPI_API_SECRET, SOLAPI_FROM(발신번호)를 Pages/Workers 환경에 등록하세요.',
+          }),
+          {
+            status: 503,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
+      }
+
+      let form;
+      try {
+        form = await request.formData();
+      } catch {
+        return new Response(JSON.stringify({ success: false, error: '잘못된 요청 본문입니다.' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const inquiryIdsRaw = form.get('inquiry_ids');
+      const subject = String(form.get('subject') || '').trim();
+      const text = String(form.get('text') || '').trim();
+      const imageFile = form.get('image');
+
+      if (!text) {
+        return new Response(JSON.stringify({ success: false, error: '문자 내용을 입력해주세요.' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      let inquiryIds;
+      try {
+        inquiryIds = JSON.parse(String(inquiryIdsRaw || '[]'));
+      } catch {
+        inquiryIds = [];
+      }
+      if (!Array.isArray(inquiryIds) || inquiryIds.length === 0) {
+        return new Response(JSON.stringify({ success: false, error: '수신 대상을 1건 이상 선택해주세요.' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const numericIds = inquiryIds
+        .map((id) => parseInt(String(id), 10))
+        .filter((id) => Number.isFinite(id));
+
+      if (numericIds.length === 0) {
+        return new Response(JSON.stringify({ success: false, error: '유효한 문의 ID가 없습니다.' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const placeholders = numericIds.map(() => '?').join(',');
+      const q = `SELECT id, contact FROM inquiries WHERE site_id = 'bun-partner' AND id IN (${placeholders})`;
+      const rows = await db.prepare(q).bind(...numericIds).all();
+
+      const byPhone = new Map();
+      for (const row of rows.results || []) {
+        const phone = normalizeKoreanPhone(row.contact);
+        if (!phone) continue;
+        if (!byPhone.has(phone)) {
+          byPhone.set(phone, { to: phone, inquiryId: row.id });
+        }
+      }
+
+      if (byPhone.size === 0) {
+        return new Response(
+          JSON.stringify({ success: false, error: '선택한 문의에서 유효한 휴대폰 번호를 찾을 수 없습니다.' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
+      }
+
+      let imageId = null;
+      const isFile = imageFile && typeof imageFile === 'object' && 'arrayBuffer' in imageFile;
+      if (isFile) {
+        const size = imageFile.size || 0;
+        if (size === 0) {
+          // 빈 파일은 무시
+        } else {
+          if (size > 200 * 1024) {
+            return new Response(
+              JSON.stringify({ success: false, error: 'MMS 이미지는 200KB 이하여야 합니다.' }),
+              {
+                status: 400,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              },
+            );
+          }
+          const buf = await imageFile.arrayBuffer();
+          const b64 = arrayBufferToBase64(buf);
+          const uploadName = imageFile.name && /\.(jpe?g)$/i.test(imageFile.name) ? imageFile.name : 'image.jpg';
+          const up = await solapiUploadMmsFile(apiKey, apiSecret, b64, uploadName);
+          imageId = up.fileId;
+          if (!imageId) {
+            return new Response(JSON.stringify({ success: false, error: '이미지 업로드에 실패했습니다.', detail: up }), {
+              status: 502,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+        }
+      }
+
+      const fromDigits = normalizeKoreanPhone(from) || String(from).replace(/\D/g, '');
+
+      const messages = [...byPhone.values()].map(({ to }) => {
+        const base = {
+          to,
+          text,
+          subject: subject || undefined,
+        };
+        if (imageId) {
+          return { ...base, type: 'MMS', imageId };
+        }
+        return { ...base, type: 'LMS' };
+      });
+
+      try {
+        const detail = await solapiSendManyDetail(apiKey, apiSecret, messages, fromDigits);
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              requestedIds: numericIds.length,
+              uniqueRecipients: messages.length,
+              solapi: detail,
+            },
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
+      } catch (e) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: e.message || '솔라피 발송 실패',
+            detail: e.body || undefined,
+          }),
+          {
+            status: e.status && e.status >= 400 && e.status < 600 ? e.status : 502,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
       }
     }
 

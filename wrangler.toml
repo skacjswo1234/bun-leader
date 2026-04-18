@@ -16,3 +16,7 @@ database_id = "YOUR_DATABASE_ID"  # Cloudflare D1에서 생성 후 ID 입력
 
 # Pages는 functions/ 폴더를 자동으로 인식하므로
 # 별도의 라우트 설정이 필요 없습니다
+#
+# 분양파트너 일괄 문자(솔라피): Pages 프로젝트 환경 변수에 다음을 설정하세요.
+# - SOLAPI_API_KEY, SOLAPI_API_SECRET → Secrets 권장
+# - SOLAPI_FROM → 솔라피에 등록된 발신번호(숫자만, 예: 01012345678)

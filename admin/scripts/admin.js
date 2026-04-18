@@ -13,11 +13,62 @@ let currentSearch = '';
 let currentSearchField = 'all';
 const limit = 50;
 
+/** 분양파트너 문자발송관리 */
+let smsPage = 1;
+const smsLimit = 50;
+let smsSearch = '';
+let smsSearchField = 'all';
+let smsStatus = '';
+let smsManageStatus = '';
+let smsPaymentStatus = '';
+
+function hideBunPartnerSmsSectionEl() {
+    const s = document.getElementById('bunPartnerSmsSection');
+    if (s) s.style.display = 'none';
+}
+
+function closeSmsBulkModal() {
+    const el = document.getElementById('smsBulkModalOverlay');
+    if (el) el.style.display = 'none';
+}
+
+function syncFiltersFromMainToSms() {
+    const map = [
+        ['searchFieldFilter', 'smsSearchFieldFilter'],
+        ['searchInput', 'smsSearchInput'],
+        ['statusFilter', 'smsStatusFilter'],
+        ['manageStatusFilter', 'smsManageStatusFilter'],
+        ['paymentStatusFilter', 'smsPaymentStatusFilter'],
+    ];
+    for (const [mainId, smsId] of map) {
+        const mainEl = document.getElementById(mainId);
+        const smsEl = document.getElementById(smsId);
+        if (mainEl && smsEl) smsEl.value = mainEl.value;
+    }
+    smsSearchField = document.getElementById('smsSearchFieldFilter').value;
+    smsSearch = document.getElementById('smsSearchInput').value.trim();
+    smsStatus = document.getElementById('smsStatusFilter').value;
+    smsManageStatus = document.getElementById('smsManageStatusFilter').value;
+    smsPaymentStatus = document.getElementById('smsPaymentStatusFilter').value;
+}
+
+function updateInquirySmsShortcutVisibility() {
+    const btn = document.getElementById('inquirySmsShortcutBtn');
+    if (!btn) return;
+    const smsSec = document.getElementById('bunPartnerSmsSection');
+    const tableWrap = document.querySelector('.inquiries-table-container');
+    const mainListVisible = tableWrap && tableWrap.style.display !== 'none';
+    const smsOpen = smsSec && smsSec.style.display === 'block';
+    btn.style.display =
+        currentSite === 'bun-partner' && mainListVisible && !smsOpen ? 'inline-block' : 'none';
+}
+
 // 초기화
 document.addEventListener('DOMContentLoaded', () => {
     loadStats();
     updateContentTitle();
     loadInquiries();
+    updateInquirySmsShortcutVisibility();
     
     // 모바일 메뉴 토글
     const menuToggle = document.getElementById('menuToggle');
@@ -65,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // 분양파트너 관리자페이지/일정/현장리스트 버튼은 별도 처리
-            if (btn.id === 'bunPartnerAdminBtn' || btn.id === 'bunPartnerScheduleBtn' || btn.id === 'bunPartnerSiteListBtn') {
+            if (btn.id === 'bunPartnerAdminBtn' || btn.id === 'bunPartnerScheduleBtn' || btn.id === 'bunPartnerSiteListBtn' || btn.id === 'bunPartnerSmsBtn') {
                 return;
             }
 
@@ -91,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             updateContentTitle();
             loadInquiries();
+            updateInquirySmsShortcutVisibility();
             
             // 문의 목록 표시, 비밀번호 변경 섹션 숨기기
             document.querySelector('.inquiries-table-container').style.display = 'block';
@@ -129,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('passwordChangeSection').style.display = 'none';
         if (document.getElementById('bunPartnerScheduleSection')) document.getElementById('bunPartnerScheduleSection').style.display = 'none';
         if (document.getElementById('bunPartnerSiteListSection')) document.getElementById('bunPartnerSiteListSection').style.display = 'none';
+        hideBunPartnerSmsSectionEl();
         bunPartnerAdminSection.style.display = 'block';
         
         // 모바일에서 메뉴 닫기
@@ -157,6 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
             paymentStatusFilterEl.style.display = '';
         }
         loadInquiries();
+        updateInquirySmsShortcutVisibility();
         
         // 폼 리셋
         document.getElementById('bunPartnerAdminForm').reset();
@@ -175,6 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('passwordChangeSection').style.display = 'none';
             document.getElementById('bunPartnerAdminSection').style.display = 'none';
             document.getElementById('bunPartnerSiteListSection').style.display = 'none';
+            hideBunPartnerSmsSectionEl();
             bunPartnerScheduleSection.style.display = 'block';
             if (window.innerWidth <= 768) { closeMenu(); }
             initCalendar();
@@ -194,11 +249,164 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('passwordChangeSection').style.display = 'none';
             document.getElementById('bunPartnerAdminSection').style.display = 'none';
             document.getElementById('bunPartnerScheduleSection').style.display = 'none';
+            hideBunPartnerSmsSectionEl();
             bunPartnerSiteListSection.style.display = 'block';
             if (window.innerWidth <= 768) { closeMenu(); }
             loadSiteList();
         });
     }
+
+    const bunPartnerSmsBtn = document.getElementById('bunPartnerSmsBtn');
+    const bunPartnerSmsSection = document.getElementById('bunPartnerSmsSection');
+    function openBunPartnerSmsSectionUi() {
+        currentSite = 'bun-partner';
+        syncFiltersFromMainToSms();
+        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+        if (bunPartnerSmsBtn) bunPartnerSmsBtn.classList.add('active');
+        document.querySelector('.inquiries-table-container').style.display = 'none';
+        document.querySelector('.pagination').style.display = 'none';
+        document.querySelector('.content-header').style.display = 'none';
+        document.getElementById('passwordChangeSection').style.display = 'none';
+        document.getElementById('bunPartnerAdminSection').style.display = 'none';
+        if (document.getElementById('bunPartnerScheduleSection')) document.getElementById('bunPartnerScheduleSection').style.display = 'none';
+        if (document.getElementById('bunPartnerSiteListSection')) document.getElementById('bunPartnerSiteListSection').style.display = 'none';
+        if (bunPartnerSmsSection) bunPartnerSmsSection.style.display = 'block';
+        smsPage = 1;
+        loadSmsInquiries();
+        updateInquirySmsShortcutVisibility();
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+    if (bunPartnerSmsBtn && bunPartnerSmsSection) {
+        bunPartnerSmsBtn.addEventListener('click', openBunPartnerSmsSectionUi);
+    }
+    const inquirySmsShortcutBtn = document.getElementById('inquirySmsShortcutBtn');
+    if (inquirySmsShortcutBtn) {
+        inquirySmsShortcutBtn.addEventListener('click', openBunPartnerSmsSectionUi);
+    }
+
+    const smsSearchBtn = document.getElementById('smsSearchBtn');
+    const smsSearchInput = document.getElementById('smsSearchInput');
+    if (smsSearchBtn && smsSearchInput) {
+        smsSearchBtn.addEventListener('click', () => {
+            smsSearch = smsSearchInput.value.trim();
+            smsSearchField = document.getElementById('smsSearchFieldFilter').value;
+            smsPage = 1;
+            loadSmsInquiries();
+        });
+        smsSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') smsSearchBtn.click();
+        });
+    }
+    document.getElementById('smsStatusFilter').addEventListener('change', (e) => {
+        smsStatus = e.target.value;
+        smsPage = 1;
+        loadSmsInquiries();
+    });
+    document.getElementById('smsManageStatusFilter').addEventListener('change', (e) => {
+        smsManageStatus = e.target.value;
+        smsPage = 1;
+        loadSmsInquiries();
+    });
+    document.getElementById('smsPaymentStatusFilter').addEventListener('change', (e) => {
+        smsPaymentStatus = e.target.value;
+        smsPage = 1;
+        loadSmsInquiries();
+    });
+    document.getElementById('smsResetFiltersBtn').addEventListener('click', () => {
+        document.getElementById('smsSearchInput').value = '';
+        document.getElementById('smsSearchFieldFilter').value = 'all';
+        document.getElementById('smsStatusFilter').value = '';
+        document.getElementById('smsManageStatusFilter').value = '';
+        document.getElementById('smsPaymentStatusFilter').value = '';
+        smsSearch = '';
+        smsSearchField = 'all';
+        smsStatus = '';
+        smsManageStatus = '';
+        smsPaymentStatus = '';
+        smsPage = 1;
+        loadSmsInquiries();
+    });
+    document.getElementById('smsRefreshBtn').addEventListener('click', () => loadSmsInquiries());
+
+    const smsSelectAll = document.getElementById('smsSelectAll');
+    if (smsSelectAll) {
+        smsSelectAll.addEventListener('change', (e) => {
+            document.querySelectorAll('.sms-inq-cb').forEach((cb) => {
+                cb.checked = e.target.checked;
+            });
+        });
+    }
+
+    document.getElementById('smsBulkOpenBtn').addEventListener('click', () => {
+        const ids = [...document.querySelectorAll('.sms-inq-cb:checked')].map((cb) => cb.value);
+        if (ids.length === 0) {
+            showNotification('warning', '선택 필요', '문자를 보낼 대상을 체크해 주세요.');
+            return;
+        }
+        document.getElementById('smsBulkModalOverlay').style.display = 'flex';
+        document.getElementById('smsBulkImage').value = '';
+        document.getElementById('smsBulkSubject').value = '';
+        document.getElementById('smsBulkText').value = '';
+    });
+
+    document.getElementById('smsBulkModalClose').addEventListener('click', closeSmsBulkModal);
+    document.getElementById('smsBulkCancelBtn').addEventListener('click', closeSmsBulkModal);
+    const smsBulkOverlay = document.getElementById('smsBulkModalOverlay');
+    if (smsBulkOverlay) {
+        smsBulkOverlay.addEventListener('click', (e) => {
+            if (e.target === smsBulkOverlay) closeSmsBulkModal();
+        });
+    }
+
+    document.getElementById('smsBulkSubmitBtn').addEventListener('click', async () => {
+        const ids = [...document.querySelectorAll('.sms-inq-cb:checked')].map((cb) => cb.value);
+        if (ids.length === 0) {
+            showNotification('warning', '선택 필요', '문자를 보낼 대상을 체크해 주세요.');
+            return;
+        }
+        const text = document.getElementById('smsBulkText').value.trim();
+        if (!text) {
+            showNotification('warning', '입력 필요', '내용을 입력해 주세요.');
+            return;
+        }
+        const subject = document.getElementById('smsBulkSubject').value.trim();
+        const imageInput = document.getElementById('smsBulkImage');
+        const formData = new FormData();
+        formData.append('inquiry_ids', JSON.stringify(ids));
+        formData.append('subject', subject);
+        formData.append('text', text);
+        if (imageInput.files && imageInput.files[0]) {
+            formData.append('image', imageInput.files[0], imageInput.files[0].name || 'image.jpg');
+        }
+        const submitBtn = document.getElementById('smsBulkSubmitBtn');
+        submitBtn.disabled = true;
+        const prevText = submitBtn.textContent;
+        submitBtn.textContent = '발송 중...';
+        try {
+            const res = await fetch(`${API_BASE}/sms/bulk-send`, { method: 'POST', body: formData, credentials: 'include' });
+            const json = await res.json();
+            if (json.success) {
+                showNotification('success', '접수 완료', '솔라피로 발송 요청이 접수되었습니다.');
+                closeSmsBulkModal();
+                loadSmsInquiries();
+                document.querySelectorAll('.sms-inq-cb').forEach((cb) => { cb.checked = false; });
+                const sa = document.getElementById('smsSelectAll');
+                if (sa) sa.checked = false;
+            } else {
+                showNotification('error', '발송 실패', json.error || '발송에 실패했습니다.');
+            }
+        } catch (err) {
+            console.error(err);
+            showNotification('error', '오류', '네트워크 오류가 발생했습니다.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = prevText;
+        }
+    });
 
     // 분양파트너 관리자페이지 폼 제출
     document.getElementById('bunPartnerAdminForm').addEventListener('submit', async (e) => {
@@ -389,6 +597,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.inquiries-table-container').style.display = 'none';
         document.querySelector('.pagination').style.display = 'none';
         document.querySelector('.content-header').style.display = 'none';
+        hideBunPartnerSmsSectionEl();
+        document.getElementById('bunPartnerAdminSection').style.display = 'none';
+        if (document.getElementById('bunPartnerScheduleSection')) document.getElementById('bunPartnerScheduleSection').style.display = 'none';
+        if (document.getElementById('bunPartnerSiteListSection')) document.getElementById('bunPartnerSiteListSection').style.display = 'none';
         passwordChangeSection.style.display = 'block';
         
         // 모바일에서 메뉴 닫기
@@ -414,6 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 폼 리셋
         document.getElementById('passwordChangeForm').reset();
+        updateInquirySmsShortcutVisibility();
     });
 
     // 비밀번호 변경 폼 제출
@@ -531,6 +744,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // ESC 키로 모달 닫기
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
+            const smsOv = document.getElementById('smsBulkModalOverlay');
+            if (smsOv && smsOv.style.display === 'flex') {
+                closeSmsBulkModal();
+            }
             if (editModalOverlay.style.display === 'flex') {
                 closeEditModal();
             }
@@ -605,12 +822,17 @@ async function loadInquiries() {
         if (result.success) {
             displayInquiries(result.data, result.pagination);
             displayPagination(result.pagination);
+            updateInquirySmsShortcutVisibility();
         } else {
             tbody.innerHTML = `<tr><td colspan="${colCount}" class="loading">데이터를 불러올 수 없습니다.</td></tr>`;
         }
     } catch (error) {
         console.error('Inquiries load error:', error);
         tbody.innerHTML = `<tr><td colspan="${colCount}" class="loading">오류가 발생했습니다.</td></tr>`;
+    }
+    const smsSec = document.getElementById('bunPartnerSmsSection');
+    if (smsSec && smsSec.style.display === 'block') {
+        loadSmsInquiries();
     }
 }
 
@@ -765,6 +987,133 @@ function displayInquiries(inquiries, pagination) {
         </tr>
         `;
     }).join('');
+}
+
+async function loadSmsInquiries() {
+    const tbody = document.getElementById('smsInquiriesTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="9" class="loading">로딩 중...</td></tr>';
+    try {
+        const params = new URLSearchParams({
+            page: smsPage,
+            limit: smsLimit,
+            site_id: 'bun-partner',
+        });
+        if (smsStatus) params.append('status', smsStatus);
+        if (smsManageStatus) params.append('manage_status', smsManageStatus);
+        if (smsPaymentStatus) params.append('payment_status', smsPaymentStatus);
+        if (smsSearch) {
+            params.append('search', smsSearch);
+            params.append('search_field', smsSearchField);
+        }
+        const response = await fetch(`${API_BASE}/inquiries?${params}`, { credentials: 'include' });
+        const result = await response.json();
+        if (result.success) {
+            displaySmsInquiries(result.data, result.pagination);
+            displaySmsPagination(result.pagination);
+        } else {
+            tbody.innerHTML = '<tr><td colspan="9" class="loading">데이터를 불러올 수 없습니다.</td></tr>';
+        }
+    } catch (error) {
+        console.error('SMS inquiries load error:', error);
+        tbody.innerHTML = '<tr><td colspan="9" class="loading">오류가 발생했습니다.</td></tr>';
+    }
+}
+
+function displaySmsInquiries(inquiries, pagination) {
+    const tbody = document.getElementById('smsInquiriesTableBody');
+    const selectAll = document.getElementById('smsSelectAll');
+    if (selectAll) selectAll.checked = false;
+
+    if (!inquiries || inquiries.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="loading">문의가 없습니다.</td></tr>';
+        return;
+    }
+
+    const total = pagination ? pagination.total : inquiries.length;
+    const offset = pagination ? (smsPage - 1) * smsLimit : 0;
+
+    tbody.innerHTML = inquiries.map((inquiry, index) => {
+        const displayNumber = total - offset - index;
+        let customFields = {};
+        if (inquiry.custom_fields) {
+            try {
+                customFields = typeof inquiry.custom_fields === 'string'
+                    ? JSON.parse(inquiry.custom_fields)
+                    : inquiry.custom_fields;
+            } catch (e) {
+                console.error('Failed to parse custom_fields:', e);
+            }
+        }
+        const manageStatus = customFields.manage_status || '';
+        const paymentStatus = customFields.payment_status || '입금미완료';
+        const paymentCell = `
+            <td>
+                <select class="filter-select manage-status-select" data-inquiry-id="${inquiry.id}" onchange="updatePaymentStatusFromSelect(this)" title="지급현황 변경">
+                    ${renderPaymentStatusOptions(paymentStatus)}
+                </select>
+            </td>`;
+        const manageStatusCell = `
+            <td>
+                <select class="filter-select manage-status-select" data-inquiry-id="${inquiry.id}" onchange="updateManageStatusFromSelect(this)" title="관리현황 변경">
+                    ${renderManageStatusOptions(manageStatus)}
+                </select>
+            </td>`;
+
+        return `
+        <tr>
+            <td><input type="checkbox" class="sms-inq-cb" value="${inquiry.id}"></td>
+            <td>${displayNumber}</td>
+            <td>${escapeHtml(inquiry.name)}</td>
+            <td>${escapeHtml(inquiry.contact)}</td>
+            <td>
+                <select class="filter-select status-select" data-inquiry-id="${inquiry.id}" onchange="updateStatusFromSelect(this)" title="상태 변경">
+                    <option value="pending" ${inquiry.status === 'pending' ? 'selected' : ''}>대기 중</option>
+                    <option value="contacted" ${inquiry.status === 'contacted' ? 'selected' : ''}>연락 완료</option>
+                    <option value="reviewing" ${inquiry.status === 'reviewing' ? 'selected' : ''}>심사중</option>
+                    <option value="rejected" ${inquiry.status === 'rejected' ? 'selected' : ''}>심사탈락</option>
+                    <option value="completed" ${inquiry.status === 'completed' ? 'selected' : ''}>처리 완료</option>
+                    <option value="advertising" ${inquiry.status === 'advertising' ? 'selected' : ''}>광고중</option>
+                    <option value="partner" ${inquiry.status === 'partner' ? 'selected' : ''}>파트너</option>
+                </select>
+            </td>
+            ${manageStatusCell}
+            ${paymentCell}
+            <td>${formatDate(inquiry.created_at)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button type="button" class="action-btn" onclick="openDetailModal(${inquiry.id})" style="background: rgba(139, 92, 246, 0.2); color: #A78BFA; border: 1px solid rgba(139, 92, 246, 0.3);">상세</button>
+                    <button type="button" class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
+                    <button type="button" class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
+                    <button type="button" class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
+                </div>
+            </td>
+        </tr>
+        `;
+    }).join('');
+}
+
+function displaySmsPagination(pagination) {
+    const paginationDiv = document.getElementById('smsPagination');
+    if (!paginationDiv) return;
+    if (!pagination || pagination.totalPages <= 1) {
+        paginationDiv.innerHTML = '';
+        return;
+    }
+    let html = '';
+    html += `<button type="button" class="pagination-btn" ${smsPage === 1 ? 'disabled' : ''} onclick="smsChangePage(${smsPage - 1})">이전</button>`;
+    const startPage = Math.max(1, smsPage - 2);
+    const endPage = Math.min(pagination.totalPages, smsPage + 2);
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button type="button" class="pagination-btn ${i === smsPage ? 'active' : ''}" onclick="smsChangePage(${i})">${i}</button>`;
+    }
+    html += `<button type="button" class="pagination-btn" ${smsPage === pagination.totalPages ? 'disabled' : ''} onclick="smsChangePage(${smsPage + 1})">다음</button>`;
+    paginationDiv.innerHTML = html;
+}
+
+function smsChangePage(page) {
+    smsPage = page;
+    loadSmsInquiries();
 }
 
 // 문의 타입 추출 함수

@@ -81,6 +81,10 @@
                         <span class="sidebar-icon">📋</span>
                         <span class="sidebar-text">분양파트너 현장리스트</span>
                     </button>
+                    <button class="sidebar-item" id="bunPartnerSmsBtn">
+                        <span class="sidebar-icon">💬</span>
+                        <span class="sidebar-text">분양파트너 문자발송관리</span>
+                    </button>
                     <button class="sidebar-item" data-site="band-program">
                         <span class="sidebar-icon">🎵</span>
                         <span class="sidebar-text">밴드홍보대행/프로그램판매</span>
@@ -148,6 +152,7 @@
                         <button class="refresh-btn" id="resetFiltersBtn" style="background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(100, 100, 100, 0.5);">초기화</button>
                         <button class="refresh-btn" id="refreshBtn">새로고침</button>
                         <button class="refresh-btn" id="excelDownloadBtn" style="background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.3); color: #86EFAC;">엑셀 다운로드</button>
+                        <button type="button" class="refresh-btn" id="inquirySmsShortcutBtn" style="display: none; background: rgba(234, 179, 8, 0.25); border: 1px solid rgba(234, 179, 8, 0.45); color: #FDE047;">문자발송관리</button>
                     </div>
                 </div>
 
@@ -250,6 +255,35 @@
                         </div>
                         <div class="form-actions" style="justify-content: flex-end; margin-top: 1rem;">
                             <button type="button" class="refresh-btn" id="closeDetailBtn" style="background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(100, 100, 100, 0.5);">닫기</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 분양파트너 일괄 문자 발송 모달 -->
+                <div class="modal-overlay" id="smsBulkModalOverlay" style="display: none;">
+                    <div class="modal-content" style="max-width: 520px;">
+                        <div class="modal-header">
+                            <h3>문자 일괄 발송</h3>
+                            <button type="button" class="modal-close" id="smsBulkModalClose" aria-label="닫기">✕</button>
+                        </div>
+                        <div class="modal-form">
+                            <div class="form-group">
+                                <label for="smsBulkImage">이미지 (MMS, JPG 권장 · 최대 200KB)</label>
+                                <input type="file" id="smsBulkImage" class="form-input" accept="image/jpeg,.jpg,.jpeg">
+                                <p class="form-hint" style="font-size: 12px; color: #888; margin-top: 6px;">이미지를 올리지 않으면 LMS(장문)로 발송됩니다.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="smsBulkSubject">제목 (LMS/MMS)</label>
+                                <input type="text" id="smsBulkSubject" class="form-input" placeholder="제목 (선택)">
+                            </div>
+                            <div class="form-group">
+                                <label for="smsBulkText">내용</label>
+                                <textarea id="smsBulkText" class="form-input" rows="6" placeholder="문자 내용" required></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="refresh-btn" id="smsBulkSubmitBtn">발송</button>
+                                <button type="button" class="refresh-btn" id="smsBulkCancelBtn" style="background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(100, 100, 100, 0.5);">취소</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -471,6 +505,78 @@
                                 <tbody id="siteListTableBody"></tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+                <!-- 분양파트너 문자발송관리 -->
+                <div class="password-change-section" id="bunPartnerSmsSection" style="display: none;">
+                    <div class="password-change-container" style="max-width: 100%;">
+                        <h2 class="content-title">분양파트너 문자발송관리</h2>
+                        <p style="color: #aaa; margin-bottom: 1rem;">문의 목록에서 수신자를 선택한 뒤 문자발송을 누르고, 이미지·제목·내용을 입력해 일괄 발송합니다. (검색·필터는 분양파트너 문의와 동일)</p>
+                        <div class="content-header sms-content-header" style="margin-bottom: 1rem;">
+                            <div class="filters" style="width: 100%;">
+                                <div class="search-container">
+                                    <select id="smsSearchFieldFilter" class="filter-select" style="width: 120px;">
+                                        <option value="all">전체</option>
+                                        <option value="name">이름</option>
+                                        <option value="contact">연락처</option>
+                                        <option value="type">문의타입</option>
+                                        <option value="referrer">추천인</option>
+                                    </select>
+                                    <input type="text" id="smsSearchInput" class="search-input" placeholder="검색어 입력..." style="flex: 1; padding: 8px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; background: rgba(255,255,255,0.1); color: #fff; margin-left: 8px;">
+                                    <button type="button" class="refresh-btn" id="smsSearchBtn" style="margin-left: 8px;">검색</button>
+                                </div>
+                                <select id="smsStatusFilter" class="filter-select">
+                                    <option value="">진행상태</option>
+                                    <option value="pending">대기 중</option>
+                                    <option value="contacted">연락 완료</option>
+                                    <option value="reviewing">심사중</option>
+                                    <option value="rejected">심사탈락</option>
+                                    <option value="completed">처리 완료</option>
+                                    <option value="advertising">광고중</option>
+                                    <option value="partner">파트너</option>
+                                </select>
+                                <select id="smsManageStatusFilter" class="filter-select">
+                                    <option value="">관리현황</option>
+                                    <option value="감도상">감도상</option>
+                                    <option value="감도중">감도중</option>
+                                    <option value="감도하">감도하</option>
+                                    <option value="지속관리">지속관리</option>
+                                    <option value="현장소개">현장소개</option>
+                                    <option value="현장이동">현장이동</option>
+                                    <option value="블랙거절">블랙거절</option>
+                                </select>
+                                <select id="smsPaymentStatusFilter" class="filter-select">
+                                    <option value="">지급현황</option>
+                                    <option value="입금미완료">지급대기</option>
+                                    <option value="입금완료">지급완료</option>
+                                </select>
+                                <button type="button" class="refresh-btn" id="smsResetFiltersBtn" style="background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(100, 100, 100, 0.5);">초기화</button>
+                                <button type="button" class="refresh-btn" id="smsRefreshBtn">새로고침</button>
+                                <button type="button" class="refresh-btn" id="smsBulkOpenBtn" style="background: rgba(234, 179, 8, 0.25); border: 1px solid rgba(234, 179, 8, 0.45); color: #FDE047;">문자발송</button>
+                            </div>
+                        </div>
+                        <div class="inquiries-table-container">
+                            <table class="inquiries-table" id="smsInquiriesTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 42px;"><input type="checkbox" id="smsSelectAll" title="현재 페이지 전체 선택"></th>
+                                        <th>번호</th>
+                                        <th>이름</th>
+                                        <th>연락처</th>
+                                        <th>진행상태</th>
+                                        <th>관리현황</th>
+                                        <th>지급현황</th>
+                                        <th>등록일시</th>
+                                        <th>작업</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="smsInquiriesTableBody">
+                                    <tr><td colspan="9" class="loading">로딩 중...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination" id="smsPagination"></div>
                     </div>
                 </div>
 
