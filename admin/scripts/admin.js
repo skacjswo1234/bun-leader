@@ -992,7 +992,7 @@ function displayInquiries(inquiries, pagination) {
 async function loadSmsInquiries() {
     const tbody = document.getElementById('smsInquiriesTableBody');
     if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="9" class="loading">로딩 중...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="loading">로딩 중...</td></tr>';
     try {
         const params = new URLSearchParams({
             page: smsPage,
@@ -1012,11 +1012,11 @@ async function loadSmsInquiries() {
             displaySmsInquiries(result.data, result.pagination);
             displaySmsPagination(result.pagination);
         } else {
-            tbody.innerHTML = '<tr><td colspan="9" class="loading">데이터를 불러올 수 없습니다.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="loading">데이터를 불러올 수 없습니다.</td></tr>';
         }
     } catch (error) {
         console.error('SMS inquiries load error:', error);
-        tbody.innerHTML = '<tr><td colspan="9" class="loading">오류가 발생했습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="loading">오류가 발생했습니다.</td></tr>';
     }
 }
 
@@ -1026,7 +1026,7 @@ function displaySmsInquiries(inquiries, pagination) {
     if (selectAll) selectAll.checked = false;
 
     if (!inquiries || inquiries.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="loading">문의가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="loading">문의가 없습니다.</td></tr>';
         return;
     }
 
@@ -1035,30 +1035,6 @@ function displaySmsInquiries(inquiries, pagination) {
 
     tbody.innerHTML = inquiries.map((inquiry, index) => {
         const displayNumber = total - offset - index;
-        let customFields = {};
-        if (inquiry.custom_fields) {
-            try {
-                customFields = typeof inquiry.custom_fields === 'string'
-                    ? JSON.parse(inquiry.custom_fields)
-                    : inquiry.custom_fields;
-            } catch (e) {
-                console.error('Failed to parse custom_fields:', e);
-            }
-        }
-        const manageStatus = customFields.manage_status || '';
-        const paymentStatus = customFields.payment_status || '입금미완료';
-        const paymentCell = `
-            <td>
-                <select class="filter-select manage-status-select" data-inquiry-id="${inquiry.id}" onchange="updatePaymentStatusFromSelect(this)" title="지급현황 변경">
-                    ${renderPaymentStatusOptions(paymentStatus)}
-                </select>
-            </td>`;
-        const manageStatusCell = `
-            <td>
-                <select class="filter-select manage-status-select" data-inquiry-id="${inquiry.id}" onchange="updateManageStatusFromSelect(this)" title="관리현황 변경">
-                    ${renderManageStatusOptions(manageStatus)}
-                </select>
-            </td>`;
 
         return `
         <tr>
@@ -1076,17 +1052,6 @@ function displaySmsInquiries(inquiries, pagination) {
                     <option value="advertising" ${inquiry.status === 'advertising' ? 'selected' : ''}>광고중</option>
                     <option value="partner" ${inquiry.status === 'partner' ? 'selected' : ''}>파트너</option>
                 </select>
-            </td>
-            ${manageStatusCell}
-            ${paymentCell}
-            <td>${formatDate(inquiry.created_at)}</td>
-            <td>
-                <div class="action-buttons">
-                    <button type="button" class="action-btn" onclick="openDetailModal(${inquiry.id})" style="background: rgba(139, 92, 246, 0.2); color: #A78BFA; border: 1px solid rgba(139, 92, 246, 0.3);">상세</button>
-                    <button type="button" class="action-btn" onclick="openEditModal(${inquiry.id})" style="background: rgba(34, 197, 94, 0.2); color: #86EFAC; border: 1px solid rgba(34, 197, 94, 0.3);">수정</button>
-                    <button type="button" class="action-btn" onclick="openMemoModal(${inquiry.id})" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">메모</button>
-                    <button type="button" class="action-btn delete" onclick="deleteInquiry(${inquiry.id})">삭제</button>
-                </div>
             </td>
         </tr>
         `;
